@@ -12,8 +12,8 @@ export default function Hero() {
   const isArabic = locale === 'ar';
 
   const handleExploreRooms = () => {
-    const roomsSection = document.getElementById('rooms');
-    roomsSection?.scrollIntoView({ behavior: 'smooth' });
+    const locationsSection = document.getElementById('locations');
+    locationsSection?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleWhatsAppClick = () => {
