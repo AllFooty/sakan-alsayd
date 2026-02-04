@@ -1,26 +1,252 @@
 @import "tailwindcss";
 
+/* Brand Colors */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Colors */
+  --color-coral: #C75B5B;
+  --color-coral-dark: #A84848;
+  --color-coral-light: #D97B7B;
+
+  /* Secondary Colors */
+  --color-navy: #1A3A5A;
+  --color-navy-dark: #132840;
+  --color-navy-light: #2A5580;
+
+  /* Neutral Colors */
+  --color-cream: #F5F0EB;
+  --color-cream-dark: #E8E0D8;
+  --color-white: #FFFFFF;
+
+  /* Semantic Colors */
+  --background: var(--color-cream);
+  --foreground: var(--color-navy);
+  --primary: var(--color-coral);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-navy);
+  --secondary-foreground: var(--color-white);
+  --muted: var(--color-cream-dark);
+  --muted-foreground: #6B7280;
+  --accent: var(--color-coral-light);
+  --border: #E5E7EB;
+  --ring: var(--color-coral);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  /* Brand Colors */
+  --color-coral: var(--color-coral);
+  --color-coral-dark: var(--color-coral-dark);
+  --color-coral-light: var(--color-coral-light);
+  --color-navy: var(--color-navy);
+  --color-navy-dark: var(--color-navy-dark);
+  --color-navy-light: var(--color-navy-light);
+  --color-cream: var(--color-cream);
+  --color-cream-dark: var(--color-cream-dark);
+
+  /* Font Family */
+  --font-sans: "IBM Plex Sans Arabic", "IBM Plex Sans", system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ===========================================
+   BASE LAYER - Can be overridden by utilities
+   =========================================== */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    text-align: right;
+  }
+
+  /* Typography - Default heading color (can be overridden by text-* utilities) */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-navy);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  /* Link Styles */
+  a {
+    color: var(--color-coral);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--color-coral-dark);
+  }
+
+  /* Button Base */
+  button {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  /* Focus Styles */
+  :focus-visible {
+    outline: 2px solid var(--color-coral);
+    outline-offset: 2px;
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--color-coral);
+    color: var(--color-white);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===========================================
+   COMPONENTS LAYER - Reusable component styles
+   =========================================== */
+@layer components {
+  /* Section Padding */
+  .section-padding {
+    padding: 5rem 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-padding {
+      padding: 6rem 2rem;
+    }
+  }
+
+  /* Container */
+  .container {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-coral) 0%, var(--color-coral-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glass Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Card Hover Effect */
+  .card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(26, 58, 90, 0.1);
+  }
+
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease forwards;
+  }
+
+  [dir="rtl"] .animate-slide-in {
+    animation: slideInRight 0.6s ease forwards;
+  }
+
+  [dir="ltr"] .animate-slide-in {
+    animation: slideInLeft 0.6s ease forwards;
+  }
+}
+
+/* ===========================================
+   UTILITIES LAYER - Custom utilities
+   =========================================== */
+@layer utilities {
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-coral);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-coral-dark);
+  }
+}
+
+/* ===========================================
+   KEYFRAMES - Animation definitions
+   =========================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

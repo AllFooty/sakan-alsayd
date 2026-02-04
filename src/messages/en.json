@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "title": "Sakan Alsayd - Fully Furnished Student Housing in Saudi Arabia",
+    "description": "Fully furnished and serviced housing for female students and working women in the best neighborhoods across Saudi Arabia. Single, double, and triple rooms with all services included."
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "rooms": "Rooms",
+    "locations": "Locations",
+    "testimonials": "Testimonials",
+    "contact": "Contact",
+    "bookNow": "Book Now"
+  },
+  "hero": {
+    "title": "Your Home",
+    "titleHighlight": "Away From Home",
+    "subtitle": "Fully furnished and serviced housing for female students and working women in the best neighborhoods across the Kingdom",
+    "tagline": "Among Your Family and Loved Ones",
+    "selectCity": "Select City",
+    "exploreRooms": "Explore Rooms",
+    "contactWhatsApp": "Contact via WhatsApp"
+  },
+  "about": {
+    "sectionTitle": "Who We Are?",
+    "description": "Sakan Alsayd serves all expatriate women, whether from within the Kingdom or abroad. We provide serviced housing - fully furnished apartments equipped with all appliances.",
+    "vision": "Our Vision",
+    "visionText": "With distinguished ambition reaching for the horizon, supported by the expertise of a qualified team characterized by effectiveness and focus on achieving goals. Sakan Alsayd launched to serve female students and employees from the Eastern Region and beyond, to support and help girls inside and outside the Kingdom to establish a conscious generation of ambitious young women.",
+    "stats": {
+      "years": "Years of Experience",
+      "residents": "Happy Residents",
+      "cities": "Cities in the Kingdom",
+      "buildings": "Residential Buildings",
+      "allTimeResidents": "Total Over the Years"
+    }
+  },
+  "services": {
+    "sectionTitle": "Our Services & Features",
+    "sectionSubtitle": "We provide you with a complete residential experience with all the services you need",
+    "items": {
+      "supervision": {
+        "title": "24/7 Supervision",
+        "description": "Supervision of residents and meeting their needs and welcoming them"
+      },
+      "cleaning": {
+        "title": "Building Cleaning",
+        "description": "Regular and periodic cleaning of the building and its facilities"
+      },
+      "facilities": {
+        "title": "Multiple Facilities",
+        "description": "General study room and equipped fitness room"
+      },
+      "transportation": {
+        "title": "Free Transportation",
+        "description": "To supermarket, pharmacy, library, and shopping centers"
+      },
+      "maintenance": {
+        "title": "Regular Maintenance",
+        "description": "Regular maintenance service for all facilities and equipment"
+      },
+      "utilities": {
+        "title": "Utilities Included",
+        "description": "High-speed internet, electricity, and water"
+      }
+    }
+  },
+  "rooms": {
+    "sectionTitle": "Room Types",
+    "sectionSubtitle": "Choose the room that suits your needs",
+    "types": {
+      "single": "Single",
+      "double": "Double",
+      "triple": "Triple"
+    },
+    "bathroom": {
+      "shared": "Shared Bathroom",
+      "private": "Private Bathroom",
+      "master": "Master"
+    },
+    "pricePerMonth": "SAR/month",
+    "originalPrice": "Original Price",
+    "viewDetails": "View Details",
+    "deposit": "Refundable Deposit",
+    "depositAmount": "500 SAR",
+    "yearlyDiscount": "7.5% discount for annual upfront payment",
+    "monthlyDiscount": "Price after 15% discount"
+  },
+  "locations": {
+    "sectionTitle": "Our Locations",
+    "sectionSubtitle": "We are present in the best neighborhoods in several cities across the Kingdom",
+    "nearbyPlaces": "Nearby Places",
+    "minutesAway": "minutes",
+    "viewLocation": "View Location",
+    "viewRooms": "View Rooms"
+  },
+  "buildings": {
+    "pageTitle": "Available Rooms",
+    "backToLocations": "Back to Locations",
+    "selectRoom": "Book This Room",
+    "viewBuildings": "View Buildings for Prices",
+    "pricesVary": "Prices vary by location. Select a building to see accurate pricing."
+  },
+  "transportation": {
+    "sectionTitle": "Transportation Service",
+    "sectionSubtitle": "We provide comfortable and safe transportation service",
+    "university": {
+      "title": "University Transportation",
+      "pnuName": "Princess Nourah bint Abdulrahman University",
+      "semesterPrice": "SAR per semester",
+      "installments": "3 monthly installments",
+      "fullPayment": "One payment"
+    },
+    "cities": {
+      "title": "City Transportation",
+      "ahsa": "Al-Ahsa Transportation",
+      "dammam": "Dammam & Qatif Transportation",
+      "perTrip": "SAR per trip"
+    },
+    "free": {
+      "title": "Free Transportation",
+      "description": "Mid-week trips to supermarket, pharmacy, library, and shopping centers"
+    }
+  },
+  "testimonials": {
+    "sectionTitle": "What Our Residents Say",
+    "sectionSubtitle": "Real experiences from students and working women living with us",
+    "readMore": "Read more",
+    "viewAll": "View All Testimonials",
+    "pageTitle": "Our Residents' Experiences",
+    "pageSubtitle": "Real stories from our community - reviews, screenshots, and videos from students and working women who live with us",
+    "filters": {
+      "all": "All",
+      "quotes": "Reviews",
+      "screenshots": "Screenshots",
+      "videos": "Videos"
+    },
+    "sources": {
+      "google_maps": "Google Maps",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "whatsapp": "WhatsApp",
+      "other": "Other"
+    },
+    "video": {
+      "play": "Play Video",
+      "duration": "Duration"
+    },
+    "lightbox": {
+      "close": "Close",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "noResults": "No testimonials found",
+    "backToHome": "Back to Home"
+  },
+  "faq": {
+    "sectionTitle": "Frequently Asked Questions",
+    "sectionSubtitle": "Answers to the most common questions",
+    "questions": {
+      "documents": {
+        "question": "What documents are required for registration?",
+        "answer": "You must present your National ID or Iqama (residence permit) when checking into the housing."
+      },
+      "checkInOut": {
+        "question": "What are the check-in and check-out times?",
+        "answer": "Check-in time for receiving the housing unit is from 11 AM to 4 PM, and check-out is by 4 PM maximum."
+      },
+      "visitors": {
+        "question": "Can I receive visitors?",
+        "answer": "Visits are allowed from 3 PM to 8 PM, subject to obtaining permission and written approval from the branch supervisor."
+      },
+      "holidays": {
+        "question": "What about holidays and vacations?",
+        "answer": "The contract runs for the full period. During annual vacations, the housing unit must be vacated, and upon return, subscription is renewed based on available vacancies."
+      },
+      "deposit": {
+        "question": "How does the deposit system work?",
+        "answer": "A deposit of 500 SAR is required as a prerequisite for receiving the housing unit. The deposit is fully refunded upon final checkout and handing over the unit in good condition with the housing card and keys."
+      },
+      "transport": {
+        "question": "Is university transportation available?",
+        "answer": "Yes, transportation to Princess Nourah University is available at specific times. You can subscribe per semester for 2,250 SAR or 1,900 SAR for upfront payment."
+      },
+      "included": {
+        "question": "What does the rent include?",
+        "answer": "The rent includes: high-speed internet, electricity, water, cleaning service for shared areas, and new bedding and pillow for each resident."
+      }
+    },
+    "downloadTerms": "Download Full Terms & Conditions",
+    "termsNote": "By booking, you agree to the full terms and conditions"
+  },
+  "contact": {
+    "sectionTitle": "Contact Us",
+    "sectionSubtitle": "We are here to help. Contact us through any of the following methods",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "city": "City of Interest",
+      "message": "Your Message",
+      "submit": "Send",
+      "submitting": "Sending...",
+      "success": "Your message has been sent successfully!",
+      "error": "An error occurred. Please try again."
+    },
+    "info": {
+      "customerService": "Customer Service",
+      "supervision": "Supervision Manager",
+      "transportation": "Transportation Manager",
+      "finance": "Finance Manager"
+    },
+    "whatsapp": "Contact via WhatsApp"
+  },
+  "footer": {
+    "description": "Fully furnished and serviced housing for female students and working women in the best neighborhoods across Saudi Arabia",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "contactDescription": "View all our contact options and get in touch with our team",
+    "followUs": "Follow Us",
+    "bankInfo": "Bank Account Information",
+    "bankName": "Al Rajhi Bank",
+    "accountName": "Ali Ibrahim Mohammed Al-Hassan Real Estate Development & Investment Office",
+    "rights": "All Rights Reserved",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy"
+  },
+  "common": {
+    "sar": "SAR",
+    "month": "month",
+    "learnMore": "Learn More",
+    "close": "Close",
+    "loading": "Loading..."
+  }
+}
