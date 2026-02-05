@@ -231,5 +231,10 @@
     "learnMore": "Learn More",
     "close": "Close",
     "loading": "Loading..."
+  },
+  "whatsappModal": {
+    "title": "Choose Your Region",
+    "subtitle": "Select your region to contact us via WhatsApp",
+    "close": "Close"
   }
 }

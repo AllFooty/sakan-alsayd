@@ -1,23 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { MessageCircle, ChevronDown, Home } from 'lucide-react';
 import { Button } from '@/components/ui';
+import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
 
 export default function Hero() {
   const t = useTranslations('hero');
   const tAbout = useTranslations('about');
   const locale = useLocale();
   const isArabic = locale === 'ar';
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   const handleExploreRooms = () => {
     const locationsSection = document.getElementById('locations');
     locationsSection?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleWhatsAppClick = () => {
-    window.open('https://wa.me/966539988872', '_blank');
   };
 
   return (
@@ -81,7 +80,7 @@ export default function Hero() {
             <Button
               variant="whatsapp"
               size="lg"
-              onClick={handleWhatsAppClick}
+              onClick={() => setIsWhatsAppModalOpen(true)}
               className="w-full sm:w-auto"
             >
               <MessageCircle className="w-5 h-5" />
@@ -129,6 +128,12 @@ export default function Hero() {
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
         <ChevronDown className="w-6 h-6 text-navy/40" />
       </div>
+
+      {/* WhatsApp Region Modal */}
+      <WhatsAppRegionModal
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+      />
     </section>
   );
 }
