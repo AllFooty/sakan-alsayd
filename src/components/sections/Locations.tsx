@@ -123,9 +123,11 @@ export default function Locations() {
 
                 {/* CTA */}
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    {t('viewLocation')}
-                  </Button>
+                  <a href={location.mapUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      {t('viewLocation')}
+                    </Button>
+                  </a>
                   <Link href={`/${locale}/buildings/${location.id}`} className="flex-1">
                     <Button variant="primary" size="sm" className="w-full">
                       {t('viewRooms')}

@@ -22,6 +22,7 @@ export interface Location {
   description: string;
   descriptionAr: string;
   image: string;
+  mapUrl: string;
   nearbyLandmarks: NearbyLandmark[];
   roomPrices: RoomPrice[];
   isPlaceholder: boolean;
@@ -38,6 +39,7 @@ export const locations: Location[] = [
     description: 'Located in Al-Olaya neighborhood in Khobar, a prime location near business centers.',
     descriptionAr: 'حي العليا الراقي بالخبر - موقع استراتيجي آمن قريب من مراكز الأعمال والخدمات. منطقة محافظة مناسبة للعوائل والطالبات.',
     image: '/images/locations/khobar-alolaya.jpg',
+    mapUrl: 'https://maps.app.goo.gl/xEkYrLEVorwnsLzP6?g_st=ic',
     nearbyLandmarks: [
       { id: 'corniche', name: 'Khobar Corniche', nameAr: 'كورنيش الخبر', distance: '5 minutes', distanceAr: '5 دقائق' },
       { id: 'mall', name: 'Al-Rashid Mall', nameAr: 'الراشد مول', distance: '5 minutes', distanceAr: '5 دقائق' },
@@ -60,6 +62,7 @@ export const locations: Location[] = [
     description: 'Located in Al-Andalus neighborhood in Khobar, a quiet residential area with all amenities.',
     descriptionAr: 'حي الأندلس بالخبر - منطقة سكنية هادئة وآمنة جداً، مشهورة بالهدوء والخصوصية. موقع مثالي للتركيز على الدراسة مع جميع الخدمات القريبة.',
     image: '/images/locations/khobar-alandalus.jpg',
+    mapUrl: 'https://maps.app.goo.gl/odAYEoTAmu4ha8oe9?g_st=ic',
     nearbyLandmarks: [
       { id: 'corniche', name: 'Khobar Corniche', nameAr: 'كورنيش الخبر', distance: '15 minutes', distanceAr: '15 دقيقة' },
       { id: 'mall', name: 'Dhahran Mall', nameAr: 'الظهران مول', distance: '10 minutes', distanceAr: '10 دقائق' },
@@ -89,6 +92,7 @@ export const locations: Location[] = [
     description: 'Located in Al-Rakah Northern neighborhood in Khobar, with easy access to main roads and facilities.',
     descriptionAr: 'حي الراكة بالخبر - منطقة سكنية آمنة وراقية مع وصول سهل للطرق الرئيسية والخدمات. موقع مناسب للطالبات والموظفات.',
     image: '/images/locations/khobar-alrakah.jpg',
+    mapUrl: 'https://maps.app.goo.gl/Vis5Dq8qaAwiQx4A8?g_st=ic',
     nearbyLandmarks: [
       { id: 'corniche', name: 'Khobar Corniche', nameAr: 'كورنيش الخبر', distance: '10 minutes', distanceAr: '10 دقائق' },
       { id: 'mall', name: 'Al-Rashid Mall', nameAr: 'الراشد مول', distance: '8 minutes', distanceAr: '8 دقائق' },
@@ -116,6 +120,7 @@ export const locations: Location[] = [
     description: 'Located in Al-Aziziah neighborhood in Dammam, a vibrant residential area with excellent facilities.',
     descriptionAr: 'حي العزيزية بالدمام - منطقة سكنية حيوية وآمنة مع مرافق ممتازة. قريبة من جامعة الإمام عبدالرحمن والخدمات التجارية.',
     image: '/images/locations/dammam-alaziziah.jpg',
+    mapUrl: 'https://maps.app.goo.gl/BzvKVyG8oigUbHr87?g_st=ic',
     nearbyLandmarks: [
       { id: 'mall', name: 'Al-Nuzha Mall', nameAr: 'مول النزهة', distance: '8 minutes', distanceAr: '8 دقائق' },
       { id: 'university', name: 'Imam Abdulrahman University', nameAr: 'جامعة الإمام عبدالرحمن', distance: '10 minutes', distanceAr: '10 دقائق' },
@@ -139,6 +144,7 @@ export const locations: Location[] = [
     description: 'Located in Jubail Industrial City, ideal for working women at the industrial companies and nearby facilities.',
     descriptionAr: 'الجبيل الصناعية - موقع آمن وراقي مثالي للموظفات في الشركات الصناعية. بيئة محافظة مع خدمات متكاملة وقريب من جميع المنشآت.',
     image: '/images/locations/jubail-jalmudah.jpg',
+    mapUrl: 'https://maps.app.goo.gl/3W6RL75MdUuXzAfn8?g_st=ic',
     nearbyLandmarks: [
       { id: 'royal-commission', name: 'Royal Commission', nameAr: 'الهيئة الملكية', distance: '10 minutes', distanceAr: '10 دقائق' },
       { id: 'industrial-college', name: 'Jubail Industrial College', nameAr: 'كلية الجبيل الصناعية', distance: '8 minutes', distanceAr: '8 دقائق' },
@@ -168,6 +174,7 @@ export const locations: Location[] = [
     description: 'Located in Al-Yarmouk neighborhood in Riyadh, a well-established residential area with excellent facilities.',
     descriptionAr: 'حي اليرموك الراقي بالرياض - منطقة سكنية آمنة محافظة مع مرافق ممتازة. موقع استراتيجي قريب من الجامعات والخدمات.',
     image: '/images/locations/riyadh-alyarmouk-1.jpg',
+    mapUrl: 'https://maps.app.goo.gl/wFivqUUKo3YG91QB6?g_st=ic',
     nearbyLandmarks: [
       { id: 'metro', name: 'Metro Station', nameAr: 'محطة الميترو', distance: '8 minutes', distanceAr: '8 دقائق' },
       { id: 'mall', name: 'Riyadh Park Mall', nameAr: 'الرياض بارك مول', distance: '10 minutes', distanceAr: '10 دقائق' },
@@ -195,6 +202,7 @@ export const locations: Location[] = [
     description: 'Coming soon - Located in Al-Yarmouk neighborhood in Riyadh, a well-established residential area with excellent facilities.',
     descriptionAr: 'قريباً - حي اليرموك الراقي بالرياض - منطقة سكنية آمنة محافظة مع مرافق ممتازة. موقع استراتيجي قريب من الجامعات والخدمات.',
     image: '/images/locations/placeholder.jpg',
+    mapUrl: 'https://maps.app.goo.gl/wFivqUUKo3YG91QB6?g_st=ic',
     nearbyLandmarks: [
       { id: 'metro', name: 'Metro Station', nameAr: 'محطة الميترو', distance: '8 minutes', distanceAr: '8 دقائق' },
       { id: 'mall', name: 'Riyadh Park Mall', nameAr: 'الرياض بارك مول', distance: '10 minutes', distanceAr: '10 دقائق' },
@@ -222,6 +230,7 @@ export const locations: Location[] = [
     description: 'Located in one of the finest neighborhoods in Riyadh, near King Salman Road and Abu Bakr Al-Siddiq Road.',
     descriptionAr: 'حي العارض الراقي جداً بالرياض - أحد أرقى المناطق السكنية في المملكة. بيئة آمنة محافظة مع خدمات عالية الجودة وقريب من جامعة الأميرة نورة.',
     image: '/images/locations/riyadh-alaridh.jpg',
+    mapUrl: 'https://maps.app.goo.gl/a28rhz9mh7RENndr6?g_st=ic',
     nearbyLandmarks: [
       { id: 'metro', name: 'SAB Metro Station', nameAr: 'محطة ميترو ساب', distance: '10 minutes', distanceAr: '10 دقائق' },
       { id: 'pnu', name: 'Princess Nourah University', nameAr: 'جامعة الأميرة نورة', distance: '15 minutes', distanceAr: '15 دقيقة' },
