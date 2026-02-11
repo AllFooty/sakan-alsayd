@@ -23,6 +23,15 @@ export default function About() {
               {t('description')}
             </p>
 
+            <ol className="space-y-2 text-navy/70 leading-relaxed text-lg list-decimal ps-6">
+              <li>{t('service1')}</li>
+              <li>{t('service2')}</li>
+              <li>{t('service3')}</li>
+              <li>{t('service4')}</li>
+              <li>{t('service5')}</li>
+              <li>{t('service6')}</li>
+            </ol>
+
             <div className="pt-4">
               <h3 className="text-xl font-semibold text-navy mb-3">
                 {t('vision')}

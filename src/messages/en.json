@@ -24,9 +24,15 @@
   },
   "about": {
     "sectionTitle": "Who We Are?",
-    "description": "Sakan Alsayd serves all expatriate women, whether from within the Kingdom or abroad. We provide serviced housing - fully furnished apartments equipped with all appliances.",
+    "description": "Sakan Alsayd serves all expatriate women, whether from within the Kingdom or abroad. We provide serviced housing - fully furnished apartments equipped with all appliances, offering many services including:",
+    "service1": "Supervision of residents and meeting their needs and welcoming them",
+    "service2": "Cleaning of the building and its facilities.",
+    "service3": "Multiple facilities (study room, gym)",
+    "service4": "Free transportation (to supermarket, pharmacy, library, shopping malls)",
+    "service5": "Periodic maintenance.",
+    "service6": "Internet, electricity, water",
     "vision": "Our Vision",
-    "visionText": "With distinguished ambition reaching for the horizon, supported by the expertise of a qualified team characterized by effectiveness and focus on achieving goals. Sakan Alsayd launched to serve female students and employees from the Eastern Region and beyond, to support and help girls inside and outside the Kingdom to establish a conscious generation of ambitious young women.",
+    "visionText": "With distinguished ambition reaching for the horizon, supported by the expertise of a qualified team characterized by effectiveness and focus on achieving goals, with extensive experience and broad knowledge. Sakan Alsayd launched for female students and employees from the Eastern Region and beyond, to support and help girls inside and outside the Kingdom to establish a conscious generation of ambitious young women.",
     "stats": {
       "years": "Years of Experience",
       "residents": "Happy Residents",
