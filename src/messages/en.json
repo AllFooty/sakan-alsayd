@@ -71,12 +71,22 @@
     "types": {
       "single": "Single",
       "double": "Double",
-      "triple": "Triple"
+      "triple": "Triple",
+      "suite": "Suite"
     },
     "bathroom": {
       "shared": "Shared Bathroom",
+      "shared-a": "Shared Bathroom (Class A)",
+      "shared-b": "Shared Bathroom (Class B)",
+      "shared-balcony": "Shared Bathroom + Balcony",
       "private": "Private Bathroom",
-      "master": "Master"
+      "private-balcony": "Private Bathroom + Balcony",
+      "private-two-rooms": "Private Suite (Two Rooms)",
+      "master": "Master",
+      "master-a": "Master (Class A)",
+      "master-b": "Master (Class B)",
+      "master-balcony": "Master + Balcony",
+      "suite": "Suite"
     },
     "pricePerMonth": "SAR/month",
     "originalPrice": "Original Price",

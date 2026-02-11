@@ -4,33 +4,21 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin } from 'lucide-react';
+import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin, DoorOpen } from 'lucide-react';
 import { Card, Button } from '@/components/ui';
 import { getLocationById } from '@/data/locations';
 import { formatPrice, cn } from '@/lib/utils';
 
-type RoomType = 'all' | 'single' | 'double' | 'triple';
+type RoomType = 'all' | 'single' | 'double' | 'triple' | 'suite';
 
 interface BuildingRoomsProps {
   locationId: string;
 }
 
-// Map room configurations to image paths
-const getRoomImage = (type: string, bathroomType: string): string => {
-  const imageMap: Record<string, string> = {
-    'single-shared': '/images/rooms/single-shared.jpg',
-    'single-private': '/images/rooms/single-private.jpg',
-    'single-master': '/images/rooms/single-master.jpg',
-    'double-shared': '/images/rooms/double-shared.jpg',
-    'double-private': '/images/rooms/double-private.jpg',
-    'double-master': '/images/rooms/double-master.jpg',
-    'triple-private': '/images/rooms/triple-private.jpg',
-    'triple-shared': '/images/rooms/triple-private.jpg',
-    'triple-master': '/images/rooms/triple-private.jpg',
-  };
-
+// Map room configurations to image paths (location-specific)
+const getRoomImage = (locationId: string, type: string, bathroomType: string): string => {
   const key = `${type}-${bathroomType}`;
-  return imageMap[key] || '/images/rooms/room-placeholder.jpg';
+  return `/images/locations/${locationId}/rooms/${key}.jpg`;
 };
 
 export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
@@ -50,12 +38,19 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
   const buildingName = isArabic ? location.neighborhoodAr : location.neighborhood;
   const cityName = isArabic ? location.cityAr : location.city;
 
-  const filterTabs: { type: RoomType; label: string; icon: React.ReactNode }[] = [
+  const availableTypes = new Set(roomPrices.map((room) => room.type));
+
+  const allFilterTabs: { type: RoomType; label: string; icon: React.ReactNode }[] = [
     { type: 'all', label: isArabic ? 'الكل' : 'All', icon: null },
     { type: 'single', label: t('types.single'), icon: <User className="w-4 h-4" /> },
     { type: 'double', label: t('types.double'), icon: <Users className="w-4 h-4" /> },
     { type: 'triple', label: t('types.triple'), icon: <Users2 className="w-4 h-4" /> },
+    { type: 'suite', label: t('types.suite'), icon: <DoorOpen className="w-4 h-4" /> },
   ];
+
+  const filterTabs = allFilterTabs.filter(
+    (tab) => tab.type === 'all' || availableTypes.has(tab.type)
+  );
 
   const filteredRooms = selectedType === 'all'
     ? roomPrices
@@ -69,22 +64,16 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
         return t('types.double');
       case 'triple':
         return t('types.triple');
+      case 'suite':
+        return t('types.suite');
       default:
         return type;
     }
   };
 
   const getBathroomName = (bathroomType: string) => {
-    switch (bathroomType) {
-      case 'shared':
-        return t('bathroom.shared');
-      case 'private':
-        return t('bathroom.private');
-      case 'master':
-        return t('bathroom.master');
-      default:
-        return bathroomType;
-    }
+    const key = `bathroom.${bathroomType}`;
+    return t(key);
   };
 
   const BackArrow = isArabic ? ArrowRight : ArrowLeft;
@@ -141,7 +130,7 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
               {/* Room Image */}
               <div className="relative h-48">
                 <Image
-                  src={getRoomImage(room.type, room.bathroomType)}
+                  src={getRoomImage(locationId, room.type, room.bathroomType)}
                   alt={`${getRoomTypeName(room.type)} - ${getBathroomName(room.bathroomType)}`}
                   fill
                   className="object-cover"

@@ -71,12 +71,22 @@
     "types": {
       "single": "مفردة",
       "double": "ثنائية",
-      "triple": "ثلاثية"
+      "triple": "ثلاثية",
+      "suite": "جناح"
     },
     "bathroom": {
       "shared": "دورة مياه مشتركة",
+      "shared-a": "دورة مياه مشتركة (فئة أ)",
+      "shared-b": "دورة مياه مشتركة (فئة ب)",
+      "shared-balcony": "دورة مياه مشتركة + بلكونة",
       "private": "دورة مياه خاصة",
-      "master": "ماستر"
+      "private-balcony": "دورة مياه خاصة + بلكونة",
+      "private-two-rooms": "جناح خاص (غرفتين)",
+      "master": "ماستر",
+      "master-a": "ماستر (فئة أ)",
+      "master-b": "ماستر (فئة ب)",
+      "master-balcony": "ماستر + بلكونة",
+      "suite": "جناح"
     },
     "pricePerMonth": "ريال/شهرياً",
     "originalPrice": "السعر الأصلي",

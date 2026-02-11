@@ -29,8 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `الغرف المتاحة في ${buildingName} - ${cityName} | سكن السيد`
       : `Available Rooms in ${buildingName} - ${cityName} | Sakan Alsayd`,
     description: isArabic
-      ? `اكتشفي الغرف المتاحة والأسعار في فرع ${buildingName} بـ${cityName}. غرف مفردة وثنائية وثلاثية مع جميع الخدمات.`
-      : `Discover available rooms and prices at ${buildingName} in ${cityName}. Single, double, and triple rooms with all services included.`,
+      ? `اكتشفي الغرف المتاحة والأسعار في فرع ${buildingName} بـ${cityName}. غرف مفردة وثنائية وثلاثية وأجنحة مع جميع الخدمات.`
+      : `Discover available rooms and prices at ${buildingName} in ${cityName}. Single, double, triple rooms and suites with all services included.`,
   };
 }
 

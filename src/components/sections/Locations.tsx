@@ -9,20 +9,9 @@ import { Card, Button } from '@/components/ui';
 import { locations, getCities } from '@/data/locations';
 import { cn } from '@/lib/utils';
 
-// Map location IDs to image paths
-const getLocationImage = (locationId: string): string => {
-  const imageMap: Record<string, string> = {
-    'riyadh-alaridh': '/images/locations/riyadh-alaridh.jpg',
-    'riyadh-almalqa': '/images/locations/riyadh-almalqa.jpg',
-    'jeddah-alhamra': '/images/locations/jeddah-alhamra.jpg',
-    'dammam-alfaisaliah': '/images/locations/dammam-alfaisaliah.jpg',
-    'khobar-alraqiya': '/images/locations/khobar-alraqiya.jpg',
-    'makkah-aziziyah': '/images/locations/makkah-aziziyah.jpg',
-    'madinah-quba': '/images/locations/madinah-quba.jpg',
-    'abha-almansak': '/images/locations/abha-almansak.jpg',
-  };
-
-  return imageMap[locationId] || '/images/locations/placeholder.jpg';
+// Get location image from location data
+const getLocationImage = (location: { image: string }): string => {
+  return location.image || '/images/locations/placeholder.jpg';
 };
 
 export default function Locations() {
@@ -86,7 +75,7 @@ export default function Locations() {
               {/* Location Image */}
               <div className="relative h-48">
                 <Image
-                  src={getLocationImage(location.id)}
+                  src={getLocationImage(location)}
                   alt={`${isArabic ? location.neighborhoodAr : location.neighborhood} - ${isArabic ? location.cityAr : location.city}`}
                   fill
                   className="object-cover"

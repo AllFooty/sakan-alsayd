@@ -3,37 +3,28 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
-import { User, Users, Users2, Bath } from 'lucide-react';
+import { User, Users, Users2, Bath, DoorOpen } from 'lucide-react';
 import { Card, Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
-type RoomType = 'all' | 'single' | 'double' | 'triple';
+type RoomType = 'all' | 'single' | 'double' | 'triple' | 'suite';
 
 // Define the room types we want to showcase (without prices)
 const roomConfigurations = [
   { type: 'triple' as const, bathroomType: 'private' as const },
   { type: 'double' as const, bathroomType: 'shared' as const },
   { type: 'double' as const, bathroomType: 'private' as const },
+  { type: 'double' as const, bathroomType: 'master' as const },
   { type: 'single' as const, bathroomType: 'shared' as const },
   { type: 'single' as const, bathroomType: 'private' as const },
+  { type: 'single' as const, bathroomType: 'master' as const },
+  { type: 'suite' as const, bathroomType: 'private' as const },
 ];
 
-// Map room configurations to image paths
+// Map room configurations to image paths (using first location as showcase)
 const getRoomImage = (type: string, bathroomType: string): string => {
-  const imageMap: Record<string, string> = {
-    'single-shared': '/images/rooms/single-shared.jpg',
-    'single-private': '/images/rooms/single-private.jpg',
-    'single-master': '/images/rooms/single-master.jpg',
-    'double-shared': '/images/rooms/double-shared.jpg',
-    'double-private': '/images/rooms/double-private.jpg',
-    'double-master': '/images/rooms/double-master.jpg',
-    'triple-private': '/images/rooms/triple-private.jpg',
-    'triple-shared': '/images/rooms/triple-private.jpg',
-    'triple-master': '/images/rooms/triple-private.jpg',
-  };
-
   const key = `${type}-${bathroomType}`;
-  return imageMap[key] || '/images/rooms/room-placeholder.jpg';
+  return `/images/locations/khobar-alolaya-1/rooms/${key}.jpg`;
 };
 
 export default function RoomTypes() {
@@ -48,6 +39,7 @@ export default function RoomTypes() {
     { type: 'single', label: t('types.single'), icon: <User className="w-4 h-4" /> },
     { type: 'double', label: t('types.double'), icon: <Users className="w-4 h-4" /> },
     { type: 'triple', label: t('types.triple'), icon: <Users2 className="w-4 h-4" /> },
+    { type: 'suite', label: t('types.suite'), icon: <DoorOpen className="w-4 h-4" /> },
   ];
 
   const filteredRooms = selectedType === 'all'
@@ -62,22 +54,16 @@ export default function RoomTypes() {
         return t('types.double');
       case 'triple':
         return t('types.triple');
+      case 'suite':
+        return t('types.suite');
       default:
         return type;
     }
   };
 
   const getBathroomName = (bathroomType: string) => {
-    switch (bathroomType) {
-      case 'shared':
-        return t('bathroom.shared');
-      case 'private':
-        return t('bathroom.private');
-      case 'master':
-        return t('bathroom.master');
-      default:
-        return bathroomType;
-    }
+    const key = `bathroom.${bathroomType}`;
+    return t(key);
   };
 
   return (
