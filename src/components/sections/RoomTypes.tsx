@@ -24,7 +24,7 @@ const roomConfigurations = [
 // Map room configurations to image paths (using first location as showcase)
 const getRoomImage = (type: string, bathroomType: string): string => {
   const key = `${type}-${bathroomType}`;
-  return `/images/locations/khobar-alolaya-1/rooms/${key}.jpg`;
+  return `/images/locations/khobar-alolaya/rooms/${key}.jpg`;
 };
 
 export default function RoomTypes() {
