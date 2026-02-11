@@ -76,6 +76,6 @@ export const bankInfo = {
   bankNameAr: 'بنك الراجحي',
   accountName: 'Ali Ibrahim Mohammed Al-Hassan Real Estate Development & Investment Office',
   accountNameAr: 'مكتب علي إبراهيم محمد الحسن للتطوير والاستثمار العقاري',
-  iban: 'SA0980000300608016135953',
-  accountNumber: '300000010006086135953',
+  iban: 'SA0280000300608016100965',
+  accountNumber: '300000010006086100965',
 };

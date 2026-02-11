@@ -34,7 +34,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand Section */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold">
+            <h3 className="text-2xl font-bold text-white">
               {isArabic ? 'سكن السيد' : 'Sakan Alsayd'}
             </h3>
             <p className="text-white/70 text-sm leading-relaxed">
@@ -75,7 +75,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">{t('footer.quickLinks')}</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
@@ -93,7 +93,7 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">{t('footer.contactUs')}</h4>
             <p className="text-white/70 text-sm mb-4">
               {t('footer.contactDescription')}
             </p>
@@ -108,7 +108,7 @@ export default function Footer() {
 
           {/* Bank Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">{t('footer.bankInfo')}</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">{t('footer.bankInfo')}</h4>
             <div className="bg-white/5 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-coral" />
