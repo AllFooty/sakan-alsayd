@@ -50,6 +50,15 @@ export async function generateMetadata({
         : 'Safe and conservative environment with 24/7 supervision and comprehensive services',
       locale: isArabic ? 'ar_SA' : 'en_US',
       type: 'website',
+      url: 'https://sakanalsayd.com',
+      images: [
+        {
+          url: 'https://sakanalsayd.com/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: isArabic ? 'سكن السيد' : 'Sakan Alsayd',
+        },
+      ],
     },
   };
 }
