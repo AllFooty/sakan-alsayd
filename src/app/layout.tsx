@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Sakan Alsayd | سكن السيد",
-  description: "Fully furnished student housing in Saudi Arabia | سكن طالبات مجهز بالكامل في السعودية",
+  description: "أكبر سكن طالبات و موظفات في المملكة",
   icons: {
     icon: "/favicon.png",
   },
