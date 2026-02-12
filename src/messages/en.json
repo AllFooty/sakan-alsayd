@@ -100,7 +100,11 @@
     "deposit": "Refundable Deposit",
     "depositAmount": "500 SAR",
     "yearlyDiscount": "7.5% discount for annual upfront payment",
-    "monthlyDiscount": "Price after 15% discount"
+    "monthlyDiscount": "Price after 15% discount",
+    "semesterPrice": "Semester price (5 months)",
+    "discountSemester": "5% discount for full semester upfront payment",
+    "discountYearly": "7.5% discount for full annual upfront payment",
+    "installmentOption": "Interest-free installments available per semester"
   },
   "locations": {
     "sectionTitle": "Our Locations",
@@ -184,7 +188,7 @@
       },
       "visitors": {
         "question": "Can I receive visitors?",
-        "answer": "Visits are allowed from 3 PM to 8 PM, subject to obtaining permission and written approval from the branch supervisor."
+        "answer": "Visits are allowed from 1 PM to 8 PM, subject to obtaining permission and written approval from the branch supervisor."
       },
       "holidays": {
         "question": "What about holidays and vacations?",
@@ -201,6 +205,26 @@
       "included": {
         "question": "What does the rent include?",
         "answer": "The rent includes: high-speed internet, electricity, water, cleaning service for shared areas, and new bedding and pillow for each resident."
+      },
+      "smoking": {
+        "question": "Is smoking or shisha allowed?",
+        "answer": "Smoking and shisha are strictly prohibited inside the building and all its facilities. This is to ensure the health and safety of all residents."
+      },
+      "pets": {
+        "question": "Are pets allowed?",
+        "answer": "Pets are not allowed inside the housing to maintain cleanliness and comfort for all residents."
+      },
+      "storage": {
+        "question": "Is luggage storage available?",
+        "answer": "Yes, each resident can store 2 boxes for free. Any additional box costs 5 SAR per month."
+      },
+      "cleaning_service": {
+        "question": "Is room cleaning service available?",
+        "answer": "Yes, optional cleaning service is available: 15 SAR/hour for rooms, and 10 SAR/hour for residential units."
+      },
+      "ejar": {
+        "question": "Is the contract registered on the Ejar network?",
+        "answer": "Yes, the contract is registered on the Ejar electronic network at a fee of 2.5% of the contract value."
       }
     },
     "downloadTerms": "Download Full Terms & Conditions",

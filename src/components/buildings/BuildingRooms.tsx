@@ -153,20 +153,38 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
 
                 {/* Pricing */}
                 <div className="space-y-2 mb-6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-coral">
-                      {formatPrice(room.discountedPrice)}
-                    </span>
-                    <span className="text-navy/60 text-sm">{t('pricePerMonth')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-navy/40 line-through text-sm">
-                      {formatPrice(room.monthlyPrice)}
-                    </span>
-                    <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded">
-                      {t('monthlyDiscount')}
-                    </span>
-                  </div>
+                  {room.discountedPrice ? (
+                    <>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-coral">
+                          {formatPrice(room.discountedPrice)}
+                        </span>
+                        <span className="text-navy/60 text-sm">{t('pricePerMonth')}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-navy/40 line-through text-sm">
+                          {formatPrice(room.monthlyPrice)}
+                        </span>
+                        <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded">
+                          {t('monthlyDiscount')}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-coral">
+                          {formatPrice(room.monthlyPrice)}
+                        </span>
+                        <span className="text-navy/60 text-sm">{t('pricePerMonth')}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-navy/60 text-sm">
+                          {t('semesterPrice')}: {formatPrice(room.monthlyPrice * 5)}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* CTA */}
@@ -193,7 +211,15 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
                 <p className="text-navy font-medium">
                   {t('deposit')}: <span className="text-coral">{t('depositAmount')}</span>
                 </p>
-                <p className="text-navy/60 text-sm">{t('yearlyDiscount')}</p>
+                {location.roomPrices[0]?.discountedPrice ? (
+                  <p className="text-navy/60 text-sm">{t('yearlyDiscount')}</p>
+                ) : (
+                  <>
+                    <p className="text-navy/60 text-sm">{t('discountSemester')}</p>
+                    <p className="text-navy/60 text-sm">{t('discountYearly')}</p>
+                    <p className="text-navy/60 text-sm">{t('installmentOption')}</p>
+                  </>
+                )}
               </div>
             </div>
             <Button

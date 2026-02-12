@@ -13,6 +13,11 @@ const faqKeys = [
   'deposit',
   'transport',
   'included',
+  'smoking',
+  'pets',
+  'storage',
+  'cleaning_service',
+  'ejar',
 ] as const;
 
 export default function FAQ() {
