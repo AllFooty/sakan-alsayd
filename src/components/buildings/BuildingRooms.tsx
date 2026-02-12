@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin, DoorOpen } from 'lucide-react';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, RoomImage } from '@/components/ui';
 import { getLocationById } from '@/data/locations';
 import { formatPrice, cn } from '@/lib/utils';
 
@@ -129,12 +128,10 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
             <Card key={`${room.type}-${room.bathroomType}`} variant="elevated" hover className="overflow-hidden">
               {/* Room Image */}
               <div className="relative h-48">
-                <Image
+                <RoomImage
                   src={getRoomImage(locationId, room.type, room.bathroomType)}
                   alt={`${getRoomTypeName(room.type)} - ${getBathroomName(room.bathroomType)}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  placeholderSrc={`/images/locations/${locationId}/rooms/room-placeholder.jpg`}
                 />
                 {/* Room Type Badge */}
                 <div className="absolute top-4 start-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg">
