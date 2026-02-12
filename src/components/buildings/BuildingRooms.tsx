@@ -204,32 +204,22 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
 
         {/* Info Notes */}
         <div className="mt-10 bg-cream rounded-2xl p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-coral flex-shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-navy font-medium">
-                  {t('deposit')}: <span className="text-coral">{t('depositAmount')}</span>
-                </p>
-                {location.roomPrices[0]?.discountedPrice ? (
-                  <p className="text-navy/60 text-sm">{t('yearlyDiscount')}</p>
-                ) : (
-                  <>
-                    <p className="text-navy/60 text-sm">{t('discountSemester')}</p>
-                    <p className="text-navy/60 text-sm">{t('discountYearly')}</p>
-                    <p className="text-navy/60 text-sm">{t('installmentOption')}</p>
-                  </>
-                )}
-              </div>
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-coral flex-shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-navy font-medium">
+                {t('deposit')}: <span className="text-coral">{t('depositAmount')}</span>
+              </p>
+              {location.roomPrices[0]?.discountedPrice ? (
+                <p className="text-navy/60 text-sm">{t('yearlyDiscount')}</p>
+              ) : (
+                <>
+                  <p className="text-navy/60 text-sm">{t('discountSemester')}</p>
+                  <p className="text-navy/60 text-sm">{t('discountYearly')}</p>
+                  <p className="text-navy/60 text-sm">{t('installmentOption')}</p>
+                </>
+              )}
             </div>
-            <Button
-              variant="primary"
-              onClick={() => {
-                window.location.href = `/${locale}/#contact`;
-              }}
-            >
-              {isArabic ? 'احجزي الآن' : 'Book Now'}
-            </Button>
           </div>
         </div>
       </div>
