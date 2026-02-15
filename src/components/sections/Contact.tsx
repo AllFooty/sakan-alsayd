@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Phone, MessageCircle, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button, Input, Textarea, Select } from '@/components/ui';
+import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
 import { contacts } from '@/data/contacts';
 import { getCities } from '@/data/locations';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ export default function Contact() {
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   const cities = getCities();
   const cityOptions = cities.map((city) => ({
@@ -64,7 +66,7 @@ export default function Contact() {
   };
 
   const handleWhatsAppClick = () => {
-    window.open('https://wa.me/966539988872', '_blank');
+    setIsWhatsAppModalOpen(true);
   };
 
   return (
@@ -246,6 +248,11 @@ export default function Contact() {
           </div>
         </div>
       </div>
+
+      <WhatsAppRegionModal
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+      />
     </section>
   );
 }
