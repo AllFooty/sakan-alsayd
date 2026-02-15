@@ -37,7 +37,7 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="relative h-20 w-20">
               <Image
-                src="/logo.png"
+                src="/logo-white.png"
                 alt="سكن السيد - Sakan Alsayd"
                 fill
                 className="object-contain"

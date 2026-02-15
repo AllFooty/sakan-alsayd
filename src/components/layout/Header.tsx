@@ -78,7 +78,7 @@ export default function Header() {
             {!logoError ? (
               <div className="relative h-14 w-40">
                 <Image
-                  src="/images/logo-horizontal.png"
+                  src="/logo-horizontal.png"
                   alt="سكن السيد - Sakan Alsayd"
                   fill
                   className="object-contain"
