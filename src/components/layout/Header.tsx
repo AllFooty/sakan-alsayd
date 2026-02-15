@@ -76,10 +76,10 @@ export default function Header() {
           {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center gap-2">
             {!logoError ? (
-              <div className="relative h-12 w-32">
+              <div className="relative h-14 w-40">
                 <Image
-                  src="/images/logo.svg"
-                  alt="Sakan Alsayd"
+                  src="/images/logo-horizontal.png"
+                  alt="سكن السيد - Sakan Alsayd"
                   fill
                   className="object-contain"
                   priority

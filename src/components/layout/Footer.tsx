@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { Instagram, Twitter, CreditCard, MapPin } from 'lucide-react';
 import { socialMedia, bankInfo } from '@/data/contacts';
@@ -34,9 +35,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand Section */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white">
-              {isArabic ? 'سكن السيد' : 'Sakan Alsayd'}
-            </h3>
+            <div className="relative h-20 w-20">
+              <Image
+                src="/logo.png"
+                alt="سكن السيد - Sakan Alsayd"
+                fill
+                className="object-contain"
+              />
+            </div>
             <p className="text-white/70 text-sm leading-relaxed">
               {t('footer.description')}
             </p>
