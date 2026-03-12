@@ -159,6 +159,12 @@ export default function Footer() {
               >
                 {t('footer.privacy')}
               </Link>
+              <Link
+                href={`/${locale}/admin`}
+                className="text-white/30 hover:text-white/50 transition-colors text-xs"
+              >
+                {t('footer.staff')}
+              </Link>
             </div>
           </div>
         </div>

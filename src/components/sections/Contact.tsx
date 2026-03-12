@@ -5,9 +5,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Phone, MessageCircle, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Phone, MessageCircle, Send, CheckCircle, AlertCircle, Wrench } from 'lucide-react';
 import { Button, Input, Textarea, Select } from '@/components/ui';
 import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
+import MaintenanceModal from '@/components/ui/MaintenanceModal';
 import { contacts } from '@/data/contacts';
 import { getCities } from '@/data/locations';
 import { cn } from '@/lib/utils';
@@ -28,6 +29,7 @@ export default function Contact() {
   const isArabic = locale === 'ar';
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [isMaintenanceOpen, setIsMaintenanceOpen] = useState(false);
 
   const cities = getCities();
   const cityOptions = cities.map((city) => ({
@@ -48,18 +50,19 @@ export default function Contact() {
     setSubmitStatus('loading');
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-      // In production, you would send this to your API
-      console.log('Form submitted:', data);
+      if (!res.ok) throw new Error('Failed to submit');
 
       setSubmitStatus('success');
       reset();
 
-      // Reset status after 3 seconds
       setTimeout(() => setSubmitStatus('idle'), 3000);
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
       setTimeout(() => setSubmitStatus('idle'), 3000);
     }
@@ -88,7 +91,7 @@ export default function Contact() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <Input
                 label={t('form.name')}
-                placeholder={isArabic ? 'أدخلي اسمك الكامل' : 'Enter your full name'}
+                placeholder={t('placeholders.fullName')}
                 error={errors.name?.message}
                 {...register('name')}
               />
@@ -97,14 +100,14 @@ export default function Contact() {
                 <Input
                   label={t('form.email')}
                   type="email"
-                  placeholder={isArabic ? 'example@email.com' : 'example@email.com'}
+                  placeholder={t('placeholders.email')}
                   error={errors.email?.message}
                   {...register('email')}
                 />
                 <Input
                   label={t('form.phone')}
                   type="tel"
-                  placeholder="05XXXXXXXX"
+                  placeholder={t('placeholders.phone')}
                   dir="ltr"
                   error={errors.phone?.message}
                   {...register('phone')}
@@ -114,14 +117,14 @@ export default function Contact() {
               <Select
                 label={t('form.city')}
                 options={cityOptions}
-                placeholder={isArabic ? 'اختاري المدينة' : 'Select city'}
+                placeholder={t('placeholders.city')}
                 error={errors.city?.message}
                 {...register('city')}
               />
 
               <Textarea
                 label={t('form.message')}
-                placeholder={isArabic ? 'اكتبي رسالتك هنا...' : 'Write your message here...'}
+                placeholder={t('placeholders.message')}
                 rows={4}
                 error={errors.message?.message}
                 {...register('message')}
@@ -174,7 +177,7 @@ export default function Contact() {
                     {t('whatsapp')}
                   </h3>
                   <p className="text-navy/60 text-sm">
-                    {isArabic ? 'الرد خلال دقائق' : 'Response within minutes'}
+                    {t('whatsappSubtitle')}
                   </p>
                 </div>
               </div>
@@ -184,14 +187,39 @@ export default function Contact() {
                 onClick={handleWhatsAppClick}
               >
                 <MessageCircle className="w-5 h-5" />
-                {isArabic ? 'ابدئي المحادثة' : 'Start Chat'}
+                {t('startChat')}
+              </Button>
+            </div>
+
+            {/* Maintenance Request Card */}
+            <div className="bg-amber-50 rounded-2xl p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center">
+                  <Wrench className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-navy text-lg">
+                    {t('maintenanceTitle')}
+                  </h3>
+                  <p className="text-navy/60 text-sm">
+                    {t('maintenanceSubtitle')}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="primary"
+                className="w-full bg-amber-500 hover:bg-amber-600"
+                onClick={() => setIsMaintenanceOpen(true)}
+              >
+                <Wrench className="w-5 h-5" />
+                {t('submitMaintenance')}
               </Button>
             </div>
 
             {/* Contact Numbers */}
             <div className="bg-cream rounded-2xl p-6">
               <h3 className="font-semibold text-navy text-lg mb-4">
-                {isArabic ? 'أرقام التواصل' : 'Contact Numbers'}
+                {t('contactNumbers')}
               </h3>
               <div className="space-y-4">
                 {contacts.map((contact) => (
@@ -232,17 +260,13 @@ export default function Contact() {
             {/* Business Hours */}
             <div className="bg-navy/5 rounded-2xl p-6">
               <h3 className="font-semibold text-navy text-lg mb-2">
-                {isArabic ? 'ساعات العمل' : 'Business Hours'}
+                {t('businessHours')}
               </h3>
               <p className="text-navy/70">
-                {isArabic
-                  ? 'السبت - الخميس: 9 صباحاً - 9 مساءً'
-                  : 'Saturday - Thursday: 9 AM - 9 PM'}
+                {t('businessHoursWeekday')}
               </p>
               <p className="text-navy/70">
-                {isArabic
-                  ? 'الجمعة: 4 مساءً - 9 مساءً'
-                  : 'Friday: 4 PM - 9 PM'}
+                {t('businessHoursFriday')}
               </p>
             </div>
           </div>
@@ -252,6 +276,10 @@ export default function Contact() {
       <WhatsAppRegionModal
         isOpen={isWhatsAppModalOpen}
         onClose={() => setIsWhatsAppModalOpen(false)}
+      />
+      <MaintenanceModal
+        isOpen={isMaintenanceOpen}
+        onClose={() => setIsMaintenanceOpen(false)}
       />
     </section>
   );

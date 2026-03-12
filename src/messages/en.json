@@ -250,7 +250,23 @@
       "transportation": "Transportation Manager",
       "finance": "Finance Manager"
     },
-    "whatsapp": "Contact via WhatsApp"
+    "whatsapp": "Contact via WhatsApp",
+    "whatsappSubtitle": "Response within minutes",
+    "startChat": "Start Chat",
+    "maintenanceTitle": "Maintenance Request",
+    "maintenanceSubtitle": "Report any issue",
+    "submitMaintenance": "Submit Maintenance Request",
+    "contactNumbers": "Contact Numbers",
+    "businessHours": "Business Hours",
+    "businessHoursWeekday": "Saturday - Thursday: 9 AM - 9 PM",
+    "businessHoursFriday": "Friday: 4 PM - 9 PM",
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "email": "example@email.com",
+      "phone": "05XXXXXXXX",
+      "city": "Select city",
+      "message": "Write your message here..."
+    }
   },
   "footer": {
     "description": "Fully furnished and serviced housing for female students and working women in the best neighborhoods across Saudi Arabia",
@@ -263,7 +279,8 @@
     "accountName": "Ali Ibrahim Mohammed Al-Hassan Real Estate Development & Investment Office",
     "rights": "All Rights Reserved",
     "terms": "Terms & Conditions",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "staff": "Staff Portal"
   },
   "common": {
     "sar": "SAR",
@@ -276,5 +293,384 @@
     "title": "Choose Your Region",
     "subtitle": "Select your region to contact us via WhatsApp",
     "close": "Close"
+  },
+  "bookingModal": {
+    "title": "Book Your Room",
+    "submit": "Submit Booking Request",
+    "submitting": "Submitting...",
+    "error": "An error occurred. Please try again.",
+    "currency": "SAR",
+    "placeholders": {
+      "fullName": "Full name",
+      "email": "email@example.com",
+      "phone": "05XXXXXXXX",
+      "notes": "Any additional notes..."
+    },
+    "steps": {
+      "city": {
+        "title": "Select your city",
+        "buildings": "branches"
+      },
+      "building": {
+        "title": "Choose a building",
+        "rooms": "room types",
+        "from": "From"
+      },
+      "room": {
+        "title": "Pick your room"
+      },
+      "info": {
+        "title": "Your information",
+        "name": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "notes": "Additional Notes"
+      }
+    },
+    "summary": {
+      "building": "Building",
+      "room": "Room",
+      "price": "Price"
+    },
+    "success": {
+      "title": "Booking Request Sent",
+      "heading": "Thank you!",
+      "description": "Your booking request has been submitted successfully. Our team will contact you shortly to confirm your reservation.",
+      "close": "Done"
+    }
+  },
+  "maintenanceModal": {
+    "title": "Report Maintenance Issue",
+    "submit": "Submit Request",
+    "submitting": "Submitting...",
+    "error": "An error occurred. Please try again.",
+    "next": "Next",
+    "placeholders": {
+      "building": "Building",
+      "fullName": "Full name",
+      "phone": "05XXXXXXXX"
+    },
+    "steps": {
+      "building": {
+        "title": "Select your building",
+        "buildings": "branches"
+      },
+      "details": {
+        "title": "Issue details",
+        "category": "Category",
+        "categoryPlaceholder": "Select category",
+        "issueTitle": "Issue Title",
+        "issueTitlePlaceholder": "Brief description of the issue",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the issue in detail...",
+        "roomNumber": "Room Number / Area",
+        "roomNumberPlaceholder": "e.g. Room 12, Kitchen, Hallway"
+      },
+      "info": {
+        "title": "Your information",
+        "name": "Full Name",
+        "phone": "Phone Number"
+      }
+    },
+    "categories": {
+      "plumbing": "Plumbing",
+      "electrical": "Electrical",
+      "furniture": "Furniture",
+      "cleaning": "Cleaning",
+      "hvac": "HVAC / AC",
+      "general": "General"
+    },
+    "photos": "Photos (optional)",
+    "photosHint": "Upload up to 3 photos",
+    "uploading": "Uploading photos...",
+    "success": {
+      "title": "Request Submitted",
+      "heading": "Thank you!",
+      "description": "Your maintenance request has been submitted successfully. Our team will review it and take action as soon as possible.",
+      "close": "Done"
+    }
+  },
+  "admin": {
+    "login": {
+      "title": "Management Portal",
+      "subtitle": "Sign in with your email",
+      "emailLabel": "Email Address",
+      "emailHint": "Enter your staff email address",
+      "passwordLabel": "Password",
+      "signIn": "Sign In",
+      "switchToOtp": "Sign in with email code instead",
+      "switchToPassword": "Sign in with password instead",
+      "sendOtp": "Send Verification Code",
+      "otpLabel": "Verification Code",
+      "otpSent": "A verification code has been sent to {email}",
+      "verify": "Verify & Sign In",
+      "resendOtp": "Resend Code",
+      "backToEmail": "Change email",
+      "backToWebsite": "Back to Website",
+      "errors": {
+        "unexpected": "An unexpected error occurred. Please try again."
+      }
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "bookings": "Booking Requests",
+      "maintenance": "Maintenance",
+      "buildings": "Buildings & Rooms",
+      "residents": "Residents",
+      "content": "Content",
+      "settings": "Settings",
+      "version": "v{version}"
+    },
+    "topbar": {
+      "welcome": "Welcome",
+      "logout": "Sign Out",
+      "roles": {
+        "super_admin": "Super Admin",
+        "branch_manager": "Branch Manager",
+        "maintenance_staff": "Maintenance Staff",
+        "transportation_staff": "Transportation Staff",
+        "supervision_staff": "Supervision Staff",
+        "finance_staff": "Finance Staff"
+      }
+    },
+    "dashboard": {
+      "welcome": "Welcome, {name}",
+      "subtitle": "Here's an overview of your operations",
+      "stats": {
+        "newBookings": "New Bookings",
+        "openMaintenance": "Open Maintenance",
+        "totalBuildings": "Total Buildings",
+        "activeResidents": "Active Residents"
+      },
+      "recentActivity": "Recent Activity",
+      "noActivity": "No recent activity to show"
+    },
+    "comingSoon": {
+      "title": "Coming Soon",
+      "description": "This section is under development and will be available soon."
+    },
+    "bookings": {
+      "title": "Booking Requests",
+      "subtitle": "Manage and track all booking inquiries",
+      "newRequest": "New Request",
+      "export": "Export CSV",
+      "exporting": "Exporting...",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "city": "City",
+        "status": "Status",
+        "assignedTo": "Assigned To",
+        "date": "Date",
+        "actions": "Actions",
+        "unassigned": "Unassigned"
+      },
+      "filters": {
+        "all": "All",
+        "new": "New",
+        "in_review": "In Review",
+        "pending_payment": "Payment",
+        "pending_onboarding": "Onboarding",
+        "completed": "Completed",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "search": "Search by name, email, or phone..."
+      },
+      "status": {
+        "new": "New",
+        "in_review": "In Review",
+        "pending_payment": "Pending Payment",
+        "pending_onboarding": "Pending Onboarding",
+        "completed": "Completed",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "contacted": "Contacted",
+        "confirmed": "Confirmed"
+      },
+      "pipeline": {
+        "department": {
+          "customer_service": "Customer Service",
+          "finance": "Finance",
+          "supervision": "Supervision"
+        },
+        "actions": {
+          "startReview": "Start Review",
+          "sendToFinance": "Send to Finance",
+          "sendToSupervision": "Send to Supervision",
+          "markComplete": "Mark Complete",
+          "reject": "Reject",
+          "cancel": "Cancel",
+          "reopen": "Reopen"
+        },
+        "assignAndProceed": "Assign & Proceed",
+        "selectStaffForDept": "Select {department} staff"
+      },
+      "detail": {
+        "title": "Booking Request Details",
+        "back": "Back to Bookings",
+        "contactInfo": "Contact Information",
+        "message": "Message",
+        "assignment": "Assignment & Status",
+        "currentDepartment": "Current Department",
+        "assignedTo": "Assigned To",
+        "changeStatus": "Change Status",
+        "assignTo": "Assign To",
+        "selectStaff": "Select staff member",
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "saved": "Changes saved successfully",
+        "contactCustomer": "Contact Customer",
+        "sendEmail": "Send Email",
+        "callPhone": "Call",
+        "whatsapp": "WhatsApp",
+        "createdAt": "Created",
+        "updatedAt": "Last Updated"
+      },
+      "notes": {
+        "title": "Internal Notes",
+        "add": "Add Note",
+        "placeholder": "Write an internal note...",
+        "submit": "Post Note",
+        "submitting": "Posting...",
+        "empty": "No notes yet",
+        "emptyDescription": "Add internal notes to track communication with this customer"
+      },
+      "empty": {
+        "title": "No Booking Requests",
+        "description": "Booking requests from the website contact form will appear here"
+      },
+      "deleteConfirm": {
+        "title": "Delete Booking Request",
+        "description": "Are you sure you want to delete this booking request? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+    "bulk": {
+      "selected": "{count} selected",
+      "changeStatus": "Change Status",
+      "apply": "Apply",
+      "deleteSelected": "Delete Selected",
+      "clear": "Clear",
+      "confirmDelete": "Are you sure you want to delete {count} items?",
+      "bulkUpdateSuccess": "Updated {count} items",
+      "bulkDeleteSuccess": "Deleted {count} items"
+    },
+    "maintenance": {
+      "title": "Maintenance Requests",
+      "subtitle": "Manage and track all maintenance requests",
+      "newRequest": "New Request",
+      "export": "Export CSV",
+      "exporting": "Exporting...",
+      "table": {
+        "title": "Title",
+        "building": "Building",
+        "category": "Category",
+        "priority": "Priority",
+        "status": "Status",
+        "assignedTo": "Assigned To",
+        "date": "Date",
+        "actions": "Actions",
+        "unassigned": "Unassigned",
+        "requester": "Requester",
+        "phone": "Phone"
+      },
+      "filters": {
+        "all": "All",
+        "submitted": "Submitted",
+        "assigned": "Assigned",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "search": "Search by title, name, or phone...",
+        "allPriorities": "All Priorities",
+        "allCategories": "All Categories"
+      },
+      "status": {
+        "submitted": "Submitted",
+        "assigned": "Assigned",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "category": {
+        "plumbing": "Plumbing",
+        "electrical": "Electrical",
+        "furniture": "Furniture",
+        "cleaning": "Cleaning",
+        "hvac": "HVAC",
+        "general": "General"
+      },
+      "pipeline": {
+        "actions": {
+          "assignReview": "Assign & Review",
+          "startWork": "Start Work",
+          "markComplete": "Mark Complete",
+          "cancel": "Cancel Request",
+          "reopen": "Reopen"
+        },
+        "assignAndProceed": "Assign & Proceed",
+        "setPriority": "Set Priority",
+        "selectTechnician": "Select Technician"
+      },
+      "detail": {
+        "title": "Maintenance Request Details",
+        "back": "Back to Maintenance",
+        "requesterInfo": "Requester Information",
+        "issueDetails": "Issue Details",
+        "resolutionNotes": "Resolution Notes",
+        "resolutionPlaceholder": "Add resolution notes...",
+        "assignment": "Assignment & Status",
+        "assignedTo": "Assigned To",
+        "changeStatus": "Change Status",
+        "changePriority": "Change Priority",
+        "assignTo": "Assign To",
+        "selectStaff": "Select staff member",
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "saved": "Changes saved successfully",
+        "contactResident": "Contact Requester",
+        "callPhone": "Call",
+        "whatsapp": "WhatsApp",
+        "buildingInfo": "Building Information",
+        "roomNumber": "Room / Area",
+        "createdAt": "Created",
+        "updatedAt": "Last Updated",
+        "completedAt": "Completed At",
+        "noDescription": "No description provided",
+        "noRoomNumber": "Not specified",
+        "noResolutionNotes": "No resolution notes yet",
+        "photos": "Photos",
+        "noPhotos": "No photos attached",
+        "addPhoto": "Add Photo",
+        "uploadingPhoto": "Uploading..."
+      },
+      "notes": {
+        "title": "Internal Notes",
+        "add": "Add Note",
+        "placeholder": "Write an internal note...",
+        "submit": "Post Note",
+        "submitting": "Posting...",
+        "empty": "No notes yet",
+        "emptyDescription": "Add internal notes to track progress on this maintenance request"
+      },
+      "empty": {
+        "title": "No Maintenance Requests",
+        "description": "Maintenance requests submitted by residents will appear here"
+      },
+      "deleteConfirm": {
+        "title": "Delete Maintenance Request",
+        "description": "Are you sure you want to delete this maintenance request? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    }
   }
 }

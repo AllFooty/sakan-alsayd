@@ -1,0 +1,142 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { useAuth } from '@/lib/auth/hooks';
+import { useEffect, useState, useCallback } from 'react';
+import {
+  MessageSquare,
+  Wrench,
+  Building2,
+  Users,
+} from 'lucide-react';
+
+interface DashboardStats {
+  newBookings: number;
+  openMaintenance: number;
+  totalBuildings: number;
+  activeResidents: number;
+}
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  color,
+  loading,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: number | string;
+  color: string;
+  loading?: boolean;
+}) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="flex items-center gap-4">
+        <div
+          className={`w-12 h-12 rounded-lg flex items-center justify-center ${color}`}
+        >
+          <Icon size={24} className="text-white" />
+        </div>
+        <div>
+          {loading ? (
+            <div className="h-7 w-12 bg-gray-200 rounded animate-pulse" />
+          ) : (
+            <p className="text-2xl font-bold text-navy">{value}</p>
+          )}
+          <p className="text-sm text-gray-500">{label}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminDashboard() {
+  const t = useTranslations('admin.dashboard');
+  const { profile, loading: authLoading } = useAuth();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/dashboard-stats');
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
+    } catch {
+      // Stats will show loading state
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  if (authLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl border border-gray-200 p-5 h-24 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-navy">
+          {t('welcome', { name: profile?.full_name || '' })}
+        </h1>
+        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={MessageSquare}
+          label={t('stats.newBookings')}
+          value={stats?.newBookings ?? 0}
+          color="bg-coral"
+          loading={statsLoading}
+        />
+        <StatCard
+          icon={Wrench}
+          label={t('stats.openMaintenance')}
+          value={stats?.openMaintenance ?? 0}
+          color="bg-orange-500"
+          loading={statsLoading}
+        />
+        <StatCard
+          icon={Building2}
+          label={t('stats.totalBuildings')}
+          value={stats?.totalBuildings ?? 0}
+          color="bg-navy"
+          loading={statsLoading}
+        />
+        <StatCard
+          icon={Users}
+          label={t('stats.activeResidents')}
+          value={stats?.activeResidents ?? 0}
+          color="bg-green-600"
+          loading={statsLoading}
+        />
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-navy mb-4">
+          {t('recentActivity')}
+        </h2>
+        <p className="text-gray-400 text-sm">{t('noActivity')}</p>
+      </div>
+    </div>
+  );
+}

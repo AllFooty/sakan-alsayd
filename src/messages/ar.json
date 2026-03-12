@@ -250,7 +250,23 @@
       "transportation": "مسؤول المواصلات",
       "finance": "مسؤول المالية"
     },
-    "whatsapp": "تواصلِ عبر واتساب"
+    "whatsapp": "تواصلِ عبر واتساب",
+    "whatsappSubtitle": "الرد خلال دقائق",
+    "startChat": "ابدئي المحادثة",
+    "maintenanceTitle": "طلب صيانة",
+    "maintenanceSubtitle": "أبلغينا عن أي مشكلة",
+    "submitMaintenance": "تقديم طلب صيانة",
+    "contactNumbers": "أرقام التواصل",
+    "businessHours": "ساعات العمل",
+    "businessHoursWeekday": "السبت - الخميس: 9 صباحاً - 9 مساءً",
+    "businessHoursFriday": "الجمعة: 4 مساءً - 9 مساءً",
+    "placeholders": {
+      "fullName": "أدخلي اسمك الكامل",
+      "email": "example@email.com",
+      "phone": "05XXXXXXXX",
+      "city": "اختاري المدينة",
+      "message": "اكتبي رسالتك هنا..."
+    }
   },
   "footer": {
     "description": "سكن السيد - أكثر من 10 سنوات من الخبرة في توفير بيئة آمنة ومحافظة للطالبات والموظفات في أفضل أحياء السعودية",
@@ -263,7 +279,8 @@
     "accountName": "مكتب علي إبراهيم محمد الحسن للتطوير والاستثمار العقاري",
     "rights": "جميع الحقوق محفوظة",
     "terms": "الشروط والأحكام",
-    "privacy": "سياسة الخصوصية"
+    "privacy": "سياسة الخصوصية",
+    "staff": "بوابة الموظفين"
   },
   "common": {
     "sar": "ريال",
@@ -276,5 +293,384 @@
     "title": "اختاري الفرع",
     "subtitle": "اختاري فرعك للتواصل معنا عبر واتساب",
     "close": "إغلاق"
+  },
+  "bookingModal": {
+    "title": "احجزي غرفتك",
+    "submit": "إرسال طلب الحجز",
+    "submitting": "جاري الإرسال...",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "currency": "ريال",
+    "placeholders": {
+      "fullName": "الاسم الكامل",
+      "email": "email@example.com",
+      "phone": "05XXXXXXXX",
+      "notes": "أي ملاحظات إضافية..."
+    },
+    "steps": {
+      "city": {
+        "title": "اختاري مدينتك",
+        "buildings": "فروع"
+      },
+      "building": {
+        "title": "اختاري الفرع",
+        "rooms": "نوع غرفة",
+        "from": "يبدأ من"
+      },
+      "room": {
+        "title": "اختاري غرفتك"
+      },
+      "info": {
+        "title": "معلوماتك الشخصية",
+        "name": "الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الجوال",
+        "notes": "ملاحظات إضافية"
+      }
+    },
+    "summary": {
+      "building": "الفرع",
+      "room": "الغرفة",
+      "price": "السعر"
+    },
+    "success": {
+      "title": "تم إرسال طلب الحجز",
+      "heading": "شكراً لك!",
+      "description": "تم إرسال طلب الحجز بنجاح. سيتواصل فريقنا معك قريباً لتأكيد الحجز.",
+      "close": "تم"
+    }
+  },
+  "maintenanceModal": {
+    "title": "الإبلاغ عن مشكلة صيانة",
+    "submit": "إرسال الطلب",
+    "submitting": "جاري الإرسال...",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "next": "التالي",
+    "placeholders": {
+      "building": "الفرع",
+      "fullName": "الاسم الكامل",
+      "phone": "05XXXXXXXX"
+    },
+    "steps": {
+      "building": {
+        "title": "اختاري الفرع",
+        "buildings": "فروع"
+      },
+      "details": {
+        "title": "تفاصيل المشكلة",
+        "category": "التصنيف",
+        "categoryPlaceholder": "اختاري التصنيف",
+        "issueTitle": "عنوان المشكلة",
+        "issueTitlePlaceholder": "وصف مختصر للمشكلة",
+        "description": "الوصف",
+        "descriptionPlaceholder": "صفي المشكلة بالتفصيل...",
+        "roomNumber": "رقم الغرفة / المنطقة",
+        "roomNumberPlaceholder": "مثل: غرفة 12، المطبخ، الممر"
+      },
+      "info": {
+        "title": "معلوماتك الشخصية",
+        "name": "الاسم الكامل",
+        "phone": "رقم الجوال"
+      }
+    },
+    "categories": {
+      "plumbing": "سباكة",
+      "electrical": "كهرباء",
+      "furniture": "أثاث",
+      "cleaning": "تنظيف",
+      "hvac": "تكييف",
+      "general": "عام"
+    },
+    "photos": "صور (اختياري)",
+    "photosHint": "ارفع حتى 3 صور",
+    "uploading": "جاري رفع الصور...",
+    "success": {
+      "title": "تم إرسال الطلب",
+      "heading": "شكراً لك!",
+      "description": "تم إرسال طلب الصيانة بنجاح. سيقوم فريقنا بمراجعته واتخاذ الإجراء اللازم في أقرب وقت.",
+      "close": "تم"
+    }
+  },
+  "admin": {
+    "login": {
+      "title": "بوابة الإدارة",
+      "subtitle": "سجل دخولك بالبريد الإلكتروني",
+      "emailLabel": "البريد الإلكتروني",
+      "emailHint": "أدخل بريدك الإلكتروني الخاص بالعمل",
+      "passwordLabel": "كلمة المرور",
+      "signIn": "تسجيل الدخول",
+      "switchToOtp": "الدخول برمز التحقق بدلاً من ذلك",
+      "switchToPassword": "الدخول بكلمة المرور بدلاً من ذلك",
+      "sendOtp": "إرسال رمز التحقق",
+      "otpLabel": "رمز التحقق",
+      "otpSent": "تم إرسال رمز التحقق إلى {email}",
+      "verify": "تحقق وسجل الدخول",
+      "resendOtp": "إعادة إرسال الرمز",
+      "backToEmail": "تغيير البريد",
+      "backToWebsite": "العودة للموقع",
+      "errors": {
+        "unexpected": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "sidebar": {
+      "dashboard": "لوحة المعلومات",
+      "bookings": "طلبات الحجز",
+      "maintenance": "الصيانة",
+      "buildings": "المباني والغرف",
+      "residents": "الساكنات",
+      "content": "المحتوى",
+      "settings": "الإعدادات",
+      "version": "v{version}"
+    },
+    "topbar": {
+      "welcome": "مرحباً",
+      "logout": "تسجيل الخروج",
+      "roles": {
+        "super_admin": "مدير عام",
+        "branch_manager": "مدير فرع",
+        "maintenance_staff": "موظف صيانة",
+        "transportation_staff": "مسؤول مواصلات",
+        "supervision_staff": "موظفة إشراف",
+        "finance_staff": "موظف مالية"
+      }
+    },
+    "dashboard": {
+      "welcome": "مرحباً، {name}",
+      "subtitle": "نظرة عامة على العمليات",
+      "stats": {
+        "newBookings": "حجوزات جديدة",
+        "openMaintenance": "صيانة مفتوحة",
+        "totalBuildings": "إجمالي المباني",
+        "activeResidents": "ساكنات نشطات"
+      },
+      "recentActivity": "آخر النشاطات",
+      "noActivity": "لا توجد نشاطات حديثة"
+    },
+    "comingSoon": {
+      "title": "قريباً",
+      "description": "هذا القسم تحت التطوير وسيكون متاحاً قريباً."
+    },
+    "bookings": {
+      "title": "طلبات الحجز",
+      "subtitle": "إدارة ومتابعة جميع طلبات الحجز",
+      "newRequest": "طلب جديد",
+      "export": "تصدير CSV",
+      "exporting": "جاري التصدير...",
+      "table": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "phone": "الجوال",
+        "city": "المدينة",
+        "status": "الحالة",
+        "assignedTo": "مسند إلى",
+        "date": "التاريخ",
+        "actions": "الإجراءات",
+        "unassigned": "غير مسند"
+      },
+      "filters": {
+        "all": "الكل",
+        "new": "جديد",
+        "in_review": "قيد المراجعة",
+        "pending_payment": "الدفع",
+        "pending_onboarding": "التسكين",
+        "completed": "مكتمل",
+        "rejected": "مرفوض",
+        "cancelled": "ملغي",
+        "search": "البحث بالاسم أو البريد أو الجوال..."
+      },
+      "status": {
+        "new": "جديد",
+        "in_review": "قيد المراجعة",
+        "pending_payment": "بانتظار الدفع",
+        "pending_onboarding": "بانتظار التسكين",
+        "completed": "مكتمل",
+        "rejected": "مرفوض",
+        "cancelled": "ملغي",
+        "contacted": "تم التواصل",
+        "confirmed": "مؤكد"
+      },
+      "pipeline": {
+        "department": {
+          "customer_service": "خدمة العملاء",
+          "finance": "المالية",
+          "supervision": "الإشراف"
+        },
+        "actions": {
+          "startReview": "بدء المراجعة",
+          "sendToFinance": "إرسال للمالية",
+          "sendToSupervision": "إرسال للإشراف",
+          "markComplete": "إتمام الحجز",
+          "reject": "رفض",
+          "cancel": "إلغاء",
+          "reopen": "إعادة فتح"
+        },
+        "assignAndProceed": "إسناد ومتابعة",
+        "selectStaffForDept": "اختر موظف {department}"
+      },
+      "detail": {
+        "title": "تفاصيل طلب الحجز",
+        "back": "العودة لطلبات الحجز",
+        "contactInfo": "معلومات التواصل",
+        "message": "الرسالة",
+        "assignment": "الإسناد والحالة",
+        "currentDepartment": "القسم الحالي",
+        "assignedTo": "مسند إلى",
+        "changeStatus": "تغيير الحالة",
+        "assignTo": "إسناد إلى",
+        "selectStaff": "اختر موظف",
+        "save": "حفظ التغييرات",
+        "saving": "جاري الحفظ...",
+        "saved": "تم حفظ التغييرات بنجاح",
+        "contactCustomer": "التواصل مع العميل",
+        "sendEmail": "إرسال بريد",
+        "callPhone": "اتصال",
+        "whatsapp": "واتساب",
+        "createdAt": "تاريخ الإنشاء",
+        "updatedAt": "آخر تحديث"
+      },
+      "notes": {
+        "title": "الملاحظات الداخلية",
+        "add": "إضافة ملاحظة",
+        "placeholder": "اكتب ملاحظة داخلية...",
+        "submit": "إرسال الملاحظة",
+        "submitting": "جاري الإرسال...",
+        "empty": "لا توجد ملاحظات",
+        "emptyDescription": "أضف ملاحظات داخلية لمتابعة التواصل مع هذا العميل"
+      },
+      "empty": {
+        "title": "لا توجد طلبات حجز",
+        "description": "ستظهر طلبات الحجز من نموذج التواصل في الموقع هنا"
+      },
+      "deleteConfirm": {
+        "title": "حذف طلب الحجز",
+        "description": "هل أنت متأكد من حذف طلب الحجز هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+        "confirm": "حذف",
+        "cancel": "إلغاء"
+      }
+    },
+    "bulk": {
+      "selected": "{count} محدد",
+      "changeStatus": "تغيير الحالة",
+      "apply": "تطبيق",
+      "deleteSelected": "حذف المحددة",
+      "clear": "مسح",
+      "confirmDelete": "هل أنت متأكد من حذف {count} عنصر؟",
+      "bulkUpdateSuccess": "تم تحديث {count} عنصر",
+      "bulkDeleteSuccess": "تم حذف {count} عنصر"
+    },
+    "maintenance": {
+      "title": "طلبات الصيانة",
+      "subtitle": "إدارة ومتابعة جميع طلبات الصيانة",
+      "newRequest": "طلب جديد",
+      "export": "تصدير CSV",
+      "exporting": "جاري التصدير...",
+      "table": {
+        "title": "العنوان",
+        "building": "المبنى",
+        "category": "التصنيف",
+        "priority": "الأولوية",
+        "status": "الحالة",
+        "assignedTo": "مسند إلى",
+        "date": "التاريخ",
+        "actions": "الإجراءات",
+        "unassigned": "غير مسند",
+        "requester": "مقدم الطلب",
+        "phone": "الجوال"
+      },
+      "filters": {
+        "all": "الكل",
+        "submitted": "مقدَّم",
+        "assigned": "مُعيَّن",
+        "in_progress": "قيد التنفيذ",
+        "completed": "مكتمل",
+        "cancelled": "ملغي",
+        "search": "البحث بالعنوان أو الاسم أو الجوال...",
+        "allPriorities": "جميع الأولويات",
+        "allCategories": "جميع التصنيفات"
+      },
+      "status": {
+        "submitted": "مقدَّم",
+        "assigned": "مُعيَّن",
+        "in_progress": "قيد التنفيذ",
+        "completed": "مكتمل",
+        "cancelled": "ملغي"
+      },
+      "priority": {
+        "low": "منخفضة",
+        "medium": "متوسطة",
+        "high": "عالية",
+        "urgent": "عاجلة"
+      },
+      "category": {
+        "plumbing": "سباكة",
+        "electrical": "كهرباء",
+        "furniture": "أثاث",
+        "cleaning": "تنظيف",
+        "hvac": "تكييف",
+        "general": "عام"
+      },
+      "pipeline": {
+        "actions": {
+          "assignReview": "مراجعة وإسناد",
+          "startWork": "بدء العمل",
+          "markComplete": "إتمام الطلب",
+          "cancel": "إلغاء الطلب",
+          "reopen": "إعادة فتح"
+        },
+        "assignAndProceed": "إسناد ومتابعة",
+        "setPriority": "تحديد الأولوية",
+        "selectTechnician": "اختر الفني"
+      },
+      "detail": {
+        "title": "تفاصيل طلب الصيانة",
+        "back": "العودة لطلبات الصيانة",
+        "requesterInfo": "معلومات مقدم الطلب",
+        "issueDetails": "تفاصيل المشكلة",
+        "resolutionNotes": "ملاحظات الحل",
+        "resolutionPlaceholder": "أضف ملاحظات الحل...",
+        "assignment": "الإسناد والحالة",
+        "assignedTo": "مسند إلى",
+        "changeStatus": "تغيير الحالة",
+        "changePriority": "تغيير الأولوية",
+        "assignTo": "إسناد إلى",
+        "selectStaff": "اختر موظف",
+        "save": "حفظ التغييرات",
+        "saving": "جاري الحفظ...",
+        "saved": "تم حفظ التغييرات بنجاح",
+        "contactResident": "التواصل مع مقدم الطلب",
+        "callPhone": "اتصال",
+        "whatsapp": "واتساب",
+        "buildingInfo": "معلومات المبنى",
+        "roomNumber": "الغرفة / المنطقة",
+        "createdAt": "تاريخ الإنشاء",
+        "updatedAt": "آخر تحديث",
+        "completedAt": "تاريخ الإكمال",
+        "noDescription": "لا يوجد وصف",
+        "noRoomNumber": "غير محدد",
+        "noResolutionNotes": "لا توجد ملاحظات حل بعد",
+        "photos": "الصور",
+        "noPhotos": "لا توجد صور مرفقة",
+        "addPhoto": "إضافة صورة",
+        "uploadingPhoto": "جاري الرفع..."
+      },
+      "notes": {
+        "title": "الملاحظات الداخلية",
+        "add": "إضافة ملاحظة",
+        "placeholder": "اكتب ملاحظة داخلية...",
+        "submit": "إرسال الملاحظة",
+        "submitting": "جاري الإرسال...",
+        "empty": "لا توجد ملاحظات",
+        "emptyDescription": "أضف ملاحظات داخلية لمتابعة تقدم طلب الصيانة"
+      },
+      "empty": {
+        "title": "لا توجد طلبات صيانة",
+        "description": "ستظهر طلبات الصيانة المقدمة من الساكنات هنا"
+      },
+      "deleteConfirm": {
+        "title": "حذف طلب الصيانة",
+        "description": "هل أنت متأكد من حذف طلب الصيانة هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+        "confirm": "حذف",
+        "cancel": "إلغاء"
+      }
+    }
   }
 }

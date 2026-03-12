@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin, DoorOpen } from 'lucide-react';
 import { Card, Button, RoomImage } from '@/components/ui';
+import BookingModal from '@/components/ui/BookingModal';
 import { getLocationById } from '@/data/locations';
 import { formatPrice, cn } from '@/lib/utils';
 
@@ -26,6 +27,11 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const [selectedType, setSelectedType] = useState<RoomType>('all');
+  const [bookingPreselect, setBookingPreselect] = useState<{
+    locationId: string;
+    roomType: string;
+    bathroomType: string;
+  } | null>(null);
 
   const location = getLocationById(locationId);
 
@@ -189,7 +195,11 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
                   variant="primary"
                   className="w-full"
                   onClick={() => {
-                    window.location.href = `/${locale}/#contact`;
+                    setBookingPreselect({
+                      locationId,
+                      roomType: room.type,
+                      bathroomType: room.bathroomType,
+                    });
                   }}
                 >
                   {tBuildings('selectRoom')}
@@ -220,6 +230,12 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
           </div>
         </div>
       </div>
+
+      <BookingModal
+        isOpen={!!bookingPreselect}
+        onClose={() => setBookingPreselect(null)}
+        preselected={bookingPreselect || undefined}
+      />
     </section>
   );
 }

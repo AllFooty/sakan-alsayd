@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui';
+import BookingModal from '@/components/ui/BookingModal';
 import { cn } from '@/lib/utils';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -33,6 +34,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   // Check if we're on the home page
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
@@ -133,10 +135,7 @@ export default function Header() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => {
-                const contactSection = document.getElementById('contact');
-                contactSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={() => setIsBookingOpen(true)}
             >
               {t('bookNow')}
             </Button>
@@ -192,9 +191,8 @@ export default function Header() {
               variant="primary"
               className="mt-2"
               onClick={() => {
-                const contactSection = document.getElementById('contact');
-                contactSection?.scrollIntoView({ behavior: 'smooth' });
                 setIsMobileMenuOpen(false);
+                setIsBookingOpen(true);
               }}
             >
               {t('bookNow')}
@@ -202,6 +200,10 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <BookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+      />
     </header>
   );
 }
