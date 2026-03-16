@@ -162,7 +162,7 @@ export default function Header() {
         <div
           className={cn(
             'lg:hidden overflow-hidden transition-all duration-300',
-            isMobileMenuOpen ? 'max-h-96 pb-4' : 'max-h-0'
+            isMobileMenuOpen ? 'max-h-[600px] pb-4' : 'max-h-0'
           )}
         >
           <div className="flex flex-col gap-4 bg-white rounded-2xl p-4 shadow-lg">
