@@ -33,7 +33,7 @@ function getLocaleFromPath(pathname: string): string {
   return defaultLocale;
 }
 
-export default async function proxy(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Run intl middleware first for locale handling
