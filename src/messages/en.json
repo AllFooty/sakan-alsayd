@@ -376,7 +376,6 @@
       "plumbing": "Plumbing",
       "electrical": "Electrical",
       "furniture": "Furniture",
-      "cleaning": "Cleaning",
       "hvac": "HVAC / AC",
       "general": "General"
     },
@@ -610,7 +609,6 @@
         "plumbing": "Plumbing",
         "electrical": "Electrical",
         "furniture": "Furniture",
-        "cleaning": "Cleaning",
         "hvac": "HVAC",
         "general": "General"
       },

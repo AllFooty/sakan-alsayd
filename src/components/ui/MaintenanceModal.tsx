@@ -26,7 +26,7 @@ interface MaintenanceModalProps {
 }
 
 const maintenanceSchema = z.object({
-  category: z.enum(['plumbing', 'electrical', 'furniture', 'cleaning', 'hvac', 'general']),
+  category: z.enum(['plumbing', 'electrical', 'furniture', 'hvac', 'general']),
   title: z.string().min(3, 'required'),
   description: z.string().optional(),
   room_number: z.string().optional(),
@@ -40,7 +40,7 @@ type Step = 'building' | 'details' | 'info';
 
 const STEPS: Step[] = ['building', 'details', 'info'];
 
-const CATEGORIES = ['plumbing', 'electrical', 'furniture', 'cleaning', 'hvac', 'general'] as const;
+const CATEGORIES = ['plumbing', 'electrical', 'furniture', 'hvac', 'general'] as const;
 
 export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalProps) {
   const locale = useLocale();

@@ -51,7 +51,7 @@ interface MaintenanceRequest {
 const STATUSES = ['all', 'submitted', 'assigned', 'in_progress', 'completed', 'cancelled'] as const;
 const MAINTENANCE_STATUS_OPTIONS = ['submitted', 'assigned', 'in_progress', 'completed', 'cancelled'] as const;
 const PRIORITIES = ['all', 'low', 'medium', 'high', 'urgent'] as const;
-const CATEGORIES = ['all', 'plumbing', 'electrical', 'furniture', 'cleaning', 'hvac', 'general'] as const;
+const CATEGORIES = ['all', 'plumbing', 'electrical', 'furniture', 'hvac', 'general'] as const;
 
 export default function MaintenanceList() {
   const t = useTranslations('admin.maintenance');

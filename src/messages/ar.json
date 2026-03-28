@@ -376,7 +376,6 @@
       "plumbing": "سباكة",
       "electrical": "كهرباء",
       "furniture": "أثاث",
-      "cleaning": "تنظيف",
       "hvac": "تكييف",
       "general": "عام"
     },
@@ -610,7 +609,6 @@
         "plumbing": "سباكة",
         "electrical": "كهرباء",
         "furniture": "أثاث",
-        "cleaning": "تنظيف",
         "hvac": "تكييف",
         "general": "عام"
       },
