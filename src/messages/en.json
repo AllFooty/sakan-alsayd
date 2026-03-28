@@ -359,12 +359,12 @@
         "title": "Issue details",
         "category": "Category",
         "categoryPlaceholder": "Select category",
-        "issueTitle": "Complaints & Suggestions",
-        "issueTitlePlaceholder": "Brief description of your complaint or suggestion",
+        "issueTitle": "Issue Title",
+        "issueTitlePlaceholder": "Brief description of the issue",
         "description": "Description",
         "descriptionPlaceholder": "Describe the issue in detail...",
-        "roomNumber": "Room Number / Area",
-        "roomNumberPlaceholder": "e.g. Room 12, Kitchen, Hallway"
+        "roomNumber": "Room No. / Apartment No. / Building",
+        "roomNumberPlaceholder": "e.g. Room 12, Apt 3, Building A"
       },
       "info": {
         "title": "Your information",

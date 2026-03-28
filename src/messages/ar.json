@@ -359,12 +359,12 @@
         "title": "تفاصيل المشكلة",
         "category": "التصنيف",
         "categoryPlaceholder": "اختاري التصنيف",
-        "issueTitle": "الشكاوى والاقتراحات",
-        "issueTitlePlaceholder": "وصف مختصر للشكوى أو الاقتراح",
+        "issueTitle": "عنوان المشكلة",
+        "issueTitlePlaceholder": "وصف مختصر للمشكلة",
         "description": "الوصف",
         "descriptionPlaceholder": "صفي المشكلة بالتفصيل...",
-        "roomNumber": "رقم الغرفة / المنطقة",
-        "roomNumberPlaceholder": "مثل: غرفة 12، المطبخ، الممر"
+        "roomNumber": "رقم الغرفة / رقم الشقة / المبنى",
+        "roomNumberPlaceholder": "مثل: غرفة 12، شقة 3، مبنى أ"
       },
       "info": {
         "title": "معلوماتك الشخصية",
