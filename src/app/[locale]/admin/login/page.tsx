@@ -168,8 +168,8 @@ function LoginForm() {
                     dir="ltr"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@sakanalsayd.com"
-                    className="w-full rounded-xl border border-gray-300 py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors"
+                    placeholder="test@sakanalsayd.com"
+                    className="w-full rounded-xl border border-gray-300 py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors placeholder:text-gray-300 placeholder:italic"
                     style={
                       locale === 'ar'
                         ? { paddingRight: 40, paddingLeft: 16 }
