@@ -406,11 +406,21 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                       <p className={`text-sm whitespace-pre-wrap ${
                         isSystem ? 'text-blue-700 italic' : 'text-gray-700'
                       }`}>
-                        {isSystem ? note.note.replace('[system] ', '') : note.note}
+                        {isSystem ? (() => {
+                          const raw = note.note.replace('[system] ', '');
+                          const match = raw.match(/^Status changed: (\w+) → (\w+)$/);
+                          if (match) {
+                            return t('notes.statusChanged', {
+                              from: t(`status.${match[1]}`),
+                              to: t(`status.${match[2]}`)
+                            });
+                          }
+                          return raw;
+                        })() : note.note}
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
                         <span className="font-medium">
-                          {note.author?.full_name || 'System'}
+                          {note.author?.full_name || t('notes.system')}
                         </span>
                         <span>&middot;</span>
                         <span>{formatDate(note.created_at)}</span>

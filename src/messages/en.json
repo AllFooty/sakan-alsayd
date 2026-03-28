@@ -547,7 +547,9 @@
         "submit": "Post Note",
         "submitting": "Posting...",
         "empty": "No notes yet",
-        "emptyDescription": "Add internal notes to track communication with this customer"
+        "emptyDescription": "Add internal notes to track communication with this customer",
+        "statusChanged": "Status changed: {from} → {to}",
+        "system": "System"
       },
       "empty": {
         "title": "No Booking Requests",
@@ -679,7 +681,9 @@
         "submit": "Post Note",
         "submitting": "Posting...",
         "empty": "No notes yet",
-        "emptyDescription": "Add internal notes to track progress on this maintenance request"
+        "emptyDescription": "Add internal notes to track progress on this maintenance request",
+        "statusChanged": "Status changed: {from} → {to}",
+        "system": "System"
       },
       "empty": {
         "title": "No Maintenance Requests",
