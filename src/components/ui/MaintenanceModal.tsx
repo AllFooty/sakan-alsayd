@@ -437,18 +437,16 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 )}
               </div>
 
-              {/* Title */}
+              {/* Description */}
               <div>
                 <label className="text-sm font-medium text-navy mb-1 block">
-                  {t('steps.details.issueTitle')} *
+                  {t('steps.details.description')}
                 </label>
-                <input
-                  {...register('title')}
-                  placeholder={t('steps.details.issueTitlePlaceholder')}
-                  className={cn(
-                    'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                    errors.title ? 'border-red-400' : 'border-gray-200'
-                  )}
+                <textarea
+                  {...register('description')}
+                  rows={3}
+                  placeholder={t('steps.details.descriptionPlaceholder')}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                 />
               </div>
 
@@ -464,16 +462,18 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 />
               </div>
 
-              {/* Description */}
+              {/* Complaints & Suggestions */}
               <div>
                 <label className="text-sm font-medium text-navy mb-1 block">
-                  {t('steps.details.description')}
+                  {t('steps.details.issueTitle')} *
                 </label>
-                <textarea
-                  {...register('description')}
-                  rows={3}
-                  placeholder={t('steps.details.descriptionPlaceholder')}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                <input
+                  {...register('title')}
+                  placeholder={t('steps.details.issueTitlePlaceholder')}
+                  className={cn(
+                    'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
+                    errors.title ? 'border-red-400' : 'border-gray-200'
+                  )}
                 />
               </div>
 
