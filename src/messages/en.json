@@ -431,6 +431,12 @@
         "transportation_staff": "Transportation Staff",
         "supervision_staff": "Supervision Staff",
         "finance_staff": "Finance Staff"
+      },
+      "signOutConfirm": {
+        "title": "Sign Out",
+        "description": "Are you sure you want to sign out?",
+        "confirm": "Sign Out",
+        "cancel": "Cancel"
       }
     },
     "dashboard": {

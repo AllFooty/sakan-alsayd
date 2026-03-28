@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { Mail, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 type Step = 'email' | 'otp';
@@ -47,6 +47,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [usePassword, setUsePassword] = useState(isDev);
+  const [showPassword, setShowPassword] = useState(false);
 
   const locale = useLocale();
   const t = useTranslations('admin.login');
@@ -195,19 +196,30 @@ function LoginForm() {
                     />
                     <input
                       id="password"
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       dir="ltr"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
+                      autoComplete="current-password"
                       className="w-full rounded-xl border border-gray-300 py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors"
                       style={
                         locale === 'ar'
-                          ? { paddingRight: 40, paddingLeft: 16 }
-                          : { paddingLeft: 40, paddingRight: 16 }
+                          ? { paddingRight: 40, paddingLeft: 40 }
+                          : { paddingLeft: 40, paddingRight: 40 }
                       }
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      style={locale === 'ar' ? { left: 12 } : { right: 12 }}
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
               )}

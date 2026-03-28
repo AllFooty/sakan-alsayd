@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import { Menu, LogOut, Globe } from 'lucide-react';
 import { useAuth } from '@/lib/auth/hooks';
+import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 
 interface AdminTopbarProps {
   onMenuToggle: () => void;
@@ -15,6 +17,8 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
   const t = useTranslations('admin.topbar');
   const router = useRouter();
   const pathname = usePathname();
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const roleLabels: Record<string, string> = {
     super_admin: t('roles.super_admin'),
@@ -32,8 +36,9 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
   }
 
   async function handleSignOut() {
+    setSigningOut(true);
     await signOut();
-    router.push(`/${locale}/admin/login`);
+    window.location.href = `/${locale}/admin/login`;
   }
 
   return (
@@ -69,7 +74,7 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
           </button>
 
           <button
-            onClick={handleSignOut}
+            onClick={() => setShowSignOutDialog(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg hover:bg-red-50 text-red-600 transition-colors"
           >
             <LogOut size={16} />
@@ -77,6 +82,17 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
           </button>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={showSignOutDialog}
+        onClose={() => setShowSignOutDialog(false)}
+        onConfirm={handleSignOut}
+        title={t('signOutConfirm.title')}
+        description={t('signOutConfirm.description')}
+        confirmLabel={t('signOutConfirm.confirm')}
+        cancelLabel={t('signOutConfirm.cancel')}
+        variant="warning"
+        loading={signingOut}
+      />
     </header>
   );
 }

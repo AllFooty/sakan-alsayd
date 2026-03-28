@@ -431,6 +431,12 @@
         "transportation_staff": "مسؤول مواصلات",
         "supervision_staff": "موظفة إشراف",
         "finance_staff": "موظف مالية"
+      },
+      "signOutConfirm": {
+        "title": "تسجيل الخروج",
+        "description": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+        "confirm": "تسجيل الخروج",
+        "cancel": "إلغاء"
       }
     },
     "dashboard": {
