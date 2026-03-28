@@ -21,6 +21,7 @@ import EmptyState from '@/components/admin/shared/EmptyState';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
 import MaintenanceModal from '@/components/ui/MaintenanceModal';
+import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
 import { generateCsv, downloadCsv } from '@/lib/export';
 
 interface MaintenanceRequest {
@@ -76,8 +77,26 @@ export default function MaintenanceList() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [buildingFilter, setBuildingFilter] = useState<string>('all');
+  const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+  const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>([]);
+  const [buildingsList, setBuildingsList] = useState<{ id: string; slug: string; neighborhood_en: string; neighborhood_ar: string; city_en: string; city_ar: string }[]>([]);
 
   const limit = 20;
+
+  // Fetch staff and buildings for filters
+  useEffect(() => {
+    fetch('/api/maintenance-requests/staff')
+      .then((res) => res.json())
+      .then((data) => setStaffList(Array.isArray(data) ? data : []))
+      .catch(() => {});
+    fetch('/api/buildings')
+      .then((res) => res.json())
+      .then((data) => setBuildingsList(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -96,6 +115,10 @@ export default function MaintenanceList() {
       if (priorityFilter !== 'all') params.set('priority', priorityFilter);
       if (categoryFilter !== 'all') params.set('category', categoryFilter);
       if (searchDebounce) params.set('search', searchDebounce);
+      if (buildingFilter !== 'all') params.set('building_id', buildingFilter);
+      if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
+      if (dateFrom) params.set('date_from', dateFrom);
+      if (dateTo) params.set('date_to', dateTo);
 
       const res = await fetch(`/api/maintenance-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -107,7 +130,7 @@ export default function MaintenanceList() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, priorityFilter, categoryFilter, searchDebounce]);
+  }, [page, statusFilter, priorityFilter, categoryFilter, searchDebounce, buildingFilter, assignedToFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchRequests();
@@ -117,7 +140,7 @@ export default function MaintenanceList() {
   useEffect(() => {
     setPage(1);
     setSelectedIds(new Set());
-  }, [statusFilter, priorityFilter, categoryFilter, searchDebounce]);
+  }, [statusFilter, priorityFilter, categoryFilter, searchDebounce, buildingFilter, assignedToFilter, dateFrom, dateTo]);
 
   // Clear selection when page changes
   useEffect(() => {
@@ -226,6 +249,10 @@ export default function MaintenanceList() {
       if (priorityFilter !== 'all') params.set('priority', priorityFilter);
       if (categoryFilter !== 'all') params.set('category', categoryFilter);
       if (searchDebounce) params.set('search', searchDebounce);
+      if (buildingFilter !== 'all') params.set('building_id', buildingFilter);
+      if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
+      if (dateFrom) params.set('date_from', dateFrom);
+      if (dateTo) params.set('date_to', dateTo);
 
       const res = await fetch(`/api/maintenance-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -308,49 +335,105 @@ export default function MaintenanceList() {
         ))}
       </div>
 
-      {/* Secondary filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        {/* Priority filter */}
-        <select
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
-        >
-          {PRIORITIES.map((p) => (
-            <option key={p} value={p}>
-              {p === 'all' ? t('filters.allPriorities') : t(`priority.${p}`)}
-            </option>
-          ))}
-        </select>
-
-        {/* Category filter */}
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
-        >
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c === 'all' ? t('filters.allCategories') : t(`category.${c}`)}
-            </option>
-          ))}
-        </select>
-
-        {/* Search */}
-        <div className="relative flex-1 min-w-0">
-          <Search
-            size={18}
-            className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder={t('filters.search')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full ps-10 pe-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
-          />
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <Search
+          size={18}
+          className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400"
+        />
+        <input
+          type="text"
+          placeholder={t('filters.search')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full ps-10 pe-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+        />
       </div>
+
+      {/* Advanced Filters */}
+      <AdvancedFilters
+        fields={[
+          {
+            key: 'priority',
+            label: t('filters.allPriorities'),
+            type: 'select',
+            options: PRIORITIES.map((p) => ({
+              value: p,
+              label: p === 'all' ? t('filters.allPriorities') : t(`priority.${p}`),
+            })),
+          },
+          {
+            key: 'category',
+            label: t('filters.allCategories'),
+            type: 'select',
+            options: CATEGORIES.map((c) => ({
+              value: c,
+              label: c === 'all' ? t('filters.allCategories') : t(`category.${c}`),
+            })),
+          },
+          {
+            key: 'building_id',
+            label: t('filters.building'),
+            type: 'select',
+            options: [
+              { value: 'all', label: t('filters.allBuildings') },
+              ...buildingsList.map((b) => ({
+                value: b.id,
+                label: isArabic
+                  ? `${b.neighborhood_ar} - ${b.city_ar}`
+                  : `${b.neighborhood_en} - ${b.city_en}`,
+              })),
+            ],
+          },
+          {
+            key: 'assigned_to',
+            label: t('filters.assignedTo'),
+            type: 'select',
+            options: [
+              { value: 'all', label: t('filters.allStaff') },
+              ...staffList.map((s) => ({ value: s.id, label: s.full_name })),
+            ],
+          },
+          { key: 'date_from', label: t('filters.dateFrom'), type: 'date' },
+          { key: 'date_to', label: t('filters.dateTo'), type: 'date' },
+        ]}
+        values={{
+          priority: priorityFilter,
+          category: categoryFilter,
+          building_id: buildingFilter,
+          assigned_to: assignedToFilter,
+          date_from: dateFrom,
+          date_to: dateTo,
+        }}
+        onChange={(key, value) => {
+          if (key === 'priority') setPriorityFilter(value);
+          if (key === 'category') setCategoryFilter(value);
+          if (key === 'building_id') setBuildingFilter(value);
+          if (key === 'assigned_to') setAssignedToFilter(value);
+          if (key === 'date_from') setDateFrom(value);
+          if (key === 'date_to') setDateTo(value);
+        }}
+        onClear={() => {
+          setPriorityFilter('all');
+          setCategoryFilter('all');
+          setBuildingFilter('all');
+          setAssignedToFilter('all');
+          setDateFrom('');
+          setDateTo('');
+        }}
+        activeCount={
+          [
+            priorityFilter !== 'all',
+            categoryFilter !== 'all',
+            buildingFilter !== 'all',
+            assignedToFilter !== 'all',
+            !!dateFrom,
+            !!dateTo,
+          ].filter(Boolean).length
+        }
+        filterLabel={t('filters.advancedFilters')}
+        clearLabel={t('filters.clearFilters')}
+      />
 
       {/* Table */}
       {loading ? (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import {
   Search,
@@ -18,6 +18,7 @@ import EmptyState from '@/components/admin/shared/EmptyState';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
 import BookingModal from '@/components/ui/BookingModal';
+import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
 import { generateCsv, downloadCsv } from '@/lib/export';
 
 interface BookingRequest {
@@ -39,9 +40,18 @@ const STATUSES = ['all', 'new', 'in_review', 'pending_payment', 'pending_onboard
 
 const BOOKING_STATUS_OPTIONS = ['new', 'in_review', 'pending_payment', 'pending_onboarding', 'completed', 'rejected', 'cancelled'] as const;
 
+const CITIES = [
+  { value: 'Khobar', en: 'Khobar', ar: 'الخبر' },
+  { value: 'Dammam', en: 'Dammam', ar: 'الدمام' },
+  { value: 'Jubail', en: 'Jubail', ar: 'الجبيل' },
+  { value: 'Riyadh', en: 'Riyadh', ar: 'الرياض' },
+];
+
 export default function BookingsList() {
   const t = useTranslations('admin.bookings');
   const tb = useTranslations('admin.bulk');
+  const locale = useLocale();
+  const isArabic = locale === 'ar';
   const router = useRouter();
 
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
@@ -58,8 +68,21 @@ export default function BookingsList() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [cityFilter, setCityFilter] = useState<string>('all');
+  const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+  const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>([]);
 
   const limit = 20;
+
+  // Fetch staff list for filter
+  useEffect(() => {
+    fetch('/api/booking-requests/staff')
+      .then((res) => res.json())
+      .then((data) => setStaffList(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -76,6 +99,10 @@ export default function BookingsList() {
       });
       if (statusFilter !== 'all') params.set('status', statusFilter);
       if (searchDebounce) params.set('search', searchDebounce);
+      if (cityFilter !== 'all') params.set('city', cityFilter);
+      if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
+      if (dateFrom) params.set('date_from', dateFrom);
+      if (dateTo) params.set('date_to', dateTo);
 
       const res = await fetch(`/api/booking-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -87,7 +114,7 @@ export default function BookingsList() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchDebounce]);
+  }, [page, statusFilter, searchDebounce, cityFilter, assignedToFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchBookings();
@@ -97,7 +124,7 @@ export default function BookingsList() {
   useEffect(() => {
     setPage(1);
     setSelectedIds(new Set());
-  }, [statusFilter, searchDebounce]);
+  }, [statusFilter, searchDebounce, cityFilter, assignedToFilter, dateFrom, dateTo]);
 
   // Clear selection when page changes
   useEffect(() => {
@@ -199,6 +226,10 @@ export default function BookingsList() {
       const params = new URLSearchParams({ export: 'true' });
       if (statusFilter !== 'all') params.set('status', statusFilter);
       if (searchDebounce) params.set('search', searchDebounce);
+      if (cityFilter !== 'all') params.set('city', cityFilter);
+      if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
+      if (dateFrom) params.set('date_from', dateFrom);
+      if (dateTo) params.set('date_to', dateTo);
 
       const res = await fetch(`/api/booking-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -294,6 +325,55 @@ export default function BookingsList() {
           />
         </div>
       </div>
+
+      {/* Advanced Filters */}
+      <AdvancedFilters
+        fields={[
+          {
+            key: 'city',
+            label: t('filters.city'),
+            type: 'select',
+            options: [
+              { value: 'all', label: t('filters.allCities') },
+              ...CITIES.map((c) => ({ value: c.value, label: isArabic ? c.ar : c.en })),
+            ],
+          },
+          {
+            key: 'assigned_to',
+            label: t('filters.assignedTo'),
+            type: 'select',
+            options: [
+              { value: 'all', label: t('filters.allStaff') },
+              ...staffList.map((s) => ({ value: s.id, label: s.full_name })),
+            ],
+          },
+          { key: 'date_from', label: t('filters.dateFrom'), type: 'date' },
+          { key: 'date_to', label: t('filters.dateTo'), type: 'date' },
+        ]}
+        values={{
+          city: cityFilter,
+          assigned_to: assignedToFilter,
+          date_from: dateFrom,
+          date_to: dateTo,
+        }}
+        onChange={(key, value) => {
+          if (key === 'city') setCityFilter(value);
+          if (key === 'assigned_to') setAssignedToFilter(value);
+          if (key === 'date_from') setDateFrom(value);
+          if (key === 'date_to') setDateTo(value);
+        }}
+        onClear={() => {
+          setCityFilter('all');
+          setAssignedToFilter('all');
+          setDateFrom('');
+          setDateTo('');
+        }}
+        activeCount={
+          [cityFilter !== 'all', assignedToFilter !== 'all', !!dateFrom, !!dateTo].filter(Boolean).length
+        }
+        filterLabel={t('filters.advancedFilters')}
+        clearLabel={t('filters.clearFilters')}
+      />
 
       {/* Table */}
       {loading ? (

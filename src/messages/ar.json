@@ -480,7 +480,15 @@
         "completed": "مكتمل",
         "rejected": "مرفوض",
         "cancelled": "ملغي",
-        "search": "البحث بالاسم أو البريد أو الجوال..."
+        "search": "البحث بالاسم أو البريد أو الجوال أو المدينة أو الرسالة...",
+        "city": "المدينة",
+        "allCities": "جميع المدن",
+        "assignedTo": "مُعيَّن إلى",
+        "allStaff": "جميع الموظفين",
+        "dateFrom": "من تاريخ",
+        "dateTo": "إلى تاريخ",
+        "advancedFilters": "تصفية",
+        "clearFilters": "مسح"
       },
       "status": {
         "new": "جديد",
@@ -588,9 +596,17 @@
         "in_progress": "قيد التنفيذ",
         "completed": "مكتمل",
         "cancelled": "ملغي",
-        "search": "البحث بالعنوان أو الاسم أو الجوال...",
+        "search": "البحث بالعنوان أو الاسم أو الجوال أو الوصف أو الغرفة...",
         "allPriorities": "جميع الأولويات",
-        "allCategories": "جميع التصنيفات"
+        "allCategories": "جميع التصنيفات",
+        "building": "المبنى",
+        "allBuildings": "جميع المباني",
+        "assignedTo": "مُعيَّن إلى",
+        "allStaff": "جميع الموظفين",
+        "dateFrom": "من تاريخ",
+        "dateTo": "إلى تاريخ",
+        "advancedFilters": "تصفية",
+        "clearFilters": "مسح"
       },
       "status": {
         "submitted": "مقدَّم",

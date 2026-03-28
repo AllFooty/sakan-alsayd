@@ -480,7 +480,15 @@
         "completed": "Completed",
         "rejected": "Rejected",
         "cancelled": "Cancelled",
-        "search": "Search by name, email, or phone..."
+        "search": "Search by name, email, phone, city, or message...",
+        "city": "City",
+        "allCities": "All Cities",
+        "assignedTo": "Assigned To",
+        "allStaff": "All Staff",
+        "dateFrom": "From Date",
+        "dateTo": "To Date",
+        "advancedFilters": "Filters",
+        "clearFilters": "Clear"
       },
       "status": {
         "new": "New",
@@ -588,9 +596,17 @@
         "in_progress": "In Progress",
         "completed": "Completed",
         "cancelled": "Cancelled",
-        "search": "Search by title, name, or phone...",
+        "search": "Search by title, name, phone, description, or room...",
         "allPriorities": "All Priorities",
-        "allCategories": "All Categories"
+        "allCategories": "All Categories",
+        "building": "Building",
+        "allBuildings": "All Buildings",
+        "assignedTo": "Assigned To",
+        "allStaff": "All Staff",
+        "dateFrom": "From Date",
+        "dateTo": "To Date",
+        "advancedFilters": "Filters",
+        "clearFilters": "Clear"
       },
       "status": {
         "submitted": "Submitted",

@@ -12,6 +12,10 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority');
     const category = searchParams.get('category');
     const search = searchParams.get('search');
+    const buildingId = searchParams.get('building_id');
+    const assignedTo = searchParams.get('assigned_to');
+    const dateFrom = searchParams.get('date_from');
+    const dateTo = searchParams.get('date_to');
     const isExport = searchParams.get('export') === 'true';
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '20'), 1), 100);
     const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
@@ -37,7 +41,23 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.or(`title.ilike.%${search}%,requester_name.ilike.%${search}%,requester_phone.ilike.%${search}%`);
+      query = query.or(`title.ilike.%${search}%,requester_name.ilike.%${search}%,requester_phone.ilike.%${search}%,description.ilike.%${search}%,room_number.ilike.%${search}%`);
+    }
+
+    if (buildingId) {
+      query = query.eq('building_id', buildingId);
+    }
+
+    if (assignedTo) {
+      query = query.eq('assigned_to', assignedTo);
+    }
+
+    if (dateFrom) {
+      query = query.gte('created_at', dateFrom);
+    }
+
+    if (dateTo) {
+      query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
     }
 
     query = query.order('created_at', { ascending: false });

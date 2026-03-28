@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const search = searchParams.get('search');
+    const city = searchParams.get('city');
+    const assignedTo = searchParams.get('assigned_to');
+    const dateFrom = searchParams.get('date_from');
+    const dateTo = searchParams.get('date_to');
     const isExport = searchParams.get('export') === 'true';
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '20'), 1), 100);
     const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
@@ -24,7 +28,23 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
+      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%,city_interested.ilike.%${search}%,message.ilike.%${search}%`);
+    }
+
+    if (city) {
+      query = query.ilike('city_interested', `%${city}%`);
+    }
+
+    if (assignedTo) {
+      query = query.eq('assigned_to', assignedTo);
+    }
+
+    if (dateFrom) {
+      query = query.gte('created_at', dateFrom);
+    }
+
+    if (dateTo) {
+      query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
     }
 
     query = query.order('created_at', { ascending: false });
