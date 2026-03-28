@@ -551,6 +551,10 @@
         "statusChanged": "Status changed: {from} → {to}",
         "system": "System"
       },
+      "activityLog": {
+        "title": "Activity Log",
+        "empty": "No activity yet"
+      },
       "empty": {
         "title": "No Booking Requests",
         "description": "Booking requests from the website contact form will appear here"
@@ -684,6 +688,10 @@
         "emptyDescription": "Add internal notes to track progress on this maintenance request",
         "statusChanged": "Status changed: {from} → {to}",
         "system": "System"
+      },
+      "activityLog": {
+        "title": "Activity Log",
+        "empty": "No activity yet"
       },
       "empty": {
         "title": "No Maintenance Requests",

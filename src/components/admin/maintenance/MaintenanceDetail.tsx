@@ -21,6 +21,7 @@ import {
   ImageIcon,
   Plus,
   Loader2,
+  History,
 } from 'lucide-react';
 import StatusBadge, {
   getMaintenanceStatusVariant,
@@ -558,48 +559,80 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
               </button>
             </div>
 
-            {notes.length === 0 ? (
-              <div className="text-center py-6">
-                <StickyNote size={24} className="mx-auto text-gray-300 mb-2" />
-                <p className="text-sm text-gray-400">{t('notes.empty')}</p>
-                <p className="text-xs text-gray-300 mt-1">{t('notes.emptyDescription')}</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {notes.map((note) => {
-                  const isSystem = note.note.startsWith('[system]');
-                  return (
+            {(() => {
+              const userNotes = notes.filter(n => !n.note.startsWith('[system]'));
+              return userNotes.length === 0 ? (
+                <div className="text-center py-6">
+                  <StickyNote size={24} className="mx-auto text-gray-300 mb-2" />
+                  <p className="text-sm text-gray-400">{t('notes.empty')}</p>
+                  <p className="text-xs text-gray-300 mt-1">{t('notes.emptyDescription')}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {userNotes.map((note) => (
                     <div
                       key={note.id}
-                      className={`rounded-lg p-3 border ${
-                        isSystem ? 'bg-blue-50/50 border-blue-100' : 'bg-gray-50 border-gray-100'
-                      }`}
+                      className="rounded-lg p-3 border bg-gray-50 border-gray-100"
                     >
-                      <p className={`text-sm whitespace-pre-wrap ${
-                        isSystem ? 'text-blue-700 italic' : 'text-gray-700'
-                      }`}>
-                        {isSystem ? (() => {
-                          const raw = note.note.replace('[system] ', '');
-                          const match = raw.match(/^Status changed: (\w+) → (\w+)$/);
-                          if (match) {
-                            return t('notes.statusChanged', {
-                              from: t(`status.${match[1]}`),
-                              to: t(`status.${match[2]}`)
-                            });
-                          }
-                          return raw;
-                        })() : note.note}
+                      <p className="text-sm whitespace-pre-wrap text-gray-700">
+                        {note.note}
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                        <span className="font-medium">{note.author?.full_name || t('notes.system')}</span>
+                        <span className="font-medium">{note.author?.full_name}</span>
                         <span>&middot;</span>
                         <span>{formatDate(note.created_at)}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Activity Log section */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h2 className="text-base font-semibold text-navy mb-4 flex items-center gap-2">
+              <History size={18} />
+              {t('activityLog.title')}
+            </h2>
+
+            {(() => {
+              const systemNotes = notes.filter(n => n.note.startsWith('[system]'));
+              return systemNotes.length === 0 ? (
+                <div className="text-center py-6">
+                  <History size={24} className="mx-auto text-gray-300 mb-2" />
+                  <p className="text-sm text-gray-400">{t('activityLog.empty')}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {systemNotes.map((note) => {
+                    const raw = note.note.replace('[system] ', '');
+                    const match = raw.match(/^Status changed: (\w+) → (\w+)$/);
+                    const displayText = match
+                      ? t('notes.statusChanged', {
+                          from: t(`status.${match[1]}`),
+                          to: t(`status.${match[2]}`)
+                        })
+                      : raw;
+                    return (
+                      <div
+                        key={note.id}
+                        className="rounded-lg p-3 border bg-blue-50/50 border-blue-100"
+                      >
+                        <p className="text-sm whitespace-pre-wrap text-blue-700 italic">
+                          {displayText}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                          <span className="font-medium">{note.author?.full_name || t('notes.system')}</span>
+                          <span>&middot;</span>
+                          <span>{formatDate(note.created_at)}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         </div>
 
