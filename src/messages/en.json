@@ -553,7 +553,8 @@
       },
       "activityLog": {
         "title": "Activity Log",
-        "empty": "No activity yet"
+        "empty": "No activity yet",
+        "created": "Request created"
       },
       "empty": {
         "title": "No Booking Requests",
@@ -691,7 +692,9 @@
       },
       "activityLog": {
         "title": "Activity Log",
-        "empty": "No activity yet"
+        "empty": "No activity yet",
+        "created": "Request created",
+        "completed": "Request completed"
       },
       "empty": {
         "title": "No Maintenance Requests",

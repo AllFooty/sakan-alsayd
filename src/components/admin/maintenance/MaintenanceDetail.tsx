@@ -598,13 +598,22 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
             {(() => {
               const systemNotes = notes.filter(n => n.note.startsWith('[system]'));
-              return systemNotes.length === 0 ? (
-                <div className="text-center py-6">
-                  <History size={24} className="mx-auto text-gray-300 mb-2" />
-                  <p className="text-sm text-gray-400">{t('activityLog.empty')}</p>
-                </div>
-              ) : (
+              return (
                 <div className="space-y-3">
+                  {/* Completion event */}
+                  {request.completed_at && (
+                    <div className="rounded-lg p-3 border bg-green-50/50 border-green-100">
+                      <p className="text-sm text-green-700 italic flex items-center gap-1.5">
+                        <CheckCircle size={14} className="text-green-500" />
+                        {t('activityLog.completed')}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                        <span>{formatDate(request.completed_at)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Status change events */}
                   {systemNotes.map((note) => {
                     const raw = note.note.replace('[system] ', '');
                     const match = raw.match(/^Status changed: (\w+) → (\w+)$/);
@@ -630,6 +639,17 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                       </div>
                     );
                   })}
+
+                  {/* Creation event — always shown at the bottom (oldest) */}
+                  <div className="rounded-lg p-3 border bg-gray-50 border-gray-200">
+                    <p className="text-sm text-gray-600 italic flex items-center gap-1.5">
+                      <Clock size={14} className="text-gray-400" />
+                      {t('activityLog.created')}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                      <span>{formatDate(request.created_at)}</span>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
@@ -813,28 +833,6 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
             </div>
           )}
 
-          {/* Timestamps */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Clock size={14} className="text-gray-400" />
-                <span className="text-gray-500">{t('detail.createdAt')}:</span>
-                <span className="text-navy">{formatDate(request.created_at)}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Clock size={14} className="text-gray-400" />
-                <span className="text-gray-500">{t('detail.updatedAt')}:</span>
-                <span className="text-navy">{formatDate(request.updated_at)}</span>
-              </div>
-              {request.completed_at && (
-                <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle size={14} className="text-green-500" />
-                  <span className="text-gray-500">{t('detail.completedAt')}:</span>
-                  <span className="text-navy">{formatDate(request.completed_at)}</span>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
