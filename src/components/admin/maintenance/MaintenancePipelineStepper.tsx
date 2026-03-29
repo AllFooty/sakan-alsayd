@@ -27,16 +27,18 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
   const t = useTranslations('admin.maintenance');
 
   const isCancelled = status === 'cancelled';
+  const isRejected = status === 'rejected';
+  const isTerminalNegative = isCancelled || isRejected;
   const currentIndex = STATUS_TO_STEP_INDEX[status] ?? -1;
   const cancelledIndex = cancelledAtStep ? (STATUS_TO_STEP_INDEX[cancelledAtStep] ?? -1) : -1;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-      {/* Cancelled banner */}
-      {isCancelled && (
+      {/* Cancelled / Rejected banner */}
+      {isTerminalNegative && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4 text-sm font-medium bg-red-50 text-red-700">
           <X size={16} />
-          {t('filters.cancelled')}
+          {t(`filters.${status}`)}
         </div>
       )}
 
@@ -48,14 +50,14 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
           let isFuture: boolean;
           let isCancelledStep = false;
 
-          if (isCancelled && cancelledIndex >= 0) {
-            // Show progress up to where it was cancelled
+          if (isTerminalNegative && cancelledIndex >= 0) {
+            // Show progress up to where it was cancelled/rejected
             isPast = i < cancelledIndex;
             isCurrent = false;
             isCancelledStep = i === cancelledIndex;
             isFuture = i > cancelledIndex;
-          } else if (isCancelled) {
-            // No info about where it was cancelled - all gray
+          } else if (isTerminalNegative) {
+            // No info about where it was cancelled/rejected - all gray
             isPast = false;
             isCurrent = false;
             isFuture = true;
@@ -96,7 +98,7 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
                 <div
                   className={cn(
                     'flex-1 h-0.5 mx-1 sm:mx-2 mt-[-20px] sm:mt-[-22px]',
-                    (isPast || (isCancelled && cancelledIndex > i)) ? 'bg-green-500' : 'bg-gray-200'
+                    (isPast || (isTerminalNegative && cancelledIndex > i)) ? 'bg-green-500' : 'bg-gray-200'
                   )}
                 />
               )}

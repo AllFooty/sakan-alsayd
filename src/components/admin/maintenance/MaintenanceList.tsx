@@ -47,8 +47,8 @@ interface MaintenanceRequest {
   assigned_staff: { id: string; full_name: string } | null;
 }
 
-const STATUSES = ['all', 'submitted', 'assigned', 'in_progress', 'completed', 'cancelled'] as const;
-const MAINTENANCE_STATUS_OPTIONS = ['submitted', 'assigned', 'in_progress', 'completed', 'cancelled'] as const;
+const STATUSES = ['all', 'submitted', 'assigned', 'in_progress', 'completed', 'rejected', 'cancelled'] as const;
+const MAINTENANCE_STATUS_OPTIONS = ['submitted', 'assigned', 'in_progress', 'completed', 'rejected', 'cancelled'] as const;
 const PRIORITIES = ['all', 'low', 'medium', 'high', 'urgent'] as const;
 const CATEGORIES = ['all', 'plumbing', 'electrical', 'furniture', 'hvac', 'general'] as const;
 

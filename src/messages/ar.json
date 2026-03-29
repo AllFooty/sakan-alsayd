@@ -602,6 +602,7 @@
         "assigned": "مُعيَّن",
         "in_progress": "قيد التنفيذ",
         "completed": "مكتمل",
+        "rejected": "مرفوض",
         "cancelled": "ملغي",
         "search": "البحث بالعنوان أو الاسم أو الجوال أو الوصف أو الغرفة...",
         "allPriorities": "جميع الأولويات",
@@ -620,6 +621,7 @@
         "assigned": "مُعيَّن",
         "in_progress": "قيد التنفيذ",
         "completed": "مكتمل",
+        "rejected": "مرفوض",
         "cancelled": "ملغي"
       },
       "priority": {
@@ -641,6 +643,7 @@
           "assignReview": "مراجعة وإسناد",
           "startWork": "بدء العمل",
           "markComplete": "إتمام الطلب",
+          "reject": "رفض الطلب",
           "cancel": "إلغاء الطلب",
           "reopen": "إعادة فتح"
         },
@@ -700,6 +703,9 @@
       "empty": {
         "title": "لا توجد طلبات صيانة",
         "description": "ستظهر طلبات الصيانة المقدمة من الساكنات هنا"
+      },
+      "rejectConfirm": {
+        "description": "هل أنت متأكد من رفض طلب الصيانة هذا؟ سيتم تحديد الطلب كمرفوض."
       },
       "deleteConfirm": {
         "title": "حذف طلب الصيانة",

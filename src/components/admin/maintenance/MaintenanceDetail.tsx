@@ -95,6 +95,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
   // Confirm dialog state
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false);
 
   // Note state
   const [newNote, setNewNote] = useState('');
@@ -252,6 +253,10 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
   const handleStartWork = () => updateRequest({ status: 'in_progress' });
   const handleComplete = () => updateRequest({ status: 'completed' });
+  const handleReject = () => {
+    setShowRejectConfirm(false);
+    updateRequest({ status: 'rejected' });
+  };
   const handleCancel = () => {
     setShowCancelConfirm(false);
     updateRequest({ status: 'cancelled' });
@@ -330,7 +335,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
     );
   }
 
-  const isTerminal = request.status === 'completed' || request.status === 'cancelled';
+  const isTerminal = request.status === 'completed' || request.status === 'rejected' || request.status === 'cancelled';
 
   return (
     <div className="space-y-4">
@@ -354,8 +359,8 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
       <MaintenancePipelineStepper
         status={request.status}
         cancelledAtStep={
-          request.status === 'cancelled'
-            ? notes.find(n => n.note.includes('\u2192 cancelled'))?.note.match(/Status changed: (\w+) \u2192/)?.[1]
+          request.status === 'cancelled' || request.status === 'rejected'
+            ? notes.find(n => n.note.includes(`\u2192 ${request.status}`))?.note.match(/Status changed: (\w+) \u2192/)?.[1]
             : undefined
         }
       />
@@ -785,20 +790,30 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                     </button>
                   )}
 
-                  {/* Cancel button */}
-                  <button
-                    onClick={() => setShowCancelConfirm(true)}
-                    disabled={actionLoading}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
-                  >
-                    <XCircle size={14} />
-                    {t('pipeline.actions.cancel')}
-                  </button>
+                  {/* Reject & Cancel buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowRejectConfirm(true)}
+                      disabled={actionLoading}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
+                    >
+                      <XCircle size={14} />
+                      {t('pipeline.actions.reject')}
+                    </button>
+                    <button
+                      onClick={() => setShowCancelConfirm(true)}
+                      disabled={actionLoading}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                    >
+                      <XCircle size={14} />
+                      {t('pipeline.actions.cancel')}
+                    </button>
+                  </div>
                 </>
               )}
 
               {/* Reopen */}
-              {request.status === 'cancelled' && (
+              {(request.status === 'rejected' || request.status === 'cancelled') && (
                 <button
                   onClick={handleReopen}
                   disabled={actionLoading}
@@ -835,6 +850,19 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
         </div>
       </div>
+
+      {/* Reject confirmation */}
+      <ConfirmDialog
+        isOpen={showRejectConfirm}
+        onClose={() => setShowRejectConfirm(false)}
+        onConfirm={handleReject}
+        title={t('pipeline.actions.reject')}
+        description={t('rejectConfirm.description')}
+        confirmLabel={t('pipeline.actions.reject')}
+        cancelLabel={t('deleteConfirm.cancel')}
+        variant="danger"
+        loading={actionLoading}
+      />
 
       {/* Cancel confirmation */}
       <ConfirmDialog

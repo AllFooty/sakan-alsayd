@@ -602,6 +602,7 @@
         "assigned": "Assigned",
         "in_progress": "In Progress",
         "completed": "Completed",
+        "rejected": "Rejected",
         "cancelled": "Cancelled",
         "search": "Search by title, name, phone, description, or room...",
         "allPriorities": "All Priorities",
@@ -620,6 +621,7 @@
         "assigned": "Assigned",
         "in_progress": "In Progress",
         "completed": "Completed",
+        "rejected": "Rejected",
         "cancelled": "Cancelled"
       },
       "priority": {
@@ -641,6 +643,7 @@
           "assignReview": "Assign & Review",
           "startWork": "Start Work",
           "markComplete": "Mark Complete",
+          "reject": "Reject Request",
           "cancel": "Cancel Request",
           "reopen": "Reopen"
         },
@@ -700,6 +703,9 @@
       "empty": {
         "title": "No Maintenance Requests",
         "description": "Maintenance requests submitted by residents will appear here"
+      },
+      "rejectConfirm": {
+        "description": "Are you sure you want to reject this maintenance request? The request will be marked as rejected."
       },
       "deleteConfirm": {
         "title": "Delete Maintenance Request",

@@ -81,6 +81,8 @@ export function getMaintenanceStatusVariant(
       return 'warning';
     case 'completed':
       return 'success';
+    case 'rejected':
+      return 'error';
     case 'cancelled':
       return 'neutral';
     default:
