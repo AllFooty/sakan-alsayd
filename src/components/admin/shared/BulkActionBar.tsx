@@ -7,7 +7,7 @@ import { X, Loader2 } from 'lucide-react';
 interface BulkActionBarProps {
   selectedCount: number;
   onChangeStatus: (status: string) => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   onClear: () => void;
   statusOptions: { value: string; label: string }[];
   loading?: boolean;
@@ -92,13 +92,15 @@ export default function BulkActionBar({
             </div>
 
             {/* Delete button */}
-            <button
-              onClick={onDelete}
-              disabled={loading}
-              className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              {t('deleteSelected')}
-            </button>
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                disabled={loading}
+                className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {t('deleteSelected')}
+              </button>
+            )}
 
             {/* Clear button */}
             <button
