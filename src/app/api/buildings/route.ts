@@ -18,7 +18,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch buildings' }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    const response = NextResponse.json(data);
+    // Buildings are very static — cache for 5 minutes
+    response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=600');
+    return response;
   } catch (error) {
     console.error('Buildings fetch error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

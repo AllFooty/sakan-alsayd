@@ -14,10 +14,13 @@ export async function GET() {
     supabase.from('residents').select('*', { count: 'exact', head: true }).eq('status', 'active'),
   ]);
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     newBookings: newBookings.count ?? 0,
     openMaintenance: openMaintenance.count ?? 0,
     totalBuildings: totalBuildings.count ?? 0,
     activeResidents: activeResidents.count ?? 0,
   });
+  // Dashboard stats can be slightly stale — cache for 30 seconds
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=60');
+  return response;
 }

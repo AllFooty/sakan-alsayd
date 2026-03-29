@@ -45,6 +45,9 @@ const CITIES = [
   { value: 'Riyadh', en: 'Riyadh', ar: 'الرياض' },
 ];
 
+// Module-level cache so staff list survives language switches and page navigation
+let cachedStaffList: { id: string; full_name: string }[] | null = null;
+
 export default function BookingsList() {
   const t = useTranslations('admin.bookings');
   const tb = useTranslations('admin.bulk');
@@ -67,15 +70,20 @@ export default function BookingsList() {
   const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
-  const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>([]);
+  const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>(cachedStaffList || []);
 
   const limit = 20;
 
-  // Fetch staff list for filter
+  // Fetch staff list for filter — skip if already cached
   useEffect(() => {
+    if (cachedStaffList) return;
     fetch('/api/booking-requests/staff')
       .then((res) => res.json())
-      .then((data) => setStaffList(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        cachedStaffList = list;
+        setStaffList(list);
+      })
       .catch(() => {});
   }, []);
 

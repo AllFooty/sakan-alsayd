@@ -52,6 +52,10 @@ const MAINTENANCE_STATUS_OPTIONS = ['submitted', 'assigned', 'in_progress', 'com
 const PRIORITIES = ['all', 'low', 'medium', 'high', 'urgent'] as const;
 const CATEGORIES = ['all', 'plumbing', 'electrical', 'furniture', 'hvac', 'general'] as const;
 
+// Module-level caches so filter data survives language switches and page navigation
+let cachedStaffList: { id: string; full_name: string }[] | null = null;
+let cachedBuildingsList: { id: string; slug: string; neighborhood_en: string; neighborhood_ar: string; city_en: string; city_ar: string }[] | null = null;
+
 export default function MaintenanceList() {
   const t = useTranslations('admin.maintenance');
   const tb = useTranslations('admin.bulk');
@@ -76,21 +80,33 @@ export default function MaintenanceList() {
   const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
-  const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>([]);
-  const [buildingsList, setBuildingsList] = useState<{ id: string; slug: string; neighborhood_en: string; neighborhood_ar: string; city_en: string; city_ar: string }[]>([]);
+  const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>(cachedStaffList || []);
+  const [buildingsList, setBuildingsList] = useState<{ id: string; slug: string; neighborhood_en: string; neighborhood_ar: string; city_en: string; city_ar: string }[]>(cachedBuildingsList || []);
 
   const limit = 20;
 
-  // Fetch staff and buildings for filters
+  // Fetch staff and buildings for filters — skip if already cached
   useEffect(() => {
-    fetch('/api/maintenance-requests/staff')
-      .then((res) => res.json())
-      .then((data) => setStaffList(Array.isArray(data) ? data : []))
-      .catch(() => {});
-    fetch('/api/buildings')
-      .then((res) => res.json())
-      .then((data) => setBuildingsList(Array.isArray(data) ? data : []))
-      .catch(() => {});
+    if (!cachedStaffList) {
+      fetch('/api/maintenance-requests/staff')
+        .then((res) => res.json())
+        .then((data) => {
+          const list = Array.isArray(data) ? data : [];
+          cachedStaffList = list;
+          setStaffList(list);
+        })
+        .catch(() => {});
+    }
+    if (!cachedBuildingsList) {
+      fetch('/api/buildings')
+        .then((res) => res.json())
+        .then((data) => {
+          const list = Array.isArray(data) ? data : [];
+          cachedBuildingsList = list;
+          setBuildingsList(list);
+        })
+        .catch(() => {});
+    }
   }, []);
 
   // Debounce search

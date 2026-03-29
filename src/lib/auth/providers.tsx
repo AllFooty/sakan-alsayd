@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
   type ReactNode,
 } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -40,38 +41,67 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
+// Module-level cache so auth state persists across remounts (e.g. language switch).
+// This prevents re-fetching user + profile when the component tree remounts
+// due to locale changes in [locale]/layout.tsx.
+let cachedUser: User | null = null;
+let cachedProfile: StaffProfile | null = null;
+let cacheReady = false;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<StaffProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [user, setUser] = useState<User | null>(cachedUser);
+  const [profile, setProfile] = useState<StaffProfile | null>(cachedProfile);
+  const [loading, setLoading] = useState(!cacheReady);
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
 
   useEffect(() => {
-    async function getSession() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+    // If we already have cached auth state, skip the initial fetch
+    if (cacheReady) {
+      setUser(cachedUser);
+      setProfile(cachedProfile);
+      setLoading(false);
+    } else {
+      // Use getSession() instead of getUser() — reads from local cookie, no network call.
+      // The middleware already called getUser() to refresh the session.
+      async function initSession() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        const sessionUser = session?.user ?? null;
+        setUser(sessionUser);
+        cachedUser = sessionUser;
 
-      if (user) {
-        const { data } = await supabase
-          .from('staff_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        setProfile(data);
+        if (sessionUser) {
+          const { data } = await supabase
+            .from('staff_profiles')
+            .select('*')
+            .eq('id', sessionUser.id)
+            .single();
+          setProfile(data);
+          cachedProfile = data;
+        }
+
+        cacheReady = true;
+        setLoading(false);
       }
 
-      setLoading(false);
+      initSession();
     }
-
-    getSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       const currentUser = session?.user ?? null;
+
+      // Only re-fetch profile if the user actually changed (sign in/out),
+      // not on INITIAL_SESSION or TOKEN_REFRESHED events with the same user
+      if (currentUser?.id === cachedUser?.id && cacheReady) {
+        return;
+      }
+
       setUser(currentUser);
+      cachedUser = currentUser;
 
       if (currentUser) {
         const { data } = await supabase
@@ -80,10 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq('id', currentUser.id)
           .single();
         setProfile(data);
+        cachedProfile = data;
       } else {
         setProfile(null);
+        cachedProfile = null;
       }
 
+      cacheReady = true;
       setLoading(false);
     });
 
@@ -94,6 +127,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    cachedUser = null;
+    cachedProfile = null;
+    cacheReady = false;
   };
 
   return (

@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch staff' }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    const response = NextResponse.json(data);
+    // Staff list changes rarely — cache for 2 minutes, serve stale up to 5 min
+    response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=300');
+    return response;
   } catch (error) {
     console.error('Staff fetch error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -18,10 +18,14 @@ export async function authenticateApiRequest(
 ): Promise<AuthResult | NextResponse> {
   const supabase = await createClient();
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
+  // Use getSession() instead of getUser() — the middleware already called getUser()
+  // to refresh the session, so the cookie-based session is trustworthy here.
+  // This avoids an extra network round-trip to Supabase on every API call.
+  const { data: { session }, error: authError } = await supabase.auth.getSession();
+  if (authError || !session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const user = session.user;
 
   const { data: profile } = await supabase
     .from('staff_profiles')
