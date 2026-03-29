@@ -170,9 +170,9 @@ export default function BookingsList() {
   const totalPages = Math.ceil(total / limit);
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-GB', {
+    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-nu-latn' : 'en-GB', {
       day: '2-digit',
-      month: 'short',
+      month: 'long',
       year: 'numeric',
     });
   };

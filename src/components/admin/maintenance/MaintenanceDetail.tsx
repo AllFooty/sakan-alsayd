@@ -300,12 +300,13 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-GB', {
+    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-nu-latn' : 'en-GB', {
       day: '2-digit',
-      month: 'short',
+      month: 'long',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: true,
     });
   };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -69,6 +69,8 @@ const ACTION_LABELS: Record<string, string> = {
 
 export default function BookingDetail({ bookingId }: { bookingId: string }) {
   const t = useTranslations('admin.bookings');
+  const locale = useLocale();
+  const isArabic = locale === 'ar';
   const router = useRouter();
 
   const [booking, setBooking] = useState<BookingRequest | null>(null);
@@ -209,12 +211,13 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-GB', {
+    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-nu-latn' : 'en-GB', {
       day: '2-digit',
-      month: 'short',
+      month: 'long',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: true,
     });
   };
 
