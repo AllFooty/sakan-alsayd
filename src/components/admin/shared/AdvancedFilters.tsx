@@ -39,7 +39,7 @@ export default function AdvancedFilters({
           onClick={() => setOpen(!open)}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
             open || activeCount > 0
-              ? 'bg-coral/10 text-coral border border-coral/30'
+              ? 'bg-coral text-white border border-coral'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-transparent'
           }`}
         >

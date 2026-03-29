@@ -706,7 +706,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                           onClick={() => setSelectedPriority(p)}
                           className={`px-2 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                             selectedPriority === p
-                              ? 'border-coral bg-coral/10 text-coral'
+                              ? 'border-coral bg-coral text-white'
                               : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
                           }`}
                         >
