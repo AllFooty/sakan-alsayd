@@ -633,6 +633,7 @@
         "electrical": "كهرباء",
         "furniture": "أثاث",
         "hvac": "تكييف",
+        "cleaning": "نظافة",
         "general": "عام"
       },
       "pipeline": {

@@ -633,6 +633,7 @@
         "electrical": "Electrical",
         "furniture": "Furniture",
         "hvac": "HVAC",
+        "cleaning": "Cleaning",
         "general": "General"
       },
       "pipeline": {

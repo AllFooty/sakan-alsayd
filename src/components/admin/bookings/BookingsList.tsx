@@ -238,8 +238,8 @@ export default function BookingsList() {
         name: b.name,
         email: b.email,
         phone: b.phone,
-        city: b.city_interested,
-        status: b.status,
+        city: CITIES.find(c => c.value === b.city_interested)?.[isArabic ? 'ar' : 'en'] || b.city_interested,
+        status: t(`status.${b.status}`),
         assignedTo: b.assigned_staff?.full_name || '',
         date: new Date(b.created_at).toLocaleDateString('en-US', {
           year: 'numeric',

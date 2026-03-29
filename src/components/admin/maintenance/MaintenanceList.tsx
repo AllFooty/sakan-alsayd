@@ -260,9 +260,9 @@ export default function MaintenanceList() {
       const rows = (json.data || []).map((r: MaintenanceRequest) => ({
         title: r.title,
         building: getBuildingName(r),
-        category: r.category,
-        priority: r.priority,
-        status: r.status,
+        category: t(`category.${r.category}`),
+        priority: t(`priority.${r.priority}`),
+        status: t(`status.${r.status}`),
         assignedTo: r.assigned_staff?.full_name || '',
         requester: r.requester_name || '',
         phone: r.requester_phone || '',
