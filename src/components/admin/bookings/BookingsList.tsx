@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import {
   Search,
   Eye,
-  Trash2,
   ChevronLeft,
   ChevronRight,
   MessageSquare,
@@ -15,7 +14,6 @@ import {
 } from 'lucide-react';
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
 import EmptyState from '@/components/admin/shared/EmptyState';
-import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
 import BookingModal from '@/components/ui/BookingModal';
 import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
@@ -61,12 +59,9 @@ export default function BookingsList() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [searchDebounce, setSearchDebounce] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<BookingRequest | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [showNewBooking, setShowNewBooking] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
-  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [cityFilter, setCityFilter] = useState<string>('all');
   const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
@@ -171,44 +166,6 @@ export default function BookingsList() {
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return;
-    setBulkLoading(true);
-    try {
-      const res = await fetch('/api/booking-requests/bulk', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: Array.from(selectedIds) }),
-      });
-      if (res.ok) {
-        setSelectedIds(new Set());
-        setBulkDeleteConfirm(false);
-        fetchBookings();
-      }
-    } catch (error) {
-      console.error('Bulk delete failed:', error);
-    } finally {
-      setBulkLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/booking-requests/${deleteTarget.id}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        setDeleteTarget(null);
-        fetchBookings();
-      }
-    } catch (error) {
-      console.error('Delete failed:', error);
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   const totalPages = Math.ceil(total / limit);
 
@@ -486,16 +443,6 @@ export default function BookingsList() {
                         >
                           <Eye size={16} />
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteTarget(booking);
-                          }}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -534,37 +481,10 @@ export default function BookingsList() {
         </div>
       )}
 
-      {/* Delete confirmation */}
-      <ConfirmDialog
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDelete}
-        title={t('deleteConfirm.title')}
-        description={t('deleteConfirm.description')}
-        confirmLabel={t('deleteConfirm.confirm')}
-        cancelLabel={t('deleteConfirm.cancel')}
-        variant="danger"
-        loading={deleting}
-      />
-
-      {/* Bulk delete confirmation */}
-      <ConfirmDialog
-        isOpen={bulkDeleteConfirm}
-        onClose={() => setBulkDeleteConfirm(false)}
-        onConfirm={handleBulkDelete}
-        title={t('deleteConfirm.title')}
-        description={tb('confirmDelete', { count: selectedIds.size })}
-        confirmLabel={t('deleteConfirm.confirm')}
-        cancelLabel={t('deleteConfirm.cancel')}
-        variant="danger"
-        loading={bulkLoading}
-      />
-
       {/* Bulk action bar */}
       <BulkActionBar
         selectedCount={selectedIds.size}
         onChangeStatus={handleBulkStatusChange}
-        onDelete={() => setBulkDeleteConfirm(true)}
         onClear={() => setSelectedIds(new Set())}
         statusOptions={BOOKING_STATUS_OPTIONS.map((s) => ({
           value: s,
