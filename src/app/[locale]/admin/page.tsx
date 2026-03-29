@@ -9,6 +9,7 @@ import {
   Building2,
   Users,
 } from 'lucide-react';
+import LoadingScreen from '@/components/admin/shared/LoadingScreen';
 
 interface DashboardStats {
   newBookings: number;
@@ -76,19 +77,7 @@ export default function AdminDashboard() {
   }, [fetchStats]);
 
   if (authLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl border border-gray-200 p-5 h-24 animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

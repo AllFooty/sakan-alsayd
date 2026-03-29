@@ -3,23 +3,14 @@
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth/hooks';
 import BookingsList from '@/components/admin/bookings/BookingsList';
+import LoadingScreen from '@/components/admin/shared/LoadingScreen';
 
 export default function BookingsPage() {
   const t = useTranslations('admin.bookings');
   const { loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="h-12 bg-gray-200 rounded animate-pulse" />
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-14 bg-gray-200 rounded animate-pulse" />
-          ))}
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
