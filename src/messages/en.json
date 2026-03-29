@@ -330,7 +330,8 @@
     "summary": {
       "building": "Building",
       "room": "Room",
-      "price": "Price"
+      "price": "Price",
+      "insurance": "Insurance"
     },
     "success": {
       "title": "Booking Request Sent",

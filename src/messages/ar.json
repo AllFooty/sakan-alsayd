@@ -330,7 +330,8 @@
     "summary": {
       "building": "الفرع",
       "room": "الغرفة",
-      "price": "السعر"
+      "price": "السعر",
+      "insurance": "التأمين"
     },
     "success": {
       "title": "تم إرسال طلب الحجز",

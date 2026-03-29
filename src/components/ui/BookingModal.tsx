@@ -205,6 +205,7 @@ export default function BookingModal({
         `${t('summary.building')}: ${buildingLabel}`,
         `${t('summary.room')}: ${roomLabel}`,
         selectedRoom ? `${t('summary.price')}: ${formatPrice(selectedRoom.price)} ${tRooms('pricePerMonth')}` : '',
+        selectedRoom ? `${t('summary.insurance')}: ${formatPrice(500)} ${t('currency')}` : '',
         data.notes ? `\n${t('steps.info.notes')}: ${data.notes}` : '',
       ].filter(Boolean).join('\n');
 
@@ -451,14 +452,24 @@ export default function BookingModal({
                   </div>
                 </div>
                 {selectedRoom && (
-                  <div className="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {selectedRoom && tRooms(`bathroom.${selectedRoom.bathroomType}`)}
-                    </span>
-                    <span className="font-bold text-coral">
-                      {formatPrice(selectedRoom.price)} {tRooms('pricePerMonth')}
-                    </span>
-                  </div>
+                  <>
+                    <div className="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        {selectedRoom && tRooms(`bathroom.${selectedRoom.bathroomType}`)}
+                      </span>
+                      <span className="font-bold text-coral">
+                        {formatPrice(selectedRoom.price)} {tRooms('pricePerMonth')}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        {t('summary.insurance')}
+                      </span>
+                      <span className="text-sm font-medium text-navy">
+                        {formatPrice(500)} {t('currency')}
+                      </span>
+                    </div>
+                  </>
                 )}
               </div>
 
