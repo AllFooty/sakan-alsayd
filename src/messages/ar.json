@@ -298,13 +298,17 @@
     "title": "احجزي غرفتك",
     "submit": "إرسال طلب الحجز",
     "submitting": "جاري الإرسال...",
+    "next": "التالي",
     "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
     "currency": "ريال",
     "placeholders": {
       "fullName": "الاسم الكامل",
       "email": "email@example.com",
       "phone": "05XXXXXXXX",
-      "notes": "أي ملاحظات إضافية..."
+      "emergencyName": "اسم شخص للطوارئ",
+      "emergencyPhone": "05XXXXXXXX",
+      "notes": "أي ملاحظات إضافية...",
+      "medicalDescription": "يرجى ذكر التفاصيل..."
     },
     "steps": {
       "city": {
@@ -319,11 +323,48 @@
       "room": {
         "title": "اختاري غرفتك"
       },
-      "info": {
+      "personal": {
         "title": "معلوماتك الشخصية",
         "name": "الاسم الكامل",
+        "dateOfBirth": "تاريخ الميلاد (بالميلادي)",
+        "occupation": "الحالة الوظيفية",
+        "occupationOptions": {
+          "employee": "موظفة",
+          "student": "طالبة",
+          "trainee": "متدربة",
+          "other": "أخرى"
+        }
+      },
+      "contact": {
+        "title": "معلومات التواصل",
         "email": "البريد الإلكتروني",
         "phone": "رقم الجوال",
+        "emergencyContactName": "اسم شخص للطوارئ",
+        "emergencyContactPhone": "رقم جوال الطوارئ"
+      },
+      "logistics": {
+        "title": "تفاصيل العقد",
+        "contractStartDate": "تاريخ بداية العقد",
+        "transportation": "المواصلات",
+        "withTransportation": "مع مواصلات",
+        "withoutTransportation": "بدون مواصلات"
+      },
+      "additional": {
+        "title": "معلومات إضافية",
+        "medicalIssues": "هل تعانين من أي مشكلة صحية؟",
+        "yes": "نعم",
+        "no": "لا",
+        "medicalDescription": "إذا كانت الإجابة نعم، اذكريها",
+        "referralSource": "كيف سمعتي عن سكن السيد؟",
+        "referralOptions": {
+          "twitter": "تويتر / X",
+          "instagram": "انستقرام",
+          "snapchat": "سناب شات",
+          "tiktok": "تيك توك",
+          "friend": "صديقة / معرفة",
+          "google": "بحث قوقل",
+          "other": "أخرى"
+        },
         "notes": "ملاحظات إضافية"
       }
     },
@@ -331,7 +372,8 @@
       "building": "الفرع",
       "room": "الغرفة",
       "price": "السعر",
-      "insurance": "التأمين"
+      "insurance": "التأمين",
+      "transportation": "المواصلات"
     },
     "success": {
       "title": "تم إرسال طلب الحجز",
@@ -524,6 +566,10 @@
         "title": "تفاصيل طلب الحجز",
         "back": "العودة لطلبات الحجز",
         "contactInfo": "معلومات التواصل",
+        "personalInfo": "المعلومات الشخصية",
+        "emergencyContact": "جهة اتصال الطوارئ",
+        "contractDetails": "تفاصيل العقد",
+        "additionalInfo": "معلومات إضافية",
         "message": "الرسالة",
         "assignment": "الإسناد والحالة",
         "currentDepartment": "القسم الحالي",
@@ -539,7 +585,34 @@
         "callPhone": "اتصال",
         "whatsapp": "واتساب",
         "createdAt": "تاريخ الإنشاء",
-        "updatedAt": "آخر تحديث"
+        "updatedAt": "آخر تحديث",
+        "dateOfBirth": "تاريخ الميلاد",
+        "occupation": "الحالة الوظيفية",
+        "occupationValues": {
+          "employee": "موظفة",
+          "student": "طالبة",
+          "trainee": "متدربة",
+          "other": "أخرى"
+        },
+        "emergencyContactName": "الاسم",
+        "emergencyContactPhone": "رقم الجوال",
+        "contractStartDate": "تاريخ بداية العقد",
+        "transportation": "المواصلات",
+        "withTransportation": "مع مواصلات",
+        "withoutTransportation": "بدون مواصلات",
+        "medicalIssues": "مشاكل صحية",
+        "noMedicalIssues": "لا يوجد",
+        "referralSource": "مصدر المعرفة",
+        "referralValues": {
+          "twitter": "تويتر / X",
+          "instagram": "انستقرام",
+          "snapchat": "سناب شات",
+          "tiktok": "تيك توك",
+          "friend": "صديقة / معرفة",
+          "google": "بحث قوقل",
+          "other": "أخرى"
+        },
+        "notProvided": "غير متوفر"
       },
       "notes": {
         "title": "الملاحظات الداخلية",

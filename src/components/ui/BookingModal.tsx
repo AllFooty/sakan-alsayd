@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -20,6 +20,8 @@ import {
   Users2,
   DoorOpen,
   Building2,
+  Bus,
+  BusFront,
 } from 'lucide-react';
 import { locations, getCities } from '@/data/locations';
 import { formatPrice, cn } from '@/lib/utils';
@@ -35,17 +37,41 @@ interface BookingModalProps {
 }
 
 const bookingSchema = z.object({
+  // personal
   name: z.string().min(2, 'required'),
+  dateOfBirth: z.string().min(1, 'required'),
+  occupation: z.enum(['employee', 'student', 'trainee', 'other'], {
+    message: 'required',
+  }),
+  // contact
   email: z.string().email('invalid'),
   phone: z.string().min(9, 'required'),
+  emergencyContactName: z.string().min(2, 'required'),
+  emergencyContactPhone: z.string().min(9, 'required'),
+  // logistics
+  contractStartDate: z.string().min(1, 'required'),
+  withTransportation: z.boolean(),
+  // additional
+  hasMedicalIssues: z.boolean(),
+  medicalIssuesDescription: z.string().optional(),
+  referralSource: z.string().min(1, 'required'),
   notes: z.string().optional(),
 });
 
 type BookingFormData = z.infer<typeof bookingSchema>;
 
-type Step = 'city' | 'building' | 'room' | 'info';
+type Step = 'city' | 'building' | 'room' | 'personal' | 'contact' | 'logistics' | 'additional';
 
-const STEPS: Step[] = ['city', 'building', 'room', 'info'];
+const STEPS: Step[] = ['city', 'building', 'room', 'personal', 'contact', 'logistics', 'additional'];
+
+const FORM_STEPS: Step[] = ['personal', 'contact', 'logistics', 'additional'];
+
+const FIELDS_PER_STEP: Partial<Record<Step, (keyof BookingFormData)[]>> = {
+  personal: ['name', 'dateOfBirth', 'occupation'],
+  contact: ['email', 'phone', 'emergencyContactName', 'emergencyContactPhone'],
+  logistics: ['contractStartDate', 'withTransportation'],
+  additional: ['referralSource'],
+};
 
 const roomTypeIcons: Record<string, React.ElementType> = {
   single: User,
@@ -53,6 +79,10 @@ const roomTypeIcons: Record<string, React.ElementType> = {
   triple: Users2,
   suite: DoorOpen,
 };
+
+const OCCUPATION_OPTIONS = ['employee', 'student', 'trainee', 'other'] as const;
+
+const REFERRAL_OPTIONS = ['twitter', 'instagram', 'snapchat', 'tiktok', 'friend', 'google', 'other'] as const;
 
 export default function BookingModal({
   isOpen,
@@ -77,10 +107,24 @@ export default function BookingModal({
     register,
     handleSubmit,
     reset: resetForm,
+    trigger,
+    watch,
+    control,
+    setValue,
     formState: { errors },
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      withTransportation: false,
+      hasMedicalIssues: false,
+      notes: '',
+      medicalIssuesDescription: '',
+    },
   });
+
+  const watchHasMedicalIssues = watch('hasMedicalIssues');
+  const watchOccupation = watch('occupation');
+  const watchTransportation = watch('withTransportation');
 
   // Handle preselected values — only trigger when modal opens
   const preselectedLocationId = preselected?.locationId;
@@ -106,7 +150,7 @@ export default function BookingModal({
           bathroomType: room.bathroomType,
           price: room.discountedPrice || room.monthlyPrice,
         });
-        setCurrentStep('info');
+        setCurrentStep('personal');
         return;
       }
     }
@@ -116,7 +160,6 @@ export default function BookingModal({
   // Reset on close
   const handleClose = useCallback(() => {
     onClose();
-    // Delay reset so closing animation finishes
     setTimeout(() => {
       setSelectedCity('');
       setSelectedLocationId('');
@@ -152,12 +195,19 @@ export default function BookingModal({
   );
 
   const stepIndex = STEPS.indexOf(currentStep);
+  const isFormStep = FORM_STEPS.includes(currentStep);
+  const isLastStep = currentStep === 'additional';
+
+  // Date limits
+  const today = new Date().toISOString().split('T')[0];
+  const maxDob = new Date();
+  maxDob.setFullYear(maxDob.getFullYear() - 16);
+  const maxDobStr = maxDob.toISOString().split('T')[0];
 
   const handleCitySelect = (city: string) => {
     setSelectedCity(city.toLowerCase());
     setSelectedLocationId('');
     setSelectedRoom(null);
-    // If only one building in city, auto-select it
     const buildings = locations.filter((l) => l.city.toLowerCase() === city.toLowerCase());
     if (buildings.length === 1) {
       setSelectedLocationId(buildings[0].id);
@@ -175,18 +225,29 @@ export default function BookingModal({
 
   const handleRoomSelect = (type: string, bathroomType: string, price: number) => {
     setSelectedRoom({ type, bathroomType, price });
-    setCurrentStep('info');
+    setCurrentStep('personal');
   };
 
   const handleBack = () => {
     const prevIndex = stepIndex - 1;
     if (prevIndex >= 0) {
-      // Skip building step if city has only 1 building
       if (STEPS[prevIndex] === 'building' && cityBuildings.length <= 1) {
         setCurrentStep('city');
       } else {
         setCurrentStep(STEPS[prevIndex]);
       }
+    }
+  };
+
+  const handleNext = async () => {
+    const fields = FIELDS_PER_STEP[currentStep];
+    if (fields) {
+      const valid = await trigger(fields);
+      if (!valid) return;
+    }
+    const nextIndex = stepIndex + 1;
+    if (nextIndex < STEPS.length) {
+      setCurrentStep(STEPS[nextIndex]);
     }
   };
 
@@ -206,7 +267,8 @@ export default function BookingModal({
         `${t('summary.room')}: ${roomLabel}`,
         selectedRoom ? `${t('summary.price')}: ${formatPrice(selectedRoom.price)} ${tRooms('pricePerMonth')}` : '',
         selectedRoom ? `${t('summary.insurance')}: ${formatPrice(500)} ${t('currency')}` : '',
-        data.notes ? `\n${t('steps.info.notes')}: ${data.notes}` : '',
+        `${t('summary.transportation')}: ${data.withTransportation ? t('steps.logistics.withTransportation') : t('steps.logistics.withoutTransportation')}`,
+        data.notes ? `\n${t('steps.additional.notes')}: ${data.notes}` : '',
       ].filter(Boolean).join('\n');
 
       const res = await fetch('/api/contact', {
@@ -218,6 +280,22 @@ export default function BookingModal({
           phone: data.phone,
           city: selectedCity,
           message,
+          date_of_birth: data.dateOfBirth,
+          occupation: data.occupation,
+          emergency_contact_name: data.emergencyContactName,
+          emergency_contact_phone: data.emergencyContactPhone,
+          contract_start_date: data.contractStartDate,
+          with_transportation: data.withTransportation,
+          metadata: {
+            medical_issues: {
+              has_issues: data.hasMedicalIssues,
+              description: data.medicalIssuesDescription || null,
+            },
+            referral_source: data.referralSource,
+            room_type: selectedRoom?.type,
+            bathroom_type: selectedRoom?.bathroomType,
+            building_id: selectedLocationId,
+          },
         }),
       });
 
@@ -231,6 +309,58 @@ export default function BookingModal({
   if (!isOpen) return null;
 
   const BackIcon = isArabic ? ChevronRight : ChevronLeft;
+
+  const inputClassName = (hasError: boolean) =>
+    cn(
+      'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
+      hasError ? 'border-red-400' : 'border-gray-200'
+    );
+
+  // Booking summary card (reused across form steps)
+  const SummaryCard = () => (
+    <div className="bg-gray-50 rounded-xl p-3.5 mb-4">
+      <div className="flex items-center justify-between text-sm">
+        <div>
+          <p className="text-gray-500 text-xs">{t('summary.building')}</p>
+          <p className="font-medium text-navy">
+            {selectedLocation && (
+              <>
+                {isArabic ? selectedLocation.neighborhoodAr : selectedLocation.neighborhood}
+                {', '}
+                {isArabic ? selectedLocation.cityAr : selectedLocation.city}
+              </>
+            )}
+          </p>
+        </div>
+        <div className="text-end">
+          <p className="text-gray-500 text-xs">{t('summary.room')}</p>
+          <p className="font-medium text-navy">
+            {selectedRoom && tRooms(`types.${selectedRoom.type}`)}
+          </p>
+        </div>
+      </div>
+      {selectedRoom && (
+        <>
+          <div className="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between">
+            <span className="text-xs text-gray-500">
+              {tRooms(`bathroom.${selectedRoom.bathroomType}`)}
+            </span>
+            <span className="font-bold text-coral">
+              {formatPrice(selectedRoom.price)} {tRooms('pricePerMonth')}
+            </span>
+          </div>
+          <div className="mt-1.5 flex items-center justify-between">
+            <span className="text-xs text-gray-500">
+              {t('summary.insurance')}
+            </span>
+            <span className="text-sm font-medium text-navy">
+              {formatPrice(500)} {t('currency')}
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  );
 
   return (
     <div
@@ -426,104 +556,284 @@ export default function BookingModal({
                 );
               })}
             </div>
-          ) : (
+          ) : currentStep === 'personal' ? (
             /* Step 4: Personal Info */
             <div>
-              {/* Selection summary */}
-              <div className="bg-gray-50 rounded-xl p-3.5 mb-4">
-                <div className="flex items-center justify-between text-sm">
-                  <div>
-                    <p className="text-gray-500 text-xs">{t('summary.building')}</p>
-                    <p className="font-medium text-navy">
-                      {selectedLocation && (
-                        <>
-                          {isArabic ? selectedLocation.neighborhoodAr : selectedLocation.neighborhood}
-                          {', '}
-                          {isArabic ? selectedLocation.cityAr : selectedLocation.city}
-                        </>
-                      )}
-                    </p>
-                  </div>
-                  <div className="text-end">
-                    <p className="text-gray-500 text-xs">{t('summary.room')}</p>
-                    <p className="font-medium text-navy">
-                      {selectedRoom && tRooms(`types.${selectedRoom.type}`)}
-                    </p>
-                  </div>
-                </div>
-                {selectedRoom && (
-                  <>
-                    <div className="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between">
-                      <span className="text-xs text-gray-500">
-                        {selectedRoom && tRooms(`bathroom.${selectedRoom.bathroomType}`)}
-                      </span>
-                      <span className="font-bold text-coral">
-                        {formatPrice(selectedRoom.price)} {tRooms('pricePerMonth')}
-                      </span>
-                    </div>
-                    <div className="mt-1.5 flex items-center justify-between">
-                      <span className="text-xs text-gray-500">
-                        {t('summary.insurance')}
-                      </span>
-                      <span className="text-sm font-medium text-navy">
-                        {formatPrice(500)} {t('currency')}
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5" id="booking-form">
+              <SummaryCard />
+              <form id="booking-form" onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
+                {/* Name */}
                 <div>
                   <label className="text-sm font-medium text-navy mb-1 block">
-                    {t('steps.info.name')} *
+                    {t('steps.personal.name')} *
                   </label>
                   <input
                     {...register('name')}
                     placeholder={t('placeholders.fullName')}
-                    className={cn(
-                      'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                      errors.name ? 'border-red-400' : 'border-gray-200'
-                    )}
+                    className={inputClassName(!!errors.name)}
                   />
                 </div>
 
+                {/* Date of birth */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1 block">
+                    {t('steps.personal.dateOfBirth')} *
+                  </label>
+                  <input
+                    {...register('dateOfBirth')}
+                    type="date"
+                    dir="ltr"
+                    max={maxDobStr}
+                    className={inputClassName(!!errors.dateOfBirth)}
+                  />
+                </div>
+
+                {/* Occupation */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1.5 block">
+                    {t('steps.personal.occupation')} *
+                  </label>
+                  <Controller
+                    name="occupation"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="grid grid-cols-2 gap-2">
+                        {OCCUPATION_OPTIONS.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => field.onChange(option)}
+                            className={cn(
+                              'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
+                              watchOccupation === option
+                                ? 'border-coral bg-coral/5 text-coral'
+                                : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                            )}
+                          >
+                            {t(`steps.personal.occupationOptions.${option}`)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  />
+                  {errors.occupation && (
+                    <p className="text-red-500 text-xs mt-1">{errors.occupation.message}</p>
+                  )}
+                </div>
+              </form>
+            </div>
+          ) : currentStep === 'contact' ? (
+            /* Step 5: Contact Info */
+            <div>
+              <SummaryCard />
+              <div className="space-y-3.5">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm font-medium text-navy mb-1 block">
-                      {t('steps.info.email')} *
+                      {t('steps.contact.email')} *
                     </label>
                     <input
                       {...register('email')}
                       type="email"
                       placeholder={t('placeholders.email')}
-                      className={cn(
-                        'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                        errors.email ? 'border-red-400' : 'border-gray-200'
-                      )}
+                      className={inputClassName(!!errors.email)}
                     />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-navy mb-1 block">
-                      {t('steps.info.phone')} *
+                      {t('steps.contact.phone')} *
                     </label>
                     <input
                       {...register('phone')}
                       type="tel"
                       dir="ltr"
                       placeholder={t('placeholders.phone')}
-                      className={cn(
-                        'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                        errors.phone ? 'border-red-400' : 'border-gray-200'
-                      )}
+                      className={inputClassName(!!errors.phone)}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-gray-100">
+                  <div>
+                    <label className="text-sm font-medium text-navy mb-1 block">
+                      {t('steps.contact.emergencyContactName')} *
+                    </label>
+                    <input
+                      {...register('emergencyContactName')}
+                      placeholder={t('placeholders.emergencyName')}
+                      className={inputClassName(!!errors.emergencyContactName)}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium text-navy mb-1 block">
-                    {t('steps.info.notes')}
+                    {t('steps.contact.emergencyContactPhone')} *
+                  </label>
+                  <input
+                    {...register('emergencyContactPhone')}
+                    type="tel"
+                    dir="ltr"
+                    placeholder={t('placeholders.emergencyPhone')}
+                    className={inputClassName(!!errors.emergencyContactPhone)}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : currentStep === 'logistics' ? (
+            /* Step 6: Logistics */
+            <div>
+              <SummaryCard />
+              <div className="space-y-4">
+                {/* Contract start date */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1 block">
+                    {t('steps.logistics.contractStartDate')} *
+                  </label>
+                  <input
+                    {...register('contractStartDate')}
+                    type="date"
+                    dir="ltr"
+                    min={today}
+                    className={inputClassName(!!errors.contractStartDate)}
+                  />
+                </div>
+
+                {/* Transportation */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1.5 block">
+                    {t('steps.logistics.transportation')} *
+                  </label>
+                  <Controller
+                    name="withTransportation"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => field.onChange(true)}
+                          className={cn(
+                            'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                            watchTransportation === true
+                              ? 'border-coral bg-coral/5'
+                              : 'border-gray-200 hover:border-coral/50'
+                          )}
+                        >
+                          <Bus size={24} className={watchTransportation === true ? 'text-coral' : 'text-gray-400'} />
+                          <span className={cn(
+                            'text-sm font-medium',
+                            watchTransportation === true ? 'text-coral' : 'text-gray-600'
+                          )}>
+                            {t('steps.logistics.withTransportation')}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => field.onChange(false)}
+                          className={cn(
+                            'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                            watchTransportation === false
+                              ? 'border-coral bg-coral/5'
+                              : 'border-gray-200 hover:border-coral/50'
+                          )}
+                        >
+                          <BusFront size={24} className={watchTransportation === false ? 'text-coral' : 'text-gray-400'} />
+                          <span className={cn(
+                            'text-sm font-medium',
+                            watchTransportation === false ? 'text-coral' : 'text-gray-600'
+                          )}>
+                            {t('steps.logistics.withoutTransportation')}
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : currentStep === 'additional' ? (
+            /* Step 7: Additional Info */
+            <div>
+              <div className="space-y-4">
+                {/* Medical issues */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1.5 block">
+                    {t('steps.additional.medicalIssues')}
+                  </label>
+                  <Controller
+                    name="hasMedicalIssues"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => field.onChange(false)}
+                          className={cn(
+                            'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
+                            !watchHasMedicalIssues
+                              ? 'border-coral bg-coral/5 text-coral'
+                              : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                          )}
+                        >
+                          {t('steps.additional.no')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => field.onChange(true)}
+                          className={cn(
+                            'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
+                            watchHasMedicalIssues
+                              ? 'border-coral bg-coral/5 text-coral'
+                              : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                          )}
+                        >
+                          {t('steps.additional.yes')}
+                        </button>
+                      </div>
+                    )}
+                  />
+                  {watchHasMedicalIssues && (
+                    <div className="mt-2">
+                      <label className="text-xs text-gray-500 mb-1 block">
+                        {t('steps.additional.medicalDescription')}
+                      </label>
+                      <textarea
+                        {...register('medicalIssuesDescription')}
+                        rows={2}
+                        placeholder={t('placeholders.medicalDescription')}
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* How did you hear */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1 block">
+                    {t('steps.additional.referralSource')} *
+                  </label>
+                  <select
+                    {...register('referralSource')}
+                    className={cn(
+                      inputClassName(!!errors.referralSource),
+                      'appearance-none bg-white'
+                    )}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      —
+                    </option>
+                    {REFERRAL_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {t(`steps.additional.referralOptions.${option}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1 block">
+                    {t('steps.additional.notes')}
                   </label>
                   <textarea
                     {...register('notes')}
@@ -539,29 +849,40 @@ export default function BookingModal({
                     <span>{t('error')}</span>
                   </div>
                 )}
-              </form>
+              </div>
             </div>
-          )}
+          ) : null}
         </div>
 
-        {/* Footer - submit button on info step */}
-        {currentStep === 'info' && submitStatus !== 'success' && (
+        {/* Footer - Next button on form steps, Submit on last step */}
+        {isFormStep && submitStatus !== 'success' && (
           <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0">
-            <button
-              type="submit"
-              form="booking-form"
-              disabled={submitStatus === 'loading'}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-coral text-white font-semibold rounded-xl hover:bg-coral/90 disabled:opacity-60 transition-colors shadow-lg shadow-coral/25"
-            >
-              {submitStatus === 'loading' ? (
-                <span>{t('submitting')}</span>
-              ) : (
-                <>
-                  <Send size={18} />
-                  <span>{t('submit')}</span>
-                </>
-              )}
-            </button>
+            {isLastStep ? (
+              <button
+                type="button"
+                onClick={handleSubmit(onSubmit)}
+                disabled={submitStatus === 'loading'}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-coral text-white font-semibold rounded-xl hover:bg-coral/90 disabled:opacity-60 transition-colors shadow-lg shadow-coral/25"
+              >
+                {submitStatus === 'loading' ? (
+                  <span>{t('submitting')}</span>
+                ) : (
+                  <>
+                    <Send size={18} />
+                    <span>{t('submit')}</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-coral text-white font-semibold rounded-xl hover:bg-coral/90 transition-colors shadow-lg shadow-coral/25"
+              >
+                <span>{t('next')}</span>
+                {isArabic ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+              </button>
+            )}
           </div>
         )}
 

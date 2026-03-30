@@ -18,6 +18,12 @@ import {
   ArrowRight,
   RotateCcw,
   History,
+  Calendar,
+  Briefcase,
+  Bus,
+  Heart,
+  Megaphone,
+  AlertTriangle,
 } from 'lucide-react';
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
@@ -50,6 +56,19 @@ interface BookingRequest {
   created_at: string;
   updated_at: string;
   assigned_staff: { id: string; full_name: string } | null;
+  date_of_birth: string | null;
+  occupation: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  contract_start_date: string | null;
+  with_transportation: boolean;
+  metadata: {
+    medical_issues?: { has_issues: boolean; description?: string | null };
+    referral_source?: string;
+    room_type?: string;
+    bathroom_type?: string;
+    building_id?: string;
+  } | null;
 }
 
 // Pipeline transitions
@@ -345,6 +364,149 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
               </a>
             </div>
           </div>
+
+          {/* Personal Info & Emergency Contact */}
+          {(booking.date_of_birth || booking.occupation || booking.emergency_contact_name) && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-base font-semibold text-navy mb-4">
+                {t('detail.personalInfo')}
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {booking.date_of_birth && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <Calendar size={16} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">{t('detail.dateOfBirth')}</p>
+                      <p className="font-medium text-navy" dir="ltr">
+                        {new Date(booking.date_of_birth).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {booking.occupation && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <Briefcase size={16} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">{t('detail.occupation')}</p>
+                      <p className="font-medium text-navy">
+                        {t(`detail.occupationValues.${booking.occupation}`)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Emergency Contact */}
+              {booking.emergency_contact_name && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-1.5">
+                    <AlertTriangle size={14} className="text-orange-500" />
+                    {t('detail.emergencyContact')}
+                  </h3>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                        <User size={16} className="text-orange-500" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">{t('detail.emergencyContactName')}</p>
+                        <p className="font-medium text-navy">{booking.emergency_contact_name}</p>
+                      </div>
+                    </div>
+                    {booking.emergency_contact_phone && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                          <Phone size={16} className="text-orange-500" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">{t('detail.emergencyContactPhone')}</p>
+                          <p className="font-medium text-navy" dir="ltr">{booking.emergency_contact_phone}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Contract Details */}
+          {(booking.contract_start_date || booking.with_transportation !== undefined) && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-base font-semibold text-navy mb-4">
+                {t('detail.contractDetails')}
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {booking.contract_start_date && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <Calendar size={16} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">{t('detail.contractStartDate')}</p>
+                      <p className="font-medium text-navy" dir="ltr">
+                        {new Date(booking.contract_start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <Bus size={16} className="text-gray-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">{t('detail.transportation')}</p>
+                    <p className="font-medium text-navy">
+                      {booking.with_transportation ? t('detail.withTransportation') : t('detail.withoutTransportation')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Additional Info (medical + referral) */}
+          {booking.metadata && (booking.metadata.medical_issues || booking.metadata.referral_source) && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-base font-semibold text-navy mb-4">
+                {t('detail.additionalInfo')}
+              </h2>
+              <div className="space-y-4">
+                {booking.metadata.medical_issues && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <Heart size={16} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">{t('detail.medicalIssues')}</p>
+                      <p className="font-medium text-navy">
+                        {booking.metadata.medical_issues.has_issues
+                          ? booking.metadata.medical_issues.description || t('detail.notProvided')
+                          : t('detail.noMedicalIssues')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {booking.metadata.referral_source && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <Megaphone size={16} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">{t('detail.referralSource')}</p>
+                      <p className="font-medium text-navy">
+                        {t(`detail.referralValues.${booking.metadata.referral_source}`)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Message */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">

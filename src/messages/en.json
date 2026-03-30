@@ -298,13 +298,17 @@
     "title": "Book Your Room",
     "submit": "Submit Booking Request",
     "submitting": "Submitting...",
+    "next": "Next",
     "error": "An error occurred. Please try again.",
     "currency": "SAR",
     "placeholders": {
       "fullName": "Full name",
       "email": "email@example.com",
       "phone": "05XXXXXXXX",
-      "notes": "Any additional notes..."
+      "emergencyName": "Emergency contact name",
+      "emergencyPhone": "05XXXXXXXX",
+      "notes": "Any additional notes...",
+      "medicalDescription": "Please describe..."
     },
     "steps": {
       "city": {
@@ -319,11 +323,48 @@
       "room": {
         "title": "Pick your room"
       },
-      "info": {
-        "title": "Your information",
+      "personal": {
+        "title": "Personal Information",
         "name": "Full Name",
+        "dateOfBirth": "Date of Birth",
+        "occupation": "Occupation",
+        "occupationOptions": {
+          "employee": "Employee",
+          "student": "Student",
+          "trainee": "Trainee",
+          "other": "Other"
+        }
+      },
+      "contact": {
+        "title": "Contact Information",
         "email": "Email",
         "phone": "Phone",
+        "emergencyContactName": "Emergency Contact Name",
+        "emergencyContactPhone": "Emergency Contact Phone"
+      },
+      "logistics": {
+        "title": "Contract Details",
+        "contractStartDate": "Contract Start Date",
+        "transportation": "Transportation",
+        "withTransportation": "With Transportation",
+        "withoutTransportation": "Without Transportation"
+      },
+      "additional": {
+        "title": "Additional Information",
+        "medicalIssues": "Do you have any medical issues?",
+        "yes": "Yes",
+        "no": "No",
+        "medicalDescription": "If yes, please describe",
+        "referralSource": "How did you hear about Sakan Alsayd?",
+        "referralOptions": {
+          "twitter": "Twitter / X",
+          "instagram": "Instagram",
+          "snapchat": "Snapchat",
+          "tiktok": "TikTok",
+          "friend": "Friend / Referral",
+          "google": "Google Search",
+          "other": "Other"
+        },
         "notes": "Additional Notes"
       }
     },
@@ -331,7 +372,8 @@
       "building": "Building",
       "room": "Room",
       "price": "Price",
-      "insurance": "Insurance"
+      "insurance": "Insurance",
+      "transportation": "Transportation"
     },
     "success": {
       "title": "Booking Request Sent",
@@ -524,6 +566,10 @@
         "title": "Booking Request Details",
         "back": "Back to Bookings",
         "contactInfo": "Contact Information",
+        "personalInfo": "Personal Information",
+        "emergencyContact": "Emergency Contact",
+        "contractDetails": "Contract Details",
+        "additionalInfo": "Additional Information",
         "message": "Message",
         "assignment": "Assignment & Status",
         "currentDepartment": "Current Department",
@@ -539,7 +585,34 @@
         "callPhone": "Call",
         "whatsapp": "WhatsApp",
         "createdAt": "Created",
-        "updatedAt": "Last Updated"
+        "updatedAt": "Last Updated",
+        "dateOfBirth": "Date of Birth",
+        "occupation": "Occupation",
+        "occupationValues": {
+          "employee": "Employee",
+          "student": "Student",
+          "trainee": "Trainee",
+          "other": "Other"
+        },
+        "emergencyContactName": "Name",
+        "emergencyContactPhone": "Phone",
+        "contractStartDate": "Contract Start Date",
+        "transportation": "Transportation",
+        "withTransportation": "With Transportation",
+        "withoutTransportation": "Without Transportation",
+        "medicalIssues": "Medical Issues",
+        "noMedicalIssues": "None",
+        "referralSource": "Referral Source",
+        "referralValues": {
+          "twitter": "Twitter / X",
+          "instagram": "Instagram",
+          "snapchat": "Snapchat",
+          "tiktok": "TikTok",
+          "friend": "Friend / Referral",
+          "google": "Google Search",
+          "other": "Other"
+        },
+        "notProvided": "Not provided"
       },
       "notes": {
         "title": "Internal Notes",

@@ -4,7 +4,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, city, message } = body;
+    const {
+      name, email, phone, city, message,
+      date_of_birth, occupation, emergency_contact_name,
+      emergency_contact_phone, contract_start_date,
+      with_transportation, metadata,
+    } = body;
 
     // Basic validation
     if (!name || !email || !phone || !city || !message) {
@@ -25,6 +30,13 @@ export async function POST(request: NextRequest) {
         city_interested: city,
         message,
         status: 'new',
+        date_of_birth: date_of_birth || null,
+        occupation: occupation || null,
+        emergency_contact_name: emergency_contact_name || null,
+        emergency_contact_phone: emergency_contact_phone || null,
+        contract_start_date: contract_start_date || null,
+        with_transportation: with_transportation ?? false,
+        metadata: metadata || {},
       })
       .select()
       .single();
