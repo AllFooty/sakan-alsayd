@@ -312,17 +312,17 @@ export default function BookingModal({
 
   const inputClassName = (hasError: boolean) =>
     cn(
-      'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
+      'w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
       hasError ? 'border-red-400' : 'border-gray-200'
     );
 
   // Booking summary card (reused across form steps)
   const SummaryCard = () => (
-    <div className="bg-gray-50 rounded-xl p-3.5 mb-4">
-      <div className="flex items-center justify-between text-sm">
-        <div>
+    <div className="bg-gray-50 rounded-xl p-3 mb-3">
+      <div className="flex items-center justify-between text-sm gap-3">
+        <div className="min-w-0 flex-1">
           <p className="text-gray-500 text-xs">{t('summary.building')}</p>
-          <p className="font-medium text-navy">
+          <p className="font-medium text-navy truncate">
             {selectedLocation && (
               <>
                 {isArabic ? selectedLocation.neighborhoodAr : selectedLocation.neighborhood}
@@ -332,7 +332,7 @@ export default function BookingModal({
             )}
           </p>
         </div>
-        <div className="text-end">
+        <div className="text-end flex-shrink-0">
           <p className="text-gray-500 text-xs">{t('summary.room')}</p>
           <p className="font-medium text-navy">
             {selectedRoom && tRooms(`types.${selectedRoom.type}`)}
@@ -380,7 +380,7 @@ export default function BookingModal({
             {stepIndex > 0 && submitStatus !== 'success' && (
               <button
                 onClick={handleBack}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2.5 -m-1 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <BackIcon size={20} className="text-gray-600" />
               </button>
@@ -560,7 +560,7 @@ export default function BookingModal({
             /* Step 4: Personal Info */
             <div>
               <SummaryCard />
-              <form id="booking-form" onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
+              <div className="space-y-3.5">
                 {/* Name */}
                 <div>
                   <label className="text-sm font-medium text-navy mb-1 block">
@@ -603,7 +603,7 @@ export default function BookingModal({
                             type="button"
                             onClick={() => field.onChange(option)}
                             className={cn(
-                              'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
+                              'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
                               watchOccupation === option
                                 ? 'border-coral bg-coral/5 text-coral'
                                 : 'border-gray-200 text-gray-600 hover:border-coral/50'
@@ -619,37 +619,35 @@ export default function BookingModal({
                     <p className="text-red-500 text-xs mt-1">{errors.occupation.message}</p>
                   )}
                 </div>
-              </form>
+              </div>
             </div>
           ) : currentStep === 'contact' ? (
             /* Step 5: Contact Info */
             <div>
               <SummaryCard />
-              <div className="space-y-3.5">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm font-medium text-navy mb-1 block">
-                      {t('steps.contact.email')} *
-                    </label>
-                    <input
-                      {...register('email')}
-                      type="email"
-                      placeholder={t('placeholders.email')}
-                      className={inputClassName(!!errors.email)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-navy mb-1 block">
-                      {t('steps.contact.phone')} *
-                    </label>
-                    <input
-                      {...register('phone')}
-                      type="tel"
-                      dir="ltr"
-                      placeholder={t('placeholders.phone')}
-                      className={inputClassName(!!errors.phone)}
-                    />
-                  </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1 block">
+                    {t('steps.contact.email')} *
+                  </label>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder={t('placeholders.email')}
+                    className={inputClassName(!!errors.email)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-navy mb-1 block">
+                    {t('steps.contact.phone')} *
+                  </label>
+                  <input
+                    {...register('phone')}
+                    type="tel"
+                    dir="ltr"
+                    placeholder={t('placeholders.phone')}
+                    className={inputClassName(!!errors.phone)}
+                  />
                 </div>
 
                 <div className="pt-2 border-t border-gray-100">
@@ -768,7 +766,7 @@ export default function BookingModal({
                           type="button"
                           onClick={() => field.onChange(false)}
                           className={cn(
-                            'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
+                            'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
                             !watchHasMedicalIssues
                               ? 'border-coral bg-coral/5 text-coral'
                               : 'border-gray-200 text-gray-600 hover:border-coral/50'
@@ -780,7 +778,7 @@ export default function BookingModal({
                           type="button"
                           onClick={() => field.onChange(true)}
                           className={cn(
-                            'px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all',
+                            'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
                             watchHasMedicalIssues
                               ? 'border-coral bg-coral/5 text-coral'
                               : 'border-gray-200 text-gray-600 hover:border-coral/50'
@@ -798,9 +796,9 @@ export default function BookingModal({
                       </label>
                       <textarea
                         {...register('medicalIssuesDescription')}
-                        rows={2}
+                        rows={3}
                         placeholder={t('placeholders.medicalDescription')}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                       />
                     </div>
                   )}
@@ -839,7 +837,7 @@ export default function BookingModal({
                     {...register('notes')}
                     rows={2}
                     placeholder={t('placeholders.notes')}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                   />
                 </div>
 
