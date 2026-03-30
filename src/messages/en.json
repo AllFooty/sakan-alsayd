@@ -242,7 +242,9 @@
       "submit": "Send",
       "submitting": "Sending...",
       "success": "Your message has been sent successfully!",
-      "error": "An error occurred. Please try again."
+      "error": "An error occurred. Please try again.",
+      "phoneHint": "Saudi mobile: 05XXXXXXXX",
+      "invalidPhone": "Must be 10 digits starting with 05"
     },
     "info": {
       "customerService": "Customer Service",
@@ -300,6 +302,8 @@
     "submitting": "Submitting...",
     "next": "Next",
     "error": "An error occurred. Please try again.",
+    "phoneHint": "Saudi mobile: 05XXXXXXXX",
+    "invalidPhone": "Must be 10 digits starting with 05",
     "currency": "SAR",
     "placeholders": {
       "fullName": "Full name",
@@ -387,6 +391,8 @@
     "submit": "Submit Request",
     "submitting": "Submitting...",
     "error": "An error occurred. Please try again.",
+    "phoneHint": "Saudi mobile: 05XXXXXXXX",
+    "invalidPhone": "Must be 10 digits starting with 05",
     "next": "Next",
     "placeholders": {
       "building": "Building",

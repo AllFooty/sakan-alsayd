@@ -6,17 +6,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Phone, MessageCircle, Send, CheckCircle, AlertCircle, Wrench } from 'lucide-react';
-import { Button, Input, Textarea, Select } from '@/components/ui';
+import { Button, Input, Textarea, Select, PhoneInput } from '@/components/ui';
 import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
 import MaintenanceModal from '@/components/ui/MaintenanceModal';
 import { contacts } from '@/data/contacts';
 import { getCities } from '@/data/locations';
-import { cn } from '@/lib/utils';
+import { cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(9, 'Phone number is required'),
+  phone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
   city: z.string().min(1, 'Please select a city'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
 });
@@ -104,12 +104,11 @@ export default function Contact() {
                   error={errors.email?.message}
                   {...register('email')}
                 />
-                <Input
+                <PhoneInput
                   label={t('form.phone')}
-                  type="tel"
                   placeholder={t('placeholders.phone')}
-                  dir="ltr"
-                  error={errors.phone?.message}
+                  formatHint={t('form.phoneHint')}
+                  error={errors.phone ? t('form.invalidPhone') : undefined}
                   {...register('phone')}
                 />
               </div>

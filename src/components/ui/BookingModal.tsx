@@ -24,7 +24,8 @@ import {
   BusFront,
 } from 'lucide-react';
 import { locations, getCities } from '@/data/locations';
-import { formatPrice, cn } from '@/lib/utils';
+import { formatPrice, cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -45,9 +46,9 @@ const bookingSchema = z.object({
   }),
   // contact
   email: z.string().email('invalid'),
-  phone: z.string().min(9, 'required'),
+  phone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
   emergencyContactName: z.string().min(2, 'required'),
-  emergencyContactPhone: z.string().min(9, 'required'),
+  emergencyContactPhone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
   // logistics
   contractStartDate: z.string().min(1, 'required'),
   withTransportation: z.boolean(),
@@ -638,14 +639,12 @@ export default function BookingModal({
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
-                    {t('steps.contact.phone')} *
-                  </label>
-                  <input
+                  <PhoneInput
+                    label={`${t('steps.contact.phone')} *`}
                     {...register('phone')}
-                    type="tel"
-                    dir="ltr"
                     placeholder={t('placeholders.phone')}
+                    formatHint={t('phoneHint')}
+                    error={errors.phone ? t('invalidPhone') : undefined}
                     className={inputClassName(!!errors.phone)}
                   />
                 </div>
@@ -664,14 +663,12 @@ export default function BookingModal({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
-                    {t('steps.contact.emergencyContactPhone')} *
-                  </label>
-                  <input
+                  <PhoneInput
+                    label={`${t('steps.contact.emergencyContactPhone')} *`}
                     {...register('emergencyContactPhone')}
-                    type="tel"
-                    dir="ltr"
                     placeholder={t('placeholders.emergencyPhone')}
+                    formatHint={t('phoneHint')}
+                    error={errors.emergencyContactPhone ? t('invalidPhone') : undefined}
                     className={inputClassName(!!errors.emergencyContactPhone)}
                   />
                 </div>

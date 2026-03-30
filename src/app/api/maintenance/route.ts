@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isValidSaudiPhone } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,6 +19,13 @@ export async function POST(request: NextRequest) {
     if (!requester_name || !requester_phone || !building_slug || !title || !category) {
       return NextResponse.json(
         { error: 'Required fields: requester_name, requester_phone, building_slug, title, category' },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidSaudiPhone(requester_phone)) {
+      return NextResponse.json(
+        { error: 'Invalid phone number. Must be 10 digits starting with 05.' },
         { status: 400 }
       );
     }

@@ -18,7 +18,8 @@ import {
   Camera,
 } from 'lucide-react';
 import { locations, getCities } from '@/data/locations';
-import { cn } from '@/lib/utils';
+import { cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 
 interface MaintenanceModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ const maintenanceSchema = z.object({
   description: z.string().optional(),
   room_number: z.string().optional(),
   requester_name: z.string().min(2, 'required'),
-  requester_phone: z.string().min(9, 'required'),
+  requester_phone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
 });
 
 type MaintenanceFormData = z.infer<typeof maintenanceSchema>;
@@ -565,14 +566,12 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
-                    {t('steps.info.phone')} *
-                  </label>
-                  <input
+                  <PhoneInput
+                    label={`${t('steps.info.phone')} *`}
                     {...register('requester_phone')}
-                    type="tel"
-                    dir="ltr"
                     placeholder={t('placeholders.phone')}
+                    formatHint={t('phoneHint')}
+                    error={errors.requester_phone ? t('invalidPhone') : undefined}
                     className={cn(
                       'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
                       errors.requester_phone ? 'border-red-400' : 'border-gray-200'
