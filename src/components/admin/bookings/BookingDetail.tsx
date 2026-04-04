@@ -230,7 +230,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-nu-latn' : 'en-GB', {
+    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
