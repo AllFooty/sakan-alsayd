@@ -582,6 +582,7 @@ export default function BookingModal({
                   <input
                     {...register('dateOfBirth')}
                     type="date"
+                    lang="en"
                     max={maxDobStr}
                     className={inputClassName(!!errors.dateOfBirth)}
                   />
@@ -686,6 +687,7 @@ export default function BookingModal({
                   <input
                     {...register('contractStartDate')}
                     type="date"
+                    lang="en"
                     min={today}
                     className={inputClassName(!!errors.contractStartDate)}
                   />

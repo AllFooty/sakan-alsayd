@@ -84,6 +84,7 @@ export default function AdvancedFilters({
               ) : (
                 <input
                   type="date"
+                  lang="en"
                   value={values[field.key] || ''}
                   onChange={(e) => onChange(field.key, e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white"

@@ -29,7 +29,7 @@ import StatusBadge, {
 } from '@/components/admin/shared/StatusBadge';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import MaintenancePipelineStepper from './MaintenancePipelineStepper';
-import { toWhatsAppUrl } from '@/lib/utils';
+import { toWhatsAppUrl, formatDate } from '@/lib/utils';
 
 interface StaffMember {
   id: string;
@@ -299,16 +299,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
+  const formatDateTime = (dateStr: string) => formatDate(dateStr, isArabic ? 'ar' : 'en', { includeTime: true });
 
   if (loading) {
     return (
@@ -351,7 +342,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
         <div className="flex-1">
           <h1 className="text-xl font-bold text-navy">{t('detail.title')}</h1>
           <p className="text-sm text-gray-500">
-            {t('detail.createdAt')}: {formatDate(request.created_at)}
+            {t('detail.createdAt')}: {formatDateTime(request.created_at)}
           </p>
         </div>
       </div>
@@ -586,7 +577,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                       <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
                         <span className="font-medium">{note.author?.full_name}</span>
                         <span>&middot;</span>
-                        <span>{formatDate(note.created_at)}</span>
+                        <span>{formatDateTime(note.created_at)}</span>
                       </div>
                     </div>
                   ))}
@@ -614,7 +605,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                         {t('activityLog.completed')}
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                        <span>{formatDate(request.completed_at)}</span>
+                        <span>{formatDateTime(request.completed_at)}</span>
                       </div>
                     </div>
                   )}
@@ -640,7 +631,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                         <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
                           <span className="font-medium">{note.author?.full_name || t('notes.system')}</span>
                           <span>&middot;</span>
-                          <span>{formatDate(note.created_at)}</span>
+                          <span>{formatDateTime(note.created_at)}</span>
                         </div>
                       </div>
                     );
@@ -653,7 +644,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                       {t('activityLog.created')}
                     </p>
                     <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                      <span>{formatDate(request.created_at)}</span>
+                      <span>{formatDateTime(request.created_at)}</span>
                     </div>
                   </div>
                 </div>

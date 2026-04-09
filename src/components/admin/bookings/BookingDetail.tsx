@@ -28,7 +28,7 @@ import {
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BookingPipelineStepper, { getDepartmentForStatus, getRoleForHandoff } from './BookingPipelineStepper';
-import { toWhatsAppUrl } from '@/lib/utils';
+import { toWhatsAppUrl, formatDate } from '@/lib/utils';
 
 interface StaffMember {
   id: string;
@@ -229,16 +229,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
+  const formatDateTime = (dateStr: string) => formatDate(dateStr, isArabic ? 'ar' : 'en', { includeTime: true });
 
   if (loading) {
     return (
@@ -282,7 +273,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
         <div className="flex-1">
           <h1 className="text-xl font-bold text-navy">{t('detail.title')}</h1>
           <p className="text-sm text-gray-500">
-            {t('detail.createdAt')}: {formatDate(booking.created_at)}
+            {t('detail.createdAt')}: {formatDateTime(booking.created_at)}
           </p>
         </div>
       </div>
@@ -380,7 +371,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                     <div>
                       <p className="text-xs text-gray-500">{t('detail.dateOfBirth')}</p>
                       <p className="font-medium text-navy" dir="ltr">
-                        {new Date(booking.date_of_birth).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                        {formatDate(booking.date_of_birth, 'en')}
                       </p>
                     </div>
                   </div>
@@ -449,7 +440,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                     <div>
                       <p className="text-xs text-gray-500">{t('detail.contractStartDate')}</p>
                       <p className="font-medium text-navy" dir="ltr">
-                        {new Date(booking.contract_start_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                        {formatDate(booking.contract_start_date, 'en')}
                       </p>
                     </div>
                   </div>
@@ -573,7 +564,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                           {note.author?.full_name}
                         </span>
                         <span>&middot;</span>
-                        <span>{formatDate(note.created_at)}</span>
+                        <span>{formatDateTime(note.created_at)}</span>
                       </div>
                     </div>
                   ))}
@@ -616,7 +607,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                             {note.author?.full_name || t('notes.system')}
                           </span>
                           <span>&middot;</span>
-                          <span>{formatDate(note.created_at)}</span>
+                          <span>{formatDateTime(note.created_at)}</span>
                         </div>
                       </div>
                     );
@@ -629,7 +620,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                       {t('activityLog.created')}
                     </p>
                     <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                      <span>{formatDate(booking.created_at)}</span>
+                      <span>{formatDateTime(booking.created_at)}</span>
                     </div>
                   </div>
                 </div>

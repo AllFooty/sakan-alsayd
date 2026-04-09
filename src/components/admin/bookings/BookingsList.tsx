@@ -13,6 +13,7 @@ import {
   Download,
 } from 'lucide-react';
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
+import { formatDate } from '@/lib/utils';
 import EmptyState from '@/components/admin/shared/EmptyState';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
 import BookingModal from '@/components/ui/BookingModal';
@@ -177,13 +178,7 @@ export default function BookingsList() {
 
   const totalPages = Math.ceil(total / limit);
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
+  const formatDateLocal = (dateStr: string) => formatDate(dateStr, isArabic ? 'ar' : 'en');
 
   const handleExport = async () => {
     setExporting(true);
@@ -437,7 +432,7 @@ export default function BookingsList() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">
-                      {formatDate(booking.created_at)}
+                      {formatDateLocal(booking.created_at)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">

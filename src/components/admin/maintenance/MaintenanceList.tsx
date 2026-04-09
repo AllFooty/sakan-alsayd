@@ -12,6 +12,7 @@ import {
   Plus,
   Download,
 } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
 import StatusBadge, {
   getMaintenanceStatusVariant,
   getMaintenancePriorityVariant,
@@ -201,13 +202,7 @@ export default function MaintenanceList() {
 
   const totalPages = Math.ceil(total / limit);
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isArabic ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
+  const formatDateLocal = (dateStr: string) => formatDate(dateStr, isArabic ? 'ar' : 'en');
 
   const getBuildingName = (req: MaintenanceRequest) => {
     if (!req.building) return '—';
@@ -513,7 +508,7 @@ export default function MaintenanceList() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">
-                      {formatDate(req.created_at)}
+                      {formatDateLocal(req.created_at)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
