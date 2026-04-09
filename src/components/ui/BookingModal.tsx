@@ -116,10 +116,18 @@ export default function BookingModal({
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      dateOfBirth: '',
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      contractStartDate: '',
       withTransportation: false,
       hasMedicalIssues: false,
       notes: '',
       medicalIssuesDescription: '',
+      referralSource: '',
     },
   });
 
@@ -568,6 +576,8 @@ export default function BookingModal({
                     {t('steps.personal.name')} *
                   </label>
                   <input
+                    id="booking-name"
+                    autoComplete="name"
                     {...register('name')}
                     placeholder={t('placeholders.fullName')}
                     className={inputClassName(!!errors.name)}
@@ -632,6 +642,8 @@ export default function BookingModal({
                     {t('steps.contact.email')} *
                   </label>
                   <input
+                    id="booking-email"
+                    autoComplete="email"
                     {...register('email')}
                     type="email"
                     placeholder={t('placeholders.email')}
