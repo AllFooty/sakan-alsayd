@@ -11,6 +11,8 @@ import {
 } from '@/components/sections';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 
+const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
+
 export default async function HomePage({
   params,
 }: {
@@ -28,7 +30,7 @@ export default async function HomePage({
         <Hero />
         <About />
         <Services />
-        <Locations />
+        {showLocations && <Locations />}
         <Testimonials />
         <FAQ />
         <Contact />

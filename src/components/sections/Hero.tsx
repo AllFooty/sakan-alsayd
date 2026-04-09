@@ -7,6 +7,8 @@ import { MessageCircle, ChevronDown, Home } from 'lucide-react';
 import { Button } from '@/components/ui';
 import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
 
+const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
+
 export default function Hero() {
   const t = useTranslations('hero');
   const tAbout = useTranslations('about');
@@ -69,14 +71,16 @@ export default function Hero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleExploreRooms}
-              className="w-full sm:w-auto"
-            >
-              {t('exploreRooms')}
-            </Button>
+            {showLocations && (
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleExploreRooms}
+                className="w-full sm:w-auto"
+              >
+                {t('exploreRooms')}
+              </Button>
+            )}
             <Button
               variant="whatsapp"
               size="lg"

@@ -40,9 +40,15 @@ export async function generateStaticParams() {
   }));
 }
 
+const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
+
 export default async function BuildingPage({ params }: Props) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+
+  if (!showLocations) {
+    notFound();
+  }
 
   const location = getLocationById(id);
 
