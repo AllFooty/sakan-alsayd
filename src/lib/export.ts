@@ -20,7 +20,8 @@ export function generateCsv(data: Record<string, unknown>[], columns: CsvColumn[
   );
 
   // Add BOM for Excel compatibility with Arabic text
-  return '\uFEFF' + [headerRow, ...dataRows].join('\r\n');
+  // Add sep=, directive so Excel uses comma delimiter regardless of locale settings
+  return '\uFEFF' + ['sep=,', headerRow, ...dataRows].join('\r\n');
 }
 
 export function downloadCsv(csvContent: string, filename: string): void {
