@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
+const VALID_MAINTENANCE_STATUSES = ['submitted', 'assigned', 'in_progress', 'completed', 'cancelled'];
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -43,6 +45,10 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     const { status, priority, assigned_to, resolution_notes, category } = body;
+
+    if (status && !VALID_MAINTENANCE_STATUSES.includes(status)) {
+      return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_MAINTENANCE_STATUSES.join(', ')}` }, { status: 400 });
+    }
 
     // Fetch current request to detect status change
     let oldStatus: string | null = null;

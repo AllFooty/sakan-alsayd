@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
+function safeInt(val: string | null, fallback: number): number {
+  const parsed = parseInt(val || String(fallback));
+  return Number.isNaN(parsed) ? fallback : parsed;
+}
+
+function isValidDate(val: string): boolean {
+  return !isNaN(new Date(val).getTime());
+}
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest();
     if (isAuthError(auth)) return auth;
-    const { supabase } = auth;
+    const { profile, supabase } = auth;
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
@@ -17,9 +26,13 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('date_from');
     const dateTo = searchParams.get('date_to');
     const isExport = searchParams.get('export') === 'true';
-    const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '20'), 1), 100);
-    const page = Math.max(parseInt(searchParams.get('page') || '1'), 1);
+    const limit = Math.min(Math.max(safeInt(searchParams.get('limit'), 20), 1), 100);
+    const page = Math.max(safeInt(searchParams.get('page'), 1), 1);
     const offset = (page - 1) * limit;
+
+    if (isExport && !['super_admin', 'branch_manager'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden: insufficient role for export' }, { status: 403 });
+    }
 
     let query = supabase
       .from('maintenance_requests')
@@ -52,11 +65,11 @@ export async function GET(request: NextRequest) {
       query = query.eq('assigned_to', assignedTo);
     }
 
-    if (dateFrom) {
+    if (dateFrom && isValidDate(dateFrom)) {
       query = query.gte('created_at', dateFrom);
     }
 
-    if (dateTo) {
+    if (dateTo && isValidDate(dateTo)) {
       query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
     }
 

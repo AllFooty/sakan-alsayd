@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { isValidSaudiPhone } from '@/lib/utils';
+import { isRateLimited } from '@/lib/rate-limit';
+
+const PHOTO_PATH_RE = /^(temp|[0-9a-f-]{36})\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (isRateLimited(`maintenance:${ip}`, 5, 60_000)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     const body = await request.json();
     const {
       requester_name,
@@ -58,9 +66,14 @@ export async function POST(request: NextRequest) {
       priority: 'medium',
     };
 
-    // Accept optional photos array (storage paths)
+    // Accept optional photos array (storage paths) — validate each entry
     if (body.photos && Array.isArray(body.photos)) {
-      insertData.photos = body.photos;
+      const validPhotos = body.photos.filter(
+        (p: unknown): p is string => typeof p === 'string' && PHOTO_PATH_RE.test(p)
+      );
+      if (validPhotos.length > 0) {
+        insertData.photos = validPhotos;
+      }
     }
 
     const { data, error } = await supabase

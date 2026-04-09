@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
+const VALID_BOOKING_STATUSES = ['new', 'in_review', 'pending_payment', 'pending_onboarding', 'completed', 'rejected', 'cancelled'];
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -41,6 +43,10 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     const { status, assigned_to, notes } = body;
+
+    if (status && !VALID_BOOKING_STATUSES.includes(status)) {
+      return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_BOOKING_STATUSES.join(', ')}` }, { status: 400 });
+    }
 
     // Fetch current booking to detect status change
     let oldStatus: string | null = null;

@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { isValidSaudiPhone } from '@/lib/utils';
+import { isRateLimited } from '@/lib/rate-limit';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ALLOWED_METADATA_KEYS = ['source', 'utm_campaign', 'utm_source', 'utm_medium', 'referrer'];
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (isRateLimited(`contact:${ip}`, 5, 60_000)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
+
     const body = await request.json();
     const {
       name, email, phone, city, message,
@@ -20,6 +29,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!EMAIL_RE.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email address' },
+        { status: 400 }
+      );
+    }
+
     if (!isValidSaudiPhone(phone)) {
       return NextResponse.json(
         { error: 'Invalid phone number. Must be 10 digits starting with 05.' },
@@ -32,6 +48,16 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid emergency contact phone. Must be 10 digits starting with 05.' },
         { status: 400 }
       );
+    }
+
+    // Sanitize metadata — only allow whitelisted keys with string values
+    let safeMetadata: Record<string, string> = {};
+    if (metadata && typeof metadata === 'object' && !Array.isArray(metadata)) {
+      for (const key of ALLOWED_METADATA_KEYS) {
+        if (typeof metadata[key] === 'string') {
+          safeMetadata[key] = metadata[key].slice(0, 200);
+        }
+      }
     }
 
     const supabase = createAdminClient();
@@ -51,7 +77,7 @@ export async function POST(request: NextRequest) {
         emergency_contact_phone: emergency_contact_phone || null,
         contract_start_date: contract_start_date || null,
         with_transportation: with_transportation ?? false,
-        metadata: metadata || {},
+        metadata: safeMetadata,
       })
       .select()
       .single();
