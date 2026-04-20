@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
+const MAX_SEARCH_LEN = 100;
+const SEARCH_STRIP_RE = /[,()*"\\]/g;
+
 function safeInt(val: string | null, fallback: number): number {
   const parsed = parseInt(val || String(fallback));
   return Number.isNaN(parsed) ? fallback : parsed;
@@ -10,9 +13,15 @@ function isValidDate(val: string): boolean {
   return !isNaN(new Date(val).getTime());
 }
 
+function sanitizeSearch(raw: string | null): string | null {
+  if (!raw) return null;
+  const trimmed = raw.slice(0, MAX_SEARCH_LEN).replace(SEARCH_STRIP_RE, '');
+  return trimmed.trim() || null;
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const auth = await authenticateApiRequest();
+    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
     const { profile, supabase } = auth;
 
@@ -20,7 +29,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const priority = searchParams.get('priority');
     const category = searchParams.get('category');
-    const search = searchParams.get('search');
+    const search = sanitizeSearch(searchParams.get('search'));
     const buildingId = searchParams.get('building_id');
     const assignedTo = searchParams.get('assigned_to');
     const dateFrom = searchParams.get('date_from');

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
+import { BOOKING_TRANSITIONS, canTransition } from '@/lib/pipeline/transitions';
 
 const VALID_BOOKING_STATUSES = ['new', 'in_review', 'pending_payment', 'pending_onboarding', 'completed', 'rejected', 'cancelled'];
 
@@ -8,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest();
+    const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -38,7 +39,7 @@ export async function PATCH(
   try {
     const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
-    const { user, supabase } = auth;
+    const { user, profile, supabase } = auth;
 
     const { id } = await params;
     const body = await request.json();
@@ -56,7 +57,21 @@ export async function PATCH(
         .select('status')
         .eq('id', id)
         .single();
-      oldStatus = current?.status || null;
+      if (!current) {
+        return NextResponse.json({ error: 'Booking request not found' }, { status: 404 });
+      }
+      oldStatus = current.status;
+
+      // Enforce forward-only pipeline transitions. super_admin can override.
+      if (profile.role !== 'super_admin' && !canTransition(BOOKING_TRANSITIONS, oldStatus, status)) {
+        const allowed = BOOKING_TRANSITIONS[oldStatus ?? ''] ?? [];
+        return NextResponse.json(
+          {
+            error: `Invalid transition: ${oldStatus} → ${status}. Allowed from ${oldStatus}: ${allowed.length ? allowed.join(', ') : '(none — terminal state)'}.`,
+          },
+          { status: 400 },
+        );
+      }
     }
 
     const updates: Record<string, unknown> = {};

@@ -11,12 +11,18 @@ export default function Footer() {
   const locale = useLocale();
   const isArabic = locale === 'ar';
 
+  const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
+
   const quickLinks = [
     { href: '#home', label: t('nav.home') },
     { href: '#about', label: t('nav.about') },
     { href: '#services', label: t('nav.services') },
-    { href: '#rooms', label: t('nav.rooms') },
-    { href: '#locations', label: t('nav.locations') },
+    ...(showLocations
+      ? [
+          { href: '#rooms', label: t('nav.rooms') },
+          { href: '#locations', label: t('nav.locations') },
+        ]
+      : []),
     { href: '#contact', label: t('nav.contact') },
   ];
 

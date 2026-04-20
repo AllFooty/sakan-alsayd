@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
+const PHOTO_PATH_RE = /^(temp|[0-9a-f-]{36})\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
+const MAX_PATHS = 20;
+
 export async function POST(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest();
@@ -11,6 +14,14 @@ export async function POST(request: NextRequest) {
 
     if (!Array.isArray(paths) || paths.length === 0) {
       return NextResponse.json({ urls: [] });
+    }
+
+    if (paths.length > MAX_PATHS) {
+      return NextResponse.json({ error: `Too many paths (max ${MAX_PATHS})` }, { status: 400 });
+    }
+
+    if (!paths.every((p) => typeof p === 'string' && PHOTO_PATH_RE.test(p))) {
+      return NextResponse.json({ error: 'Invalid path format' }, { status: 400 });
     }
 
     const urls = await Promise.all(

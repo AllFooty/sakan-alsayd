@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
+import { MAINTENANCE_TRANSITIONS, canTransition } from '@/lib/pipeline/transitions';
 
-const VALID_MAINTENANCE_STATUSES = ['submitted', 'assigned', 'in_progress', 'completed', 'cancelled'];
+const VALID_MAINTENANCE_STATUSES = ['submitted', 'assigned', 'in_progress', 'completed', 'rejected', 'cancelled'];
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest();
+    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -40,7 +41,7 @@ export async function PATCH(
   try {
     const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
-    const { user, supabase } = auth;
+    const { user, profile, supabase } = auth;
 
     const { id } = await params;
     const body = await request.json();
@@ -58,7 +59,21 @@ export async function PATCH(
         .select('status')
         .eq('id', id)
         .single();
-      oldStatus = current?.status || null;
+      if (!current) {
+        return NextResponse.json({ error: 'Maintenance request not found' }, { status: 404 });
+      }
+      oldStatus = current.status;
+
+      // Enforce forward-only pipeline transitions. super_admin can override.
+      if (profile.role !== 'super_admin' && !canTransition(MAINTENANCE_TRANSITIONS, oldStatus, status)) {
+        const allowed = MAINTENANCE_TRANSITIONS[oldStatus ?? ''] ?? [];
+        return NextResponse.json(
+          {
+            error: `Invalid transition: ${oldStatus} → ${status}. Allowed from ${oldStatus}: ${allowed.length ? allowed.join(', ') : '(none — terminal state)'}.`,
+          },
+          { status: 400 },
+        );
+      }
     }
 
     const updates: Record<string, unknown> = {};

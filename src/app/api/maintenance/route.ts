@@ -8,7 +8,7 @@ const PHOTO_PATH_RE = /^(temp|[0-9a-f-]{36})\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    if (isRateLimited(`maintenance:${ip}`, 5, 60_000)) {
+    if (await isRateLimited(`maintenance:${ip}`, 5, 60_000)) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 

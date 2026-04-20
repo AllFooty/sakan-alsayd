@@ -17,11 +17,13 @@ type NavItem = {
   isPage?: boolean;
 };
 
+const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
+
 const navItems: NavItem[] = [
   { href: '/', key: 'home', isPage: true },
   { href: '#about', key: 'about' },
   { href: '#services', key: 'services' },
-  { href: '#locations', key: 'locations' },
+  ...(showLocations ? [{ href: '#locations', key: 'locations' }] : []),
   { href: '/testimonials', key: 'testimonials', isPage: true },
   { href: '#contact', key: 'contact' },
 ];

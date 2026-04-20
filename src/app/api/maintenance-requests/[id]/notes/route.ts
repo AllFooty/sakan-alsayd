@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest();
+    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -35,7 +35,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest();
+    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
     const { user, supabase } = auth;
 
@@ -43,8 +43,12 @@ export async function POST(
     const body = await request.json();
     const { note } = body;
 
-    if (!note || note.trim().length === 0) {
+    if (!note || typeof note !== 'string' || note.trim().length === 0) {
       return NextResponse.json({ error: 'Note content is required' }, { status: 400 });
+    }
+
+    if (note.length > 5000) {
+      return NextResponse.json({ error: 'Note too long (max 5000 characters)' }, { status: 400 });
     }
 
     const { data, error } = await supabase

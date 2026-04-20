@@ -19,7 +19,7 @@ function getExtension(mimeType: string): string {
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    if (isRateLimited(`upload:${ip}`, 10, 60_000)) {
+    if (await isRateLimited(`upload:${ip}`, 10, 60_000)) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 
@@ -65,11 +65,11 @@ export async function POST(request: NextRequest) {
     const storagePath = `${folder}/${fileName}`;
 
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const bytes = new Uint8Array(arrayBuffer);
 
     const { error: uploadError } = await supabase.storage
       .from('maintenance-photos')
-      .upload(storagePath, buffer, {
+      .upload(storagePath, bytes, {
         contentType: file.type,
         upsert: false,
       });

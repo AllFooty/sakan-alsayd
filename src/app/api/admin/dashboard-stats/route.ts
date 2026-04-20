@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
 export async function GET() {
-  const auth = await authenticateApiRequest();
+  const auth = await authenticateApiRequest('branch_manager');
   if (isAuthError(auth)) return auth;
 
   const { supabase } = auth;

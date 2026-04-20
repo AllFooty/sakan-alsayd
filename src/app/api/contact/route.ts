@@ -9,7 +9,7 @@ const ALLOWED_METADATA_KEYS = ['source', 'utm_campaign', 'utm_source', 'utm_medi
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    if (isRateLimited(`contact:${ip}`, 5, 60_000)) {
+    if (await isRateLimited(`contact:${ip}`, 5, 60_000)) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
     }
 

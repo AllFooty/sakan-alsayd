@@ -6,5 +6,13 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
-  }
+  },
+  // Create with: wrangler kv namespace create RATE_LIMIT_KV
+  // Then replace the id below with the returned namespace id.
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT_KV",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+    }
+  ]
 }
