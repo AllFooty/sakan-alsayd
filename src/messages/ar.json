@@ -497,7 +497,8 @@
         "activeResidents": "ساكنات نشطات"
       },
       "recentActivity": "آخر النشاطات",
-      "noActivity": "لا توجد نشاطات حديثة"
+      "noActivity": "لا توجد نشاطات حديثة",
+      "statsError": "تعذر تحميل الإحصائيات"
     },
     "comingSoon": {
       "title": "قريباً",

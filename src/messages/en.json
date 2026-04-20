@@ -497,7 +497,8 @@
         "activeResidents": "Active Residents"
       },
       "recentActivity": "Recent Activity",
-      "noActivity": "No recent activity to show"
+      "noActivity": "No recent activity to show",
+      "statsError": "Could not load dashboard stats"
     },
     "comingSoon": {
       "title": "Coming Soon",

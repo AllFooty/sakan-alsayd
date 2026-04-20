@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
+import { MAINTENANCE_TRANSITIONS, canTransition } from '@/lib/pipeline/transitions';
 
-const VALID_STATUSES = ['submitted', 'assigned', 'in_progress', 'completed', 'cancelled'];
+const VALID_STATUSES = ['submitted', 'assigned', 'in_progress', 'completed', 'rejected', 'cancelled'];
 
 export async function PATCH(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
-    const { user, supabase } = auth;
+    const { user, profile, supabase } = auth;
 
     const body = await request.json();
     const { ids, status } = body;
@@ -18,6 +19,33 @@ export async function PATCH(request: NextRequest) {
 
     if (!status || !VALID_STATUSES.includes(status)) {
       return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 });
+    }
+
+    // Validate every row can transition to the target status. super_admin can override.
+    if (profile.role !== 'super_admin') {
+      const { data: current, error: fetchError } = await supabase
+        .from('maintenance_requests')
+        .select('id, status')
+        .in('id', ids);
+
+      if (fetchError) {
+        console.error('Bulk maintenance status precheck error:', fetchError);
+        return NextResponse.json({ error: 'Failed to validate transitions' }, { status: 500 });
+      }
+      if (!current || current.length !== ids.length) {
+        return NextResponse.json({ error: 'One or more maintenance requests not found' }, { status: 404 });
+      }
+
+      const invalid = current.filter((row) => !canTransition(MAINTENANCE_TRANSITIONS, row.status, status));
+      if (invalid.length > 0) {
+        return NextResponse.json(
+          {
+            error: `Invalid transition for ${invalid.length} record(s). Allowed next states differ per current status.`,
+            invalid: invalid.map((row) => ({ id: row.id, from: row.status, to: status })),
+          },
+          { status: 400 },
+        );
+      }
     }
 
     const updates: Record<string, unknown> = { status };

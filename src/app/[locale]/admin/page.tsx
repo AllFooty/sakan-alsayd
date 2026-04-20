@@ -1,8 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import useSWR from 'swr';
+import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth/hooks';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   MessageSquare,
   Wrench,
@@ -52,29 +54,31 @@ function StatCard({
   );
 }
 
+const statsFetcher = async (url: string): Promise<DashboardStats> => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`stats fetch failed: ${res.status}`);
+  return res.json();
+};
+
 export default function AdminDashboard() {
   const t = useTranslations('admin.dashboard');
   const { profile, loading: authLoading } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
 
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/dashboard-stats');
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data);
-      }
-    } catch {
-      // Stats will show loading state
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
+  const { data: stats, error, isLoading } = useSWR<DashboardStats>(
+    '/api/admin/dashboard-stats',
+    statsFetcher,
+    { refreshInterval: 30_000, revalidateOnFocus: true, dedupingInterval: 10_000 },
+  );
 
+  const errorToastShown = useRef(false);
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    if (error && !errorToastShown.current) {
+      toast.error(t('statsError'));
+      errorToastShown.current = true;
+    } else if (!error) {
+      errorToastShown.current = false;
+    }
+  }, [error, t]);
 
   if (authLoading) {
     return <LoadingScreen />;
@@ -95,28 +99,28 @@ export default function AdminDashboard() {
           label={t('stats.newBookings')}
           value={stats?.newBookings ?? 0}
           color="bg-coral"
-          loading={statsLoading}
+          loading={isLoading}
         />
         <StatCard
           icon={Wrench}
           label={t('stats.openMaintenance')}
           value={stats?.openMaintenance ?? 0}
           color="bg-orange-500"
-          loading={statsLoading}
+          loading={isLoading}
         />
         <StatCard
           icon={Building2}
           label={t('stats.totalBuildings')}
           value={stats?.totalBuildings ?? 0}
           color="bg-navy"
-          loading={statsLoading}
+          loading={isLoading}
         />
         <StatCard
           icon={Users}
           label={t('stats.activeResidents')}
           value={stats?.activeResidents ?? 0}
           color="bg-green-600"
-          loading={statsLoading}
+          loading={isLoading}
         />
       </div>
 

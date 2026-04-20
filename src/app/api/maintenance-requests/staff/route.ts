@@ -3,7 +3,7 @@ import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await authenticateApiRequest();
+    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
