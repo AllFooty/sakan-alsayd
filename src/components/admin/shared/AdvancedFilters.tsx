@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale } from 'next-intl';
 import { SlidersHorizontal, X } from 'lucide-react';
 
 export interface FilterField {
@@ -31,6 +32,8 @@ export default function AdvancedFilters({
   clearLabel,
 }: AdvancedFiltersProps) {
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
+  const isArabic = locale === 'ar';
 
   return (
     <div>
@@ -82,13 +85,22 @@ export default function AdvancedFilters({
                   ))}
                 </select>
               ) : (
-                <input
-                  type="date"
-                  lang="en"
-                  value={values[field.key] || ''}
-                  onChange={(e) => onChange(field.key, e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white"
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    lang="en"
+                    value={values[field.key] || ''}
+                    onChange={(e) => onChange(field.key, e.target.value)}
+                    className={`w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white ${
+                      !values[field.key] ? 'text-transparent' : ''
+                    }`}
+                  />
+                  {!values[field.key] && (
+                    <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400">
+                      {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           ))}

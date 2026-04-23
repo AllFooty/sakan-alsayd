@@ -134,6 +134,8 @@ export default function BookingModal({
   const watchHasMedicalIssues = watch('hasMedicalIssues');
   const watchOccupation = watch('occupation');
   const watchTransportation = watch('withTransportation');
+  const watchDateOfBirth = watch('dateOfBirth');
+  const watchContractStartDate = watch('contractStartDate');
 
   // Handle preselected values — only trigger when modal opens
   const preselectedLocationId = preselected?.locationId;
@@ -589,13 +591,23 @@ export default function BookingModal({
                   <label className="text-sm font-medium text-navy mb-1 block">
                     {t('steps.personal.dateOfBirth')} *
                   </label>
-                  <input
-                    {...register('dateOfBirth')}
-                    type="date"
-                    lang="en"
-                    max={maxDobStr}
-                    className={inputClassName(!!errors.dateOfBirth)}
-                  />
+                  <div className="relative">
+                    <input
+                      {...register('dateOfBirth')}
+                      type="date"
+                      lang="en"
+                      max={maxDobStr}
+                      className={cn(
+                        inputClassName(!!errors.dateOfBirth),
+                        !watchDateOfBirth && 'text-transparent'
+                      )}
+                    />
+                    {!watchDateOfBirth && (
+                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400">
+                        {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Occupation */}
@@ -696,13 +708,23 @@ export default function BookingModal({
                   <label className="text-sm font-medium text-navy mb-1 block">
                     {t('steps.logistics.contractStartDate')} *
                   </label>
-                  <input
-                    {...register('contractStartDate')}
-                    type="date"
-                    lang="en"
-                    min={today}
-                    className={inputClassName(!!errors.contractStartDate)}
-                  />
+                  <div className="relative">
+                    <input
+                      {...register('contractStartDate')}
+                      type="date"
+                      lang="en"
+                      min={today}
+                      className={cn(
+                        inputClassName(!!errors.contractStartDate),
+                        !watchContractStartDate && 'text-transparent'
+                      )}
+                    />
+                    {!watchContractStartDate && (
+                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400">
+                        {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Transportation */}
