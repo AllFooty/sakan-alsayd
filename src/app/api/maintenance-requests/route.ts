@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.or(`title.ilike.%${search}%,requester_name.ilike.%${search}%,requester_phone.ilike.%${search}%,description.ilike.%${search}%,room_number.ilike.%${search}%`);
+      query = query.or(`description.ilike.%${search}%,extra_details.ilike.%${search}%,requester_name.ilike.%${search}%,requester_phone.ilike.%${search}%,room_number.ilike.%${search}%`);
     }
 
     if (buildingId) {

@@ -26,10 +26,12 @@ interface MaintenanceModalProps {
   onClose: () => void;
 }
 
+const SUMMARY_MAX = 150;
+
 const maintenanceSchema = z.object({
   category: z.enum(['plumbing', 'electrical', 'furniture', 'hvac', 'general']),
-  title: z.string().min(3, 'required'),
-  description: z.string().optional(),
+  description: z.string().min(3, 'required').max(SUMMARY_MAX, 'tooLong'),
+  extra_details: z.string().max(2000).optional(),
   room_number: z.string().optional(),
   requester_name: z.string().min(2, 'required'),
   requester_phone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
@@ -181,8 +183,8 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   };
 
   const handleDetailsNext = () => {
-    // Validate category and title before proceeding
-    if (!selectedCategory || !watch('title') || watch('title').length < 3) return;
+    const summary = watch('description');
+    if (!selectedCategory || !summary || summary.length < 3 || summary.length > SUMMARY_MAX) return;
     setCurrentStep('info');
   };
 
@@ -221,8 +223,8 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
         building_slug: loc.id,
         room_number: data.room_number || null,
         category: data.category,
-        title: data.title,
-        description: data.description || null,
+        description: data.description,
+        extra_details: data.extra_details || null,
       };
 
       if (photoPaths.length > 0) {
@@ -438,15 +440,40 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 )}
               </div>
 
-              {/* Description */}
+              {/* Summary */}
               <div>
-                <label className="text-sm font-medium text-navy mb-1 block">
-                  {t('steps.details.description')}
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm font-medium text-navy">
+                    {t('steps.details.summary')} *
+                  </label>
+                  <span className={cn(
+                    'text-xs tabular-nums',
+                    (watch('description')?.length || 0) > SUMMARY_MAX ? 'text-red-500' : 'text-gray-400'
+                  )} dir="ltr">
+                    {watch('description')?.length || 0} / {SUMMARY_MAX}
+                  </span>
+                </div>
                 <textarea
                   {...register('description')}
-                  rows={3}
-                  placeholder={t('steps.details.descriptionPlaceholder')}
+                  rows={2}
+                  maxLength={SUMMARY_MAX}
+                  placeholder={t('steps.details.summaryPlaceholder')}
+                  className={cn(
+                    'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors',
+                    errors.description ? 'border-red-400' : 'border-gray-200'
+                  )}
+                />
+              </div>
+
+              {/* Extra Details (optional) */}
+              <div>
+                <label className="text-sm font-medium text-navy mb-1 block">
+                  {t('steps.details.extraDetails')}
+                </label>
+                <textarea
+                  {...register('extra_details')}
+                  rows={4}
+                  placeholder={t('steps.details.extraDetailsPlaceholder')}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                 />
               </div>
@@ -460,21 +487,6 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   {...register('room_number')}
                   placeholder={t('steps.details.roomNumberPlaceholder')}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
-                />
-              </div>
-
-              {/* Complaints & Suggestions */}
-              <div>
-                <label className="text-sm font-medium text-navy mb-1 block">
-                  {t('steps.details.issueTitle')} *
-                </label>
-                <input
-                  {...register('title')}
-                  placeholder={t('steps.details.issueTitlePlaceholder')}
-                  className={cn(
-                    'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                    errors.title ? 'border-red-400' : 'border-gray-200'
-                  )}
                 />
               </div>
 
@@ -544,8 +556,14 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   </div>
                 </div>
                 <div className="mt-2 pt-2 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">{t('steps.details.issueTitle')}</p>
-                  <p className="text-sm font-medium text-navy">{watch('title')}</p>
+                  <p className="text-xs text-gray-500">{t('steps.details.summary')}</p>
+                  <p className="text-sm font-medium text-navy whitespace-pre-wrap">{watch('description')}</p>
+                  {watch('extra_details') && (
+                    <>
+                      <p className="text-xs text-gray-500 mt-2">{t('steps.details.extraDetails')}</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{watch('extra_details')}</p>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -596,7 +614,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
             <button
               type="button"
               onClick={handleDetailsNext}
-              disabled={!selectedCategory || !watch('title') || watch('title').length < 3}
+              disabled={!selectedCategory || !watch('description') || watch('description').length < 3 || watch('description').length > SUMMARY_MAX}
               className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-coral text-white font-semibold rounded-xl hover:bg-coral/90 disabled:opacity-60 transition-colors shadow-lg shadow-coral/25"
             >
               {t('next')}

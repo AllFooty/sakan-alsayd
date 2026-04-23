@@ -4,6 +4,7 @@ import { isValidSaudiPhone } from '@/lib/utils';
 import { isRateLimited } from '@/lib/rate-limit';
 
 const PHOTO_PATH_RE = /^(temp|[0-9a-f-]{36})\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
+const SUMMARY_MAX = 150;
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,14 +20,21 @@ export async function POST(request: NextRequest) {
       building_slug,
       room_number,
       category,
-      title,
       description,
+      extra_details,
     } = body;
 
     // Basic validation
-    if (!requester_name || !requester_phone || !building_slug || !title || !category) {
+    if (!requester_name || !requester_phone || !building_slug || !description || !category) {
       return NextResponse.json(
-        { error: 'Required fields: requester_name, requester_phone, building_slug, title, category' },
+        { error: 'Required fields: requester_name, requester_phone, building_slug, description, category' },
+        { status: 400 }
+      );
+    }
+
+    if (typeof description !== 'string' || description.length > SUMMARY_MAX) {
+      return NextResponse.json(
+        { error: `Summary must be ${SUMMARY_MAX} characters or fewer.` },
         { status: 400 }
       );
     }
@@ -60,8 +68,8 @@ export async function POST(request: NextRequest) {
       requester_phone,
       room_number: room_number || null,
       category,
-      title,
-      description: description || null,
+      description,
+      extra_details: typeof extra_details === 'string' && extra_details.trim() ? extra_details : null,
       status: 'submitted',
       priority: 'medium',
     };

@@ -25,8 +25,8 @@ import { generateCsv, downloadCsv } from '@/lib/export';
 
 interface MaintenanceRequest {
   id: string;
-  title: string;
   description: string | null;
+  extra_details: string | null;
   category: string;
   priority: string;
   status: string;
@@ -226,7 +226,8 @@ export default function MaintenanceList() {
       if (!res.ok) throw new Error('Failed to fetch');
       const json = await res.json();
       const rows = (json.data || []).map((r: MaintenanceRequest) => ({
-        title: r.title,
+        summary: r.description || '',
+        extraDetails: r.extra_details || '',
         building: getBuildingName(r),
         category: t(`category.${r.category}`),
         priority: t(`priority.${r.priority}`),
@@ -241,7 +242,8 @@ export default function MaintenanceList() {
         }),
       }));
       const columns = [
-        { key: 'title', header: t('table.title') },
+        { key: 'summary', header: t('table.summary') },
+        { key: 'extraDetails', header: t('table.extraDetails') },
         { key: 'building', header: t('table.building') },
         { key: 'category', header: t('table.category') },
         { key: 'priority', header: t('table.priority') },
@@ -435,7 +437,7 @@ export default function MaintenanceList() {
                     />
                   </th>
                   <th className="text-start px-4 py-3 font-medium text-gray-500">
-                    {t('table.title')}
+                    {t('table.summary')}
                   </th>
                   <th className="text-start px-4 py-3 font-medium text-gray-500 hidden md:table-cell">
                     {t('table.building')}
@@ -477,8 +479,10 @@ export default function MaintenanceList() {
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="font-medium text-navy">{req.title}</p>
+                      <div className="max-w-xs">
+                        <p className="font-medium text-navy line-clamp-2">
+                          {req.description || <span className="text-gray-400 font-normal">—</span>}
+                        </p>
                         {req.requester_name && (
                           <p className="text-xs text-gray-500">{req.requester_name}</p>
                         )}

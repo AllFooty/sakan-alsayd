@@ -45,8 +45,8 @@ interface MaintenanceNote {
 
 interface MaintenanceRequest {
   id: string;
-  title: string;
   description: string | null;
+  extra_details: string | null;
   category: string;
   priority: string;
   status: string;
@@ -429,19 +429,23 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
               {t('detail.issueDetails')}
             </h2>
             <div className="space-y-3">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">{t('table.title')}</p>
-                <p className="font-medium text-navy">{request.title}</p>
-              </div>
               <div className="flex gap-2">
                 <StatusBadge label={t(`category.${request.category}`)} variant="info" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">{isArabic ? 'الوصف' : 'Description'}</p>
-                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                  {request.description || t('detail.noDescription')}
+                <p className="text-xs text-gray-500 mb-1">{t('table.summary')}</p>
+                <p className="font-medium text-navy whitespace-pre-wrap leading-relaxed">
+                  {request.description || t('detail.noSummary')}
                 </p>
               </div>
+              {request.extra_details && (
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">{t('detail.extraDetails')}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {request.extra_details}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
