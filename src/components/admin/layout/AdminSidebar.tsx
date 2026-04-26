@@ -10,11 +10,13 @@ import {
   Wrench,
   Building2,
   Users,
+  UserCog,
   FileText,
   Settings,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/auth/hooks';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -22,20 +24,27 @@ interface AdminSidebarProps {
 }
 
 const navItems = [
-  { key: 'dashboard', href: '', icon: LayoutDashboard },
-  { key: 'bookings', href: '/bookings', icon: MessageSquare },
-  { key: 'maintenance', href: '/maintenance', icon: Wrench },
-  { key: 'buildings', href: '/buildings', icon: Building2 },
-  { key: 'residents', href: '/residents', icon: Users },
-  { key: 'content', href: '/content', icon: FileText },
-  { key: 'settings', href: '/settings', icon: Settings },
+  { key: 'dashboard', href: '', icon: LayoutDashboard, superAdminOnly: false },
+  { key: 'bookings', href: '/bookings', icon: MessageSquare, superAdminOnly: false },
+  { key: 'maintenance', href: '/maintenance', icon: Wrench, superAdminOnly: false },
+  { key: 'buildings', href: '/buildings', icon: Building2, superAdminOnly: false },
+  { key: 'residents', href: '/residents', icon: Users, superAdminOnly: false },
+  { key: 'users', href: '/users', icon: UserCog, superAdminOnly: true },
+  { key: 'content', href: '/content', icon: FileText, superAdminOnly: false },
+  { key: 'settings', href: '/settings', icon: Settings, superAdminOnly: false },
 ];
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('admin.sidebar');
+  const { profile } = useAuth();
   const basePath = `/${locale}/admin`;
+  const isSuperAdmin = profile?.role === 'super_admin';
+
+  const visibleNavItems = navItems.filter(
+    (item) => !item.superAdminOnly || isSuperAdmin
+  );
 
   function isActive(href: string) {
     const fullPath = `${basePath}${href}`;
@@ -87,7 +96,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 py-4 overflow-y-auto">
           <ul className="space-y-1 px-2">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
               return (

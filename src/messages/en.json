@@ -465,6 +465,7 @@
       "maintenance": "Maintenance",
       "buildings": "Buildings & Rooms",
       "residents": "Residents",
+      "users": "Users",
       "content": "Content",
       "settings": "Settings",
       "version": "v{version}"
@@ -796,6 +797,107 @@
         "description": "Are you sure you want to delete this maintenance request? This action cannot be undone.",
         "confirm": "Delete",
         "cancel": "Cancel"
+      }
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Manage staff members and their roles",
+      "inviteButton": "Invite Staff",
+      "forbidden": {
+        "title": "Access Restricted",
+        "description": "Only super admins can manage users."
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "buildings": "Buildings",
+        "status": "Status",
+        "createdAt": "Added",
+        "actions": "Actions",
+        "allBuildings": "All buildings"
+      },
+      "filters": {
+        "search": "Search by name or email...",
+        "role": "Role",
+        "allRoles": "All roles",
+        "building": "Building",
+        "allBuildings": "All buildings",
+        "status": "Status",
+        "allStatuses": "All",
+        "active": "Active",
+        "inactive": "Inactive",
+        "advancedFilters": "Filters",
+        "clearFilters": "Clear"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "edit": "Edit",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "resetPassword": "Reset Password"
+      },
+      "modal": {
+        "inviteTitle": "Invite Staff Member",
+        "editTitle": "Edit Staff Member",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Full name",
+        "email": "Email",
+        "emailPlaceholder": "name@sakanalsayd.com",
+        "emailHelper": "An invitation email will be sent to this address.",
+        "phone": "Phone (optional)",
+        "phonePlaceholder": "05XXXXXXXX",
+        "role": "Role",
+        "selectRole": "Select a role",
+        "assignBuildings": "Assigned Buildings",
+        "assignBuildingsHint": "Select which buildings this staff member can access. Super admins see all buildings.",
+        "noBuildingsSelected": "No buildings selected",
+        "isActive": "Active",
+        "isActiveHint": "Inactive users cannot sign in.",
+        "selfNote": "You cannot change your own role or active state.",
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "sendInvite": "Send Invitation",
+        "sending": "Sending...",
+        "sendPasswordReset": "Send Password Reset Email",
+        "sendingReset": "Sending..."
+      },
+      "confirm": {
+        "deactivateTitle": "Deactivate User",
+        "deactivateDescription": "{name} will no longer be able to sign in. You can re-activate them later.",
+        "activateTitle": "Activate User",
+        "activateDescription": "{name} will be able to sign in again.",
+        "resetTitle": "Send Password Reset",
+        "resetDescription": "A password reset email will be sent to {email}.",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+      },
+      "toast": {
+        "invited": "Invitation sent to {email}",
+        "updated": "Changes saved",
+        "deactivated": "{name} deactivated",
+        "activated": "{name} activated",
+        "resetSent": "Password reset email sent",
+        "genericError": "Something went wrong. Please try again."
+      },
+      "errors": {
+        "emailExists": "A user with this email already exists.",
+        "lastSuperAdmin": "Cannot remove the last active super admin.",
+        "selfModify": "You cannot change your own role or active state.",
+        "invalidRole": "Invalid role selected.",
+        "inviteFailed": "Failed to send invitation. Please try again."
+      },
+      "empty": {
+        "title": "No Staff Members Yet",
+        "description": "Invite your first staff member to get started."
+      },
+      "pagination": {
+        "summary": "{count} users"
       }
     }
   }

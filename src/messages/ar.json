@@ -465,6 +465,7 @@
       "maintenance": "الصيانة",
       "buildings": "المباني والغرف",
       "residents": "الساكنات",
+      "users": "المستخدمون",
       "content": "المحتوى",
       "settings": "الإعدادات",
       "version": "v{version}"
@@ -796,6 +797,107 @@
         "description": "هل أنت متأكد من حذف طلب الصيانة هذا؟ لا يمكن التراجع عن هذا الإجراء.",
         "confirm": "حذف",
         "cancel": "إلغاء"
+      }
+    },
+    "users": {
+      "title": "المستخدمون",
+      "subtitle": "إدارة الموظفين وأدوارهم",
+      "inviteButton": "دعوة موظف",
+      "forbidden": {
+        "title": "وصول مقيد",
+        "description": "إدارة المستخدمين متاحة للمدير العام فقط."
+      },
+      "table": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "phone": "الجوال",
+        "role": "الدور",
+        "buildings": "المباني",
+        "status": "الحالة",
+        "createdAt": "تاريخ الإضافة",
+        "actions": "إجراءات",
+        "allBuildings": "كل المباني"
+      },
+      "filters": {
+        "search": "بحث بالاسم أو البريد الإلكتروني...",
+        "role": "الدور",
+        "allRoles": "كل الأدوار",
+        "building": "المبنى",
+        "allBuildings": "كل المباني",
+        "status": "الحالة",
+        "allStatuses": "الكل",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "advancedFilters": "تصفية",
+        "clearFilters": "مسح"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "actions": {
+        "edit": "تعديل",
+        "activate": "تفعيل",
+        "deactivate": "تعطيل",
+        "resetPassword": "إعادة تعيين كلمة المرور"
+      },
+      "modal": {
+        "inviteTitle": "دعوة موظف جديد",
+        "editTitle": "تعديل بيانات الموظف",
+        "fullName": "الاسم الكامل",
+        "fullNamePlaceholder": "الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "emailPlaceholder": "name@sakanalsayd.com",
+        "emailHelper": "سيتم إرسال دعوة إلى هذا البريد الإلكتروني.",
+        "phone": "الجوال (اختياري)",
+        "phonePlaceholder": "05XXXXXXXX",
+        "role": "الدور",
+        "selectRole": "اختر الدور",
+        "assignBuildings": "المباني المُسندة",
+        "assignBuildingsHint": "اختر المباني التي يمكن لهذا الموظف الوصول إليها. المدير العام يرى جميع المباني.",
+        "noBuildingsSelected": "لم يتم اختيار أي مبنى",
+        "isActive": "نشط",
+        "isActiveHint": "المستخدمون غير النشطين لا يمكنهم تسجيل الدخول.",
+        "selfNote": "لا يمكنك تغيير دورك أو حالة تفعيل حسابك.",
+        "save": "حفظ التغييرات",
+        "saving": "جارٍ الحفظ...",
+        "cancel": "إلغاء",
+        "sendInvite": "إرسال الدعوة",
+        "sending": "جارٍ الإرسال...",
+        "sendPasswordReset": "إرسال إعادة تعيين كلمة المرور",
+        "sendingReset": "جارٍ الإرسال..."
+      },
+      "confirm": {
+        "deactivateTitle": "تعطيل المستخدم",
+        "deactivateDescription": "لن يتمكن {name} من تسجيل الدخول. يمكنك إعادة تفعيله لاحقاً.",
+        "activateTitle": "تفعيل المستخدم",
+        "activateDescription": "سيتمكن {name} من تسجيل الدخول مرة أخرى.",
+        "resetTitle": "إرسال إعادة تعيين كلمة المرور",
+        "resetDescription": "سيتم إرسال رسالة إعادة تعيين إلى {email}.",
+        "confirm": "تأكيد",
+        "cancel": "إلغاء"
+      },
+      "toast": {
+        "invited": "تم إرسال الدعوة إلى {email}",
+        "updated": "تم حفظ التغييرات",
+        "deactivated": "تم تعطيل {name}",
+        "activated": "تم تفعيل {name}",
+        "resetSent": "تم إرسال رسالة إعادة تعيين كلمة المرور",
+        "genericError": "حدث خطأ ما. حاول مرة أخرى."
+      },
+      "errors": {
+        "emailExists": "يوجد مستخدم مسجل بهذا البريد الإلكتروني.",
+        "lastSuperAdmin": "لا يمكن إزالة آخر مدير عام نشط.",
+        "selfModify": "لا يمكنك تغيير دورك أو حالة حسابك.",
+        "invalidRole": "الدور المختار غير صحيح.",
+        "inviteFailed": "تعذر إرسال الدعوة. حاول مرة أخرى."
+      },
+      "empty": {
+        "title": "لا يوجد موظفون بعد",
+        "description": "ابدأ بدعوة أول موظف."
+      },
+      "pagination": {
+        "summary": "{count} مستخدم"
       }
     }
   }
