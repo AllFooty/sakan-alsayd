@@ -12,6 +12,9 @@ import {
   UserCog,
   Power,
   KeyRound,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
 } from 'lucide-react';
 import StatusBadge from '@/components/admin/shared/StatusBadge';
 import EmptyState from '@/components/admin/shared/EmptyState';
@@ -32,6 +35,8 @@ const ROLES: UserRole[] = [
 ];
 
 type ConfirmKind = 'deactivate' | 'activate' | 'reset' | null;
+type SortColumn = 'full_name' | 'role' | 'is_active' | 'created_at';
+type SortDir = 'asc' | 'desc';
 
 export default function UsersList() {
   const t = useTranslations('admin.users');
@@ -50,6 +55,8 @@ export default function UsersList() {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [buildingFilter, setBuildingFilter] = useState<string>('all');
+  const [sortColumn, setSortColumn] = useState<SortColumn>('created_at');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
   const [showInvite, setShowInvite] = useState(false);
   const [editing, setEditing] = useState<ManagedUser | null>(null);
@@ -81,6 +88,8 @@ export default function UsersList() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
+        sort: sortColumn,
+        dir: sortDir,
       });
       if (roleFilter !== 'all') params.set('role', roleFilter);
       if (activeFilter !== 'all') params.set('is_active', activeFilter);
@@ -98,7 +107,7 @@ export default function UsersList() {
     } finally {
       setLoading(false);
     }
-  }, [page, roleFilter, activeFilter, buildingFilter, searchDebounce, t]);
+  }, [page, roleFilter, activeFilter, buildingFilter, searchDebounce, sortColumn, sortDir, t]);
 
   useEffect(() => {
     fetchUsers();
@@ -106,7 +115,16 @@ export default function UsersList() {
 
   useEffect(() => {
     setPage(1);
-  }, [roleFilter, activeFilter, buildingFilter, searchDebounce]);
+  }, [roleFilter, activeFilter, buildingFilter, searchDebounce, sortColumn, sortDir]);
+
+  function handleSort(column: SortColumn) {
+    if (sortColumn === column) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortDir(column === 'created_at' ? 'desc' : 'asc');
+    }
+  }
 
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -288,24 +306,41 @@ export default function UsersList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-start px-4 py-3 font-medium text-gray-500">
-                    {t('table.name')}
-                  </th>
+                  <SortableHeader
+                    label={t('table.name')}
+                    column="full_name"
+                    sortColumn={sortColumn}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
                   <th className="text-start px-4 py-3 font-medium text-gray-500 hidden md:table-cell">
                     {t('table.email')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500">
-                    {t('table.role')}
-                  </th>
+                  <SortableHeader
+                    label={t('table.role')}
+                    column="role"
+                    sortColumn={sortColumn}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
                   <th className="text-start px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">
                     {t('table.buildings')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500">
-                    {t('table.status')}
-                  </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden xl:table-cell">
-                    {t('table.createdAt')}
-                  </th>
+                  <SortableHeader
+                    label={t('table.status')}
+                    column="is_active"
+                    sortColumn={sortColumn}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label={t('table.createdAt')}
+                    column="created_at"
+                    sortColumn={sortColumn}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                    className="hidden xl:table-cell"
+                  />
                   <th className="text-end px-4 py-3 font-medium text-gray-500">
                     {t('table.actions')}
                   </th>
@@ -460,5 +495,41 @@ export default function UsersList() {
         loading={actionLoading}
       />
     </div>
+  );
+}
+
+function SortableHeader({
+  label,
+  column,
+  sortColumn,
+  sortDir,
+  onSort,
+  className = '',
+}: {
+  label: string;
+  column: SortColumn;
+  sortColumn: SortColumn;
+  sortDir: SortDir;
+  onSort: (column: SortColumn) => void;
+  className?: string;
+}) {
+  const active = sortColumn === column;
+  const Icon = active ? (sortDir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
+  return (
+    <th
+      className={`text-start px-4 py-3 font-medium text-gray-500 ${className}`}
+      aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+    >
+      <button
+        type="button"
+        onClick={() => onSort(column)}
+        className={`flex items-center gap-1.5 hover:text-navy transition-colors ${
+          active ? 'text-navy' : ''
+        }`}
+      >
+        <span>{label}</span>
+        <Icon size={14} className={active ? 'opacity-100' : 'opacity-40'} />
+      </button>
+    </th>
   );
 }

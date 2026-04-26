@@ -12,6 +12,13 @@ const VALID_ROLES = [
 ] as const;
 type Role = (typeof VALID_ROLES)[number];
 
+const SORTABLE_COLUMNS = ['full_name', 'role', 'is_active', 'created_at'] as const;
+type SortColumn = (typeof SORTABLE_COLUMNS)[number];
+
+function isSortColumn(value: unknown): value is SortColumn {
+  return typeof value === 'string' && (SORTABLE_COLUMNS as readonly string[]).includes(value);
+}
+
 const MAX_SEARCH_LEN = 100;
 const SEARCH_STRIP_RE = /[,()*"\\]/g;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -70,6 +77,11 @@ export async function GET(request: NextRequest) {
     const page = Math.max(safeInt(searchParams.get('page'), 1), 1);
     const offset = (page - 1) * limit;
 
+    const sortParam = searchParams.get('sort');
+    const dirParam = searchParams.get('dir');
+    const sortColumn: SortColumn = isSortColumn(sortParam) ? sortParam : 'created_at';
+    const sortAscending = dirParam === 'asc';
+
     const admin = createAdminClient();
 
     // Fetch the auth.users → email map up-front. perPage caps at 1000 (Supabase
@@ -123,7 +135,13 @@ export async function GET(request: NextRequest) {
         'id, full_name, phone, role, is_active, created_at, updated_at, staff_building_assignments(building_id, buildings(id, city_en, city_ar, neighborhood_en, neighborhood_ar))',
         { count: 'exact' }
       )
-      .order('created_at', { ascending: false });
+      .order(sortColumn, { ascending: sortAscending });
+
+    // Stable secondary sort so equal-keyed rows have a deterministic order
+    // (and pagination doesn't shuffle them between pages).
+    if (sortColumn !== 'created_at') {
+      query = query.order('created_at', { ascending: false });
+    }
 
     if (role && isValidRole(role)) {
       query = query.eq('role', role);
