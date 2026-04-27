@@ -3,7 +3,12 @@ import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'finance_staff',
+      'finance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -16,7 +21,11 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true);
 
     if (role) {
-      query = query.eq('role', role);
+      // Accept a comma-separated role list so callers can include manager peers
+      // alongside their staff counterparts (e.g. finance_staff,finance_manager).
+      const roles = role.split(',').map((r) => r.trim()).filter(Boolean);
+      if (roles.length === 1) query = query.eq('role', roles[0]);
+      else if (roles.length > 1) query = query.in('role', roles);
     }
 
     const { data, error } = await query.order('full_name');

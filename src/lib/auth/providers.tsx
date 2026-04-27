@@ -13,7 +13,11 @@ import type { User } from '@supabase/supabase-js';
 
 type UserRole =
   | 'super_admin'
+  | 'deputy_general_manager'
   | 'branch_manager'
+  | 'maintenance_manager'
+  | 'transportation_manager'
+  | 'finance_manager'
   | 'maintenance_staff'
   | 'transportation_staff'
   | 'supervision_staff'

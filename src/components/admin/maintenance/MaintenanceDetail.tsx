@@ -228,11 +228,11 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
     setShowAssignForm(true);
     setSelectedPriority(request?.priority || 'medium');
     try {
-      const res = await fetch('/api/maintenance-requests/staff?role=maintenance_staff');
+      const res = await fetch('/api/maintenance-requests/staff?role=maintenance_staff,maintenance_manager');
       if (res.ok) {
         const staff = await res.json();
         setAssignStaff(staff);
-        // If no maintenance_staff found, fetch all staff as fallback
+        // If no maintenance staff/manager found, fetch all staff as fallback
         if (staff.length === 0) {
           const allRes = await fetch('/api/maintenance-requests/staff');
           if (allRes.ok) setAssignStaff(await allRes.json());

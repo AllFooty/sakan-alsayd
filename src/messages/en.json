@@ -474,8 +474,12 @@
       "welcome": "Welcome",
       "logout": "Sign Out",
       "roles": {
-        "super_admin": "Super Admin",
+        "super_admin": "Executive Director / Founder & General Manager",
+        "deputy_general_manager": "Deputy General Manager",
         "branch_manager": "Branch Manager",
+        "maintenance_manager": "Maintenance Manager",
+        "transportation_manager": "Transportation Manager",
+        "finance_manager": "Finance Manager",
         "maintenance_staff": "Maintenance Staff",
         "transportation_staff": "Transportation Staff",
         "supervision_staff": "Supervision Staff",

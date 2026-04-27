@@ -8,6 +8,8 @@
     "build:worker": "opennextjs-cloudflare build",
     "start": "next start",
     "preview": "npx opennextjs-cloudflare build && wrangler dev",
+    "check:migrations": "node --env-file=.env.local scripts/check-migrations.mjs",
+    "predeploy": "npm run check:migrations",
     "deploy": "npx opennextjs-cloudflare build && wrangler deploy",
     "lint": "eslint"
   },

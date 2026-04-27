@@ -9,7 +9,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'maintenance_staff',
+      'maintenance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -39,7 +44,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'maintenance_staff',
+      'maintenance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { user, profile, supabase } = auth;
 
@@ -64,8 +74,9 @@ export async function PATCH(
       }
       oldStatus = current.status;
 
-      // Enforce forward-only pipeline transitions. super_admin can override.
-      if (profile.role !== 'super_admin' && !canTransition(MAINTENANCE_TRANSITIONS, oldStatus, status)) {
+      // Enforce forward-only pipeline transitions. super_admin / deputy_general_manager can override.
+      const canOverride = profile.role === 'super_admin' || profile.role === 'deputy_general_manager';
+      if (!canOverride && !canTransition(MAINTENANCE_TRANSITIONS, oldStatus, status)) {
         const allowed = MAINTENANCE_TRANSITIONS[oldStatus ?? ''] ?? [];
         return NextResponse.json(
           {
@@ -128,8 +139,8 @@ export async function DELETE(
     if (isAuthError(auth)) return auth;
     const { profile, supabase } = auth;
 
-    if (profile.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Forbidden: super_admin only' }, { status: 403 });
+    if (profile.role !== 'super_admin' && profile.role !== 'deputy_general_manager') {
+      return NextResponse.json({ error: 'Forbidden: admin only' }, { status: 403 });
     }
 
     const { id } = await params;

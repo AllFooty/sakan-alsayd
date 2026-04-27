@@ -4,7 +4,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 const VALID_ROLES = [
   'super_admin',
+  'deputy_general_manager',
   'branch_manager',
+  'maintenance_manager',
+  'transportation_manager',
+  'finance_manager',
   'maintenance_staff',
   'transportation_staff',
   'supervision_staff',
@@ -192,8 +196,11 @@ export async function PATCH(
     }
 
     // Building assignments — replace if provided. When the (new) role is
-    // super_admin, drop assignments entirely (super admins see all buildings).
-    if (Array.isArray(body.building_ids) || (touchesRole && nextRole === 'super_admin')) {
+    // super_admin or deputy_general_manager, drop assignments entirely (admin
+    // tier sees all buildings via has_admin_access RLS).
+    const nextRoleSkipsAssignments =
+      nextRole === 'super_admin' || nextRole === 'deputy_general_manager';
+    if (Array.isArray(body.building_ids) || (touchesRole && nextRoleSkipsAssignments)) {
       const ids: string[] = Array.isArray(body.building_ids)
         ? body.building_ids.filter((v: unknown): v is string => typeof v === 'string')
         : [];
@@ -207,7 +214,7 @@ export async function PATCH(
         return NextResponse.json({ error: 'Failed' }, { status: 500 });
       }
 
-      if (nextRole !== 'super_admin' && ids.length > 0) {
+      if (!nextRoleSkipsAssignments && ids.length > 0) {
         const rows = ids.map((building_id) => ({ staff_id: id, building_id }));
         const { error: insErr } = await admin.from('staff_building_assignments').insert(rows);
         if (insErr) {

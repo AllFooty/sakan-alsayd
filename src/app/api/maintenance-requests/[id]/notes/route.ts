@@ -6,7 +6,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'maintenance_staff',
+      'maintenance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -35,7 +40,12 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'maintenance_staff',
+      'maintenance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { user, supabase } = auth;
 

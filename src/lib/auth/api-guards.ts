@@ -10,7 +10,9 @@ interface AuthResult {
 
 /**
  * Authenticate an API request and verify the user has an active staff profile.
- * Optionally restrict to specific roles. super_admin always passes.
+ * Optionally restrict to specific roles. super_admin and deputy_general_manager
+ * always pass (deputy is a super_admin peer for everything except user mgmt;
+ * the user-management API enforces the super_admin-only check itself).
  * Returns { user, profile, supabase } on success, or a NextResponse error.
  */
 export async function authenticateApiRequest(
@@ -37,8 +39,10 @@ export async function authenticateApiRequest(
     return NextResponse.json({ error: 'Forbidden: inactive account' }, { status: 403 });
   }
 
-  // If roles specified, check membership (super_admin always passes)
-  if (allowedRoles.length > 0 && profile.role !== 'super_admin' && !allowedRoles.includes(profile.role)) {
+  // If roles specified, check membership. super_admin and deputy_general_manager
+  // always pass; the user-management API does an additional super_admin-only check.
+  const isAdminTier = profile.role === 'super_admin' || profile.role === 'deputy_general_manager';
+  if (allowedRoles.length > 0 && !isAdminTier && !allowedRoles.includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden: insufficient role' }, { status: 403 });
   }
 

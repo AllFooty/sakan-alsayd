@@ -22,7 +22,11 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
 
   const roleLabels: Record<string, string> = {
     super_admin: t('roles.super_admin'),
+    deputy_general_manager: t('roles.deputy_general_manager'),
     branch_manager: t('roles.branch_manager'),
+    maintenance_manager: t('roles.maintenance_manager'),
+    transportation_manager: t('roles.transportation_manager'),
+    finance_manager: t('roles.finance_manager'),
     maintenance_staff: t('roles.maintenance_staff'),
     transportation_staff: t('roles.transportation_staff'),
     supervision_staff: t('roles.supervision_staff'),
@@ -52,12 +56,15 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
           >
             <Menu size={20} className="text-navy" />
           </button>
-          <div className="hidden sm:block">
-            <h2 className="text-sm font-semibold text-navy">
+          <div className="hidden sm:block min-w-0 max-w-[16rem]">
+            <h2 className="text-sm font-semibold text-navy truncate">
               {profile?.full_name || t('welcome')}
             </h2>
             {profile && (
-              <p className="text-xs text-gray-500">
+              <p
+                className="text-xs text-gray-500 truncate"
+                title={roleLabels[profile.role] || profile.role}
+              >
                 {roleLabels[profile.role] || profile.role}
               </p>
             )}

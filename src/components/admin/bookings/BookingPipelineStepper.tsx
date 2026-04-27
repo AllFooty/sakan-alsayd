@@ -108,11 +108,13 @@ export function getDepartmentForStatus(status: string): string | null {
   }
 }
 
-/** Get the role to filter staff by when handing off to a status */
+/** Get the role(s) to filter staff by when handing off to a status. Returns
+ * a comma-separated list when a department has both a staff and manager tier
+ * (managers are peers of their staff counterpart and assignable to the same work). */
 export function getRoleForHandoff(targetStatus: string): string | null {
   switch (targetStatus) {
     case 'in_review': return 'branch_manager';
-    case 'pending_payment': return 'finance_staff';
+    case 'pending_payment': return 'finance_staff,finance_manager';
     case 'pending_onboarding': return 'supervision_staff';
     default: return null;
   }

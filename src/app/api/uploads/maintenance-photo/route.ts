@@ -51,7 +51,12 @@ export async function POST(request: NextRequest) {
 
     if (requestId) {
       // Staff uploading to existing request — require authentication
-      const auth = await authenticateApiRequest('branch_manager', 'maintenance_staff', 'supervision_staff');
+      const auth = await authenticateApiRequest(
+        'branch_manager',
+        'maintenance_staff',
+        'maintenance_manager',
+        'supervision_staff'
+      );
       if (isAuthError(auth)) return auth;
       supabase = auth.supabase;
     } else {

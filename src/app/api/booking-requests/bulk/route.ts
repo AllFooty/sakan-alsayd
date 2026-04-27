@@ -6,7 +6,12 @@ const VALID_STATUSES = ['new', 'in_review', 'pending_payment', 'pending_onboardi
 
 export async function PATCH(request: NextRequest) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'finance_staff',
+      'finance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { user, profile, supabase } = auth;
 
@@ -21,8 +26,9 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 });
     }
 
-    // Validate every row can transition to the target status. super_admin can override.
-    if (profile.role !== 'super_admin') {
+    // Validate every row can transition to the target status. super_admin / deputy_general_manager can override.
+    const canOverride = profile.role === 'super_admin' || profile.role === 'deputy_general_manager';
+    if (!canOverride) {
       const { data: current, error: fetchError } = await supabase
         .from('booking_requests')
         .select('id, status')
@@ -80,7 +86,7 @@ export async function DELETE(request: NextRequest) {
     if (isAuthError(auth)) return auth;
     const { profile, supabase } = auth;
 
-    if (profile.role !== 'super_admin') {
+    if (profile.role !== 'super_admin' && profile.role !== 'deputy_general_manager') {
       return NextResponse.json({ error: 'Forbidden: insufficient role' }, { status: 403 });
     }
 

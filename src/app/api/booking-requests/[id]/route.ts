@@ -9,7 +9,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'finance_staff',
+      'finance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
 
@@ -37,7 +42,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'finance_staff',
+      'finance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { user, profile, supabase } = auth;
 
@@ -62,8 +72,9 @@ export async function PATCH(
       }
       oldStatus = current.status;
 
-      // Enforce forward-only pipeline transitions. super_admin can override.
-      if (profile.role !== 'super_admin' && !canTransition(BOOKING_TRANSITIONS, oldStatus, status)) {
+      // Enforce forward-only pipeline transitions. super_admin / deputy_general_manager can override.
+      const canOverride = profile.role === 'super_admin' || profile.role === 'deputy_general_manager';
+      if (!canOverride && !canTransition(BOOKING_TRANSITIONS, oldStatus, status)) {
         const allowed = BOOKING_TRANSITIONS[oldStatus ?? ''] ?? [];
         return NextResponse.json(
           {
@@ -116,7 +127,7 @@ export async function DELETE(
     if (isAuthError(auth)) return auth;
     const { profile, supabase } = auth;
 
-    if (profile.role !== 'super_admin') {
+    if (profile.role !== 'super_admin' && profile.role !== 'deputy_general_manager') {
       return NextResponse.json({ error: 'Forbidden: insufficient role' }, { status: 403 });
     }
 

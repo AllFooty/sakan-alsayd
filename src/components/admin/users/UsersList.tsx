@@ -27,7 +27,11 @@ import UserModal, { type ManagedUser, type BuildingOption } from './UserModal';
 
 const ROLES: UserRole[] = [
   'super_admin',
+  'deputy_general_manager',
   'branch_manager',
+  'maintenance_manager',
+  'transportation_manager',
+  'finance_manager',
   'maintenance_staff',
   'transportation_staff',
   'supervision_staff',
@@ -363,7 +367,7 @@ export default function UsersList() {
                       <UserRoleBadge role={u.role} />
                     </td>
                     <td className="px-4 py-3 text-gray-600 hidden lg:table-cell">
-                      {u.role === 'super_admin' ? (
+                      {u.role === 'super_admin' || u.role === 'deputy_general_manager' ? (
                         <span className="text-gray-400">{t('table.allBuildings')}</span>
                       ) : u.buildings.length === 0 ? (
                         <span className="text-gray-400">—</span>

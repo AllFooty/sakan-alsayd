@@ -4,7 +4,11 @@ import { createAdminClient } from '@/lib/supabase/admin';
 
 const VALID_ROLES = [
   'super_admin',
+  'deputy_general_manager',
   'branch_manager',
+  'maintenance_manager',
+  'transportation_manager',
+  'finance_manager',
   'maintenance_staff',
   'transportation_staff',
   'supervision_staff',
@@ -260,7 +264,8 @@ export async function POST(request: NextRequest) {
       });
       if (profileErr) throw profileErr;
 
-      if (role !== 'super_admin' && buildingIds.length > 0) {
+      const skipAssignments = role === 'super_admin' || role === 'deputy_general_manager';
+      if (!skipAssignments && buildingIds.length > 0) {
         const rows = buildingIds.map((building_id) => ({ staff_id: newId, building_id }));
         const { error: assignErr } = await admin.from('staff_building_assignments').insert(rows);
         if (assignErr) throw assignErr;
@@ -282,7 +287,8 @@ export async function POST(request: NextRequest) {
         phone,
         role,
         is_active: true,
-        building_ids: role === 'super_admin' ? [] : buildingIds,
+        building_ids:
+          role === 'super_admin' || role === 'deputy_general_manager' ? [] : buildingIds,
       },
       { status: 201 }
     );

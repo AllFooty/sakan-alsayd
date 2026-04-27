@@ -49,3 +49,7 @@ export async function getAssignedBuildingIds(staffId: string) {
 export function isSuperAdmin(role: UserRole): boolean {
   return role === 'super_admin';
 }
+
+export function hasAdminAccess(role: UserRole): boolean {
+  return role === 'super_admin' || role === 'deputy_general_manager';
+}

@@ -474,8 +474,12 @@
       "welcome": "مرحباً",
       "logout": "تسجيل الخروج",
       "roles": {
-        "super_admin": "مدير عام",
+        "super_admin": "مدير تنفيذي + مؤسس ومدير عام",
+        "deputy_general_manager": "نائب مدير عام",
         "branch_manager": "مدير فرع",
+        "maintenance_manager": "مدير الصيانة",
+        "transportation_manager": "مدير مواصلات",
+        "finance_manager": "مدير مالية",
         "maintenance_staff": "موظف صيانة",
         "transportation_staff": "مسؤول مواصلات",
         "supervision_staff": "موظفة إشراف",

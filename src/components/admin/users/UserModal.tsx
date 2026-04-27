@@ -12,7 +12,11 @@ import type { UserRole } from './UserRoleBadge';
 
 const ROLES: UserRole[] = [
   'super_admin',
+  'deputy_general_manager',
   'branch_manager',
+  'maintenance_manager',
+  'transportation_manager',
+  'finance_manager',
   'maintenance_staff',
   'transportation_staff',
   'supervision_staff',
@@ -144,7 +148,8 @@ export default function UserModal({
         phone: phone.trim() || null,
         role,
       };
-      if (role !== 'super_admin') {
+      const isAdminTier = role === 'super_admin' || role === 'deputy_general_manager';
+      if (!isAdminTier) {
         payload.building_ids = Array.from(buildingIds);
       } else {
         payload.building_ids = [];
@@ -306,7 +311,7 @@ export default function UserModal({
             options={ROLES.map((r) => ({ value: r, label: tRoles(r) }))}
           />
 
-          {role !== 'super_admin' && (
+          {role !== 'super_admin' && role !== 'deputy_general_manager' && (
             <div>
               <label className="block text-sm font-medium text-navy mb-2">
                 {t('modal.assignBuildings')}

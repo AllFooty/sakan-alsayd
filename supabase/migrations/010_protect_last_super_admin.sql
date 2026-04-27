@@ -4,15 +4,12 @@
 -- The user-management API previously enforced this with an application-level
 -- count + update, which is racy: two concurrent demotions of two different
 -- active super_admins both pass the count check and both succeed, leaving
--- zero active super_admins. We move the guard into the database:
---
---   1. A trigger BEFORE UPDATE on staff_profiles aborts any update that
---      would leave the count of (role='super_admin' AND is_active=true)
---      at zero. The trigger uses an advisory lock to serialize concurrent
---      updates that touch the super_admin pool, eliminating the TOCTOU race.
---   2. An SECURITY DEFINER RPC `update_staff_profile_safely` that the API
---      can call to perform updates atomically and surface a friendly error
---      code (`last_super_admin`) instead of a raw SQL exception string.
+-- zero active super_admins. We move the guard into the database via a
+-- BEFORE UPDATE / DELETE trigger on staff_profiles. The trigger takes an
+-- advisory lock to serialize concurrent updates that touch the super_admin
+-- pool (eliminating the TOCTOU race) and aborts with `last_super_admin` if
+-- the change would empty the active super_admin set. The user-management
+-- API at /api/admin/users/[id] surfaces this code as `lastSuperAdmin` 400.
 -- ============================================================================
 
 -- Stable lock id derived from a salted hash of "staff_profiles:super_admin_pool".

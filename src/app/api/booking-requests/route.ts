@@ -22,7 +22,12 @@ function sanitizeSearch(raw: string | null): string | null {
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await authenticateApiRequest('branch_manager', 'finance_staff', 'supervision_staff');
+    const auth = await authenticateApiRequest(
+      'branch_manager',
+      'finance_staff',
+      'finance_manager',
+      'supervision_staff'
+    );
     if (isAuthError(auth)) return auth;
     const { profile, supabase } = auth;
 
@@ -38,7 +43,12 @@ export async function GET(request: NextRequest) {
     const page = Math.max(safeInt(searchParams.get('page'), 1), 1);
     const offset = (page - 1) * limit;
 
-    if (isExport && !['super_admin', 'branch_manager'].includes(profile.role)) {
+    if (
+      isExport &&
+      !['super_admin', 'deputy_general_manager', 'branch_manager', 'finance_manager'].includes(
+        profile.role
+      )
+    ) {
       return NextResponse.json({ error: 'Forbidden: insufficient role for export' }, { status: 403 });
     }
 
