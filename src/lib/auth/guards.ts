@@ -1,8 +1,12 @@
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import type { UserRole } from './providers';
+import type { UserRole, StaffProfile } from './types';
 
-export async function getAuthenticatedStaff(locale: string) {
+// `cache()` memoizes within a single request: multiple server components
+// calling getAuthenticatedStaff during the same RSC render share one
+// staff_profiles fetch.
+export const getAuthenticatedStaff = cache(async (locale: string) => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -14,9 +18,9 @@ export async function getAuthenticatedStaff(locale: string) {
 
   const { data: profile } = await supabase
     .from('staff_profiles')
-    .select('*')
+    .select('id, full_name, phone, role, is_active')
     .eq('id', user.id)
-    .single();
+    .single<StaffProfile>();
 
   if (!profile || !profile.is_active) {
     await supabase.auth.signOut();
@@ -24,7 +28,7 @@ export async function getAuthenticatedStaff(locale: string) {
   }
 
   return { user, profile };
-}
+});
 
 export async function requireRole(locale: string, ...roles: UserRole[]) {
   const { user, profile } = await getAuthenticatedStaff(locale);

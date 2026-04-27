@@ -5,31 +5,11 @@ import {
   useContext,
   useEffect,
   useState,
-  useRef,
   type ReactNode,
 } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
-
-type UserRole =
-  | 'super_admin'
-  | 'deputy_general_manager'
-  | 'branch_manager'
-  | 'maintenance_manager'
-  | 'transportation_manager'
-  | 'finance_manager'
-  | 'maintenance_staff'
-  | 'transportation_staff'
-  | 'supervision_staff'
-  | 'finance_staff';
-
-interface StaffProfile {
-  id: string;
-  full_name: string;
-  phone: string | null;
-  role: UserRole;
-  is_active: boolean;
-}
+import type { UserRole, StaffProfile } from './types';
 
 interface AuthContextType {
   user: User | null;
@@ -45,29 +25,57 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
-// Module-level cache so auth state persists across remounts (e.g. language switch).
-// This prevents re-fetching user + profile when the component tree remounts
-// due to locale changes in [locale]/layout.tsx.
+// Module-level cache so auth state persists across remounts (e.g. language switch
+// remounting [locale]/layout.tsx). When the server hydrates us via initialUser/
+// initialProfile, we seed this cache so subsequent client-side mounts also skip
+// the network round-trip.
 let cachedUser: User | null = null;
 let cachedProfile: StaffProfile | null = null;
 let cacheReady = false;
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(cachedUser);
-  const [profile, setProfile] = useState<StaffProfile | null>(cachedProfile);
-  const [loading, setLoading] = useState(!cacheReady);
-  const supabaseRef = useRef(createClient());
-  const supabase = supabaseRef.current;
+interface AuthProviderProps {
+  children: ReactNode;
+  initialUser?: User | null;
+  initialProfile?: StaffProfile | null;
+}
+
+export function AuthProvider({
+  children,
+  initialUser,
+  initialProfile,
+}: AuthProviderProps) {
+  // Server-hydrated path: when the RSC layout passes initialUser/initialProfile,
+  // seed local state synchronously and skip the client round-trip entirely.
+  // Module cache is updated inside the effect below (writing to it during
+  // render would be a side effect React's strict rules forbid).
+  const serverHydrated = initialUser !== undefined;
+  const [user, setUser] = useState<User | null>(
+    serverHydrated ? (initialUser ?? null) : cachedUser
+  );
+  const [profile, setProfile] = useState<StaffProfile | null>(
+    serverHydrated ? (initialProfile ?? null) : cachedProfile
+  );
+  const [loading, setLoading] = useState(!serverHydrated && !cacheReady);
+  // Lazy initializer: create the Supabase browser client once per provider
+  // mount. Avoids accessing a ref during render (a React strict-rule violation).
+  const [supabase] = useState(() => createClient());
 
   useEffect(() => {
-    // If we already have cached auth state, skip the initial fetch
-    if (cacheReady) {
-      setUser(cachedUser);
-      setProfile(cachedProfile);
-      setLoading(false);
-    } else {
-      // Use getSession() instead of getUser() — reads from local cookie, no network call.
-      // The middleware already called getUser() to refresh the session.
+    // Sync the module-level cache from server-hydrated values so cross-mount
+    // reads (e.g. another AuthProvider mounting after a locale switch before
+    // its props arrive) see the fresh user without a round-trip.
+    if (serverHydrated && !cacheReady) {
+      cachedUser = initialUser ?? null;
+      cachedProfile = initialProfile ?? null;
+      cacheReady = true;
+    }
+
+    // Fallback path: no server hydration AND no module cache yet — read the
+    // session from the cookie and fetch the profile. Should be rare now that
+    // the admin layout is an RSC, but kept for safety.
+    if (!serverHydrated && !cacheReady) {
+      // Fallback path: server didn't hydrate (e.g. legacy mount without provider
+      // wrapping). Use getSession() — local cookie read, no network call.
       async function initSession() {
         const {
           data: { session },
@@ -95,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null;
 
       // Only re-fetch profile if the user actually changed (sign in/out),
@@ -125,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, [supabase, serverHydrated, initialUser, initialProfile]);
 
   const signOut = async () => {
     await supabase.auth.signOut();

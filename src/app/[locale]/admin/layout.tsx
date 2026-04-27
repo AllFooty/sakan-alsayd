@@ -1,38 +1,19 @@
-'use client';
+import { getAuthenticatedStaff } from '@/lib/auth/guards';
+import AdminShell from '@/components/admin/layout/AdminShell';
 
-import { useState } from 'react';
-import { AuthProvider } from '@/lib/auth/providers';
-import AdminSidebar from '@/components/admin/layout/AdminSidebar';
-import AdminTopbar from '@/components/admin/layout/AdminTopbar';
-import { Toaster } from 'sonner';
-
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { locale } = await params;
+  const { user, profile } = await getAuthenticatedStaff(locale);
 
   return (
-    <AuthProvider>
-      <div className="flex h-screen bg-gray-50 overflow-hidden">
-        <AdminSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <AdminTopbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6">
-            {children}
-          </main>
-        </div>
-      </div>
-      <Toaster
-        position="top-center"
-        richColors
-        closeButton
-        dir="auto"
-      />
-    </AuthProvider>
+    <AdminShell initialUser={user} initialProfile={profile}>
+      {children}
+    </AdminShell>
   );
 }

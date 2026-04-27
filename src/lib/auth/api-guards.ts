@@ -1,6 +1,22 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import type { UserRole, StaffProfile } from './providers';
+import type { UserRole, StaffProfile } from './types';
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
+// Memoized within a request — if multiple call sites authenticate the same
+// API request, they share one staff_profiles round-trip.
+const fetchStaffProfile = cache(
+  async (supabase: SupabaseServerClient, userId: string) => {
+    const { data } = await supabase
+      .from('staff_profiles')
+      .select('id, full_name, phone, role, is_active')
+      .eq('id', userId)
+      .single<StaffProfile>();
+    return data;
+  }
+);
 
 interface AuthResult {
   user: { id: string; email?: string };
@@ -29,11 +45,7 @@ export async function authenticateApiRequest(
   }
   const user = session.user;
 
-  const { data: profile } = await supabase
-    .from('staff_profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  const profile = await fetchStaffProfile(supabase, user.id);
 
   if (!profile || !profile.is_active) {
     return NextResponse.json({ error: 'Forbidden: inactive account' }, { status: 403 });
