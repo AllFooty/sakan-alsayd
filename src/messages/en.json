@@ -903,6 +903,119 @@
       "pagination": {
         "summary": "{count} users"
       }
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Manage platform configuration and access policies.",
+      "cards": {
+        "rolesPermissions": {
+          "title": "Roles & Permissions",
+          "description": "See what each staff role can do across the platform."
+        }
+      }
+    },
+    "rolesPermissions": {
+      "title": "Roles & Permissions",
+      "subtitle": "Reference for which roles can perform which actions across the platform.",
+      "readOnlyBanner": "View-only reference. Permissions are defined in code today; changes require an engineering update.",
+      "forbidden": {
+        "title": "Access Restricted",
+        "description": "Only super admins can view roles and permissions."
+      },
+      "filterRoles": "Filter by role",
+      "showAllRoles": "Show all roles",
+      "clearFilters": "Clear filters",
+      "mobileRolePicker": "Choose a role",
+      "table": {
+        "permission": "Permission"
+      },
+      "search": {
+        "placeholder": "Search permissions...",
+        "clear": "Clear search",
+        "noResults": "No permissions match your filter."
+      },
+      "legend": {
+        "title": "Legend:",
+        "full": "Full access",
+        "scoped": "Conditional access",
+        "none": "No access"
+      },
+      "scope": {
+        "assignedBuilding": "Assigned buildings only",
+        "ownTasks": "Own assigned tasks only",
+        "assignedResidents": "Residents in assigned buildings only"
+      },
+      "notes": {
+        "apiOnlyDbBlocks": "API allows this but the database currently blocks it (request will fail)",
+        "noApiYet": "No admin endpoint exists yet — RLS would permit this once a UI is built"
+      },
+      "groups": {
+        "bookings": "Bookings",
+        "maintenance": "Maintenance",
+        "buildings": "Buildings",
+        "rooms": "Rooms",
+        "residents": "Residents",
+        "users": "Users & Staff",
+        "content": "Website Content",
+        "finance": "Finance",
+        "audit": "Audit Log"
+      },
+      "permissions": {
+        "bookings": {
+          "list": "View booking requests",
+          "update": "Edit booking (status, assignment, notes)",
+          "delete": "Delete booking",
+          "export": "Export bookings to CSV",
+          "skipTransition": "Override pipeline transitions",
+          "notesRead": "Read internal notes",
+          "notesWrite": "Add internal notes"
+        },
+        "maintenance": {
+          "list": "View maintenance requests",
+          "update": "Edit maintenance (status, assignment, priority)",
+          "delete": "Delete maintenance request",
+          "export": "Export maintenance to CSV",
+          "skipTransition": "Override pipeline transitions",
+          "notesRead": "Read internal notes",
+          "notesWrite": "Add internal notes",
+          "photosDelete": "Delete uploaded photos"
+        },
+        "buildings": {
+          "list": "View buildings",
+          "update": "Edit building details",
+          "create": "Create a new building",
+          "delete": "Delete a building"
+        },
+        "rooms": {
+          "list": "View rooms",
+          "create": "Create rooms",
+          "update": "Edit rooms",
+          "delete": "Delete rooms"
+        },
+        "residents": {
+          "list": "View residents",
+          "create": "Create resident records",
+          "update": "Edit resident details",
+          "delete": "Delete resident records"
+        },
+        "users": {
+          "list": "View staff list",
+          "invite": "Invite new staff",
+          "update": "Edit staff (role, buildings, status)",
+          "deactivate": "Deactivate staff accounts",
+          "resetPassword": "Send password reset emails"
+        },
+        "content": {
+          "read": "View website content",
+          "write": "Edit website content (services, FAQ, testimonials, contacts)"
+        },
+        "finance": {
+          "notImplemented": "Finance module not yet implemented"
+        },
+        "audit": {
+          "read": "View activity log"
+        }
+      }
     }
   }
 }
