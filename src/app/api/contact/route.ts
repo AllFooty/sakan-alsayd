@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sanitize metadata — only allow whitelisted keys with string values
-    let safeMetadata: Record<string, string> = {};
+    const safeMetadata: Record<string, string> = {};
     if (metadata && typeof metadata === 'object' && !Array.isArray(metadata)) {
       for (const key of ALLOWED_METADATA_KEYS) {
         if (typeof metadata[key] === 'string') {
