@@ -47,6 +47,7 @@ export default function Footer() {
                 alt="سكن السيد - Sakan Alsayd"
                 fill
                 className="object-contain"
+                sizes="80px"
               />
             </div>
             <p className="text-white/70 text-sm leading-relaxed">

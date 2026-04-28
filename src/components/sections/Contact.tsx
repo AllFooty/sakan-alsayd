@@ -3,25 +3,28 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import dynamic from 'next/dynamic';
 import { Phone, MessageCircle, Send, CheckCircle, AlertCircle, Wrench } from 'lucide-react';
 import { Button, Input, Textarea, Select, PhoneInput } from '@/components/ui';
 import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
-import MaintenanceModal from '@/components/ui/MaintenanceModal';
 import { contacts } from '@/data/contacts';
-import { getCities } from '@/data/locations';
-import { cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
+import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
+import { SAUDI_PHONE_REGEX } from '@/lib/utils';
 
-const contactSchema = z.object({
-  name: z.string().min(2, 'Name is required'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
-  city: z.string().min(1, 'Please select a city'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-});
+// Lazy: maintenance is for existing residents — most home-page visitors
+// never open it. Holds back the photo-upload tree + extra lucide icons.
+const MaintenanceModal = dynamic(
+  () => import('@/components/ui/MaintenanceModal'),
+  { ssr: false }
+);
 
-type ContactFormData = z.infer<typeof contactSchema>;
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+  city: string;
+  message: string;
+}
 
 export default function Contact() {
   const t = useTranslations('contact');
@@ -31,7 +34,7 @@ export default function Contact() {
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [isMaintenanceOpen, setIsMaintenanceOpen] = useState(false);
 
-  const cities = getCities();
+  const { cities } = usePublicBuildings();
   const cityOptions = cities.map((city) => ({
     value: city.name.toLowerCase(),
     label: isArabic ? city.nameAr : city.name,
@@ -42,9 +45,7 @@ export default function Contact() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ContactFormData>({
-    resolver: zodResolver(contactSchema),
-  });
+  } = useForm<ContactFormData>();
 
   const onSubmit = async (data: ContactFormData) => {
     setSubmitStatus('loading');
@@ -93,7 +94,10 @@ export default function Contact() {
                 label={t('form.name')}
                 placeholder={t('placeholders.fullName')}
                 error={errors.name?.message}
-                {...register('name')}
+                {...register('name', {
+                  required: 'Name is required',
+                  minLength: { value: 2, message: 'Name is required' },
+                })}
               />
 
               <div className="grid sm:grid-cols-2 gap-5">
@@ -102,14 +106,23 @@ export default function Contact() {
                   type="email"
                   placeholder={t('placeholders.email')}
                   error={errors.email?.message}
-                  {...register('email')}
+                  {...register('email', {
+                    required: 'Invalid email address',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Invalid email address',
+                    },
+                  })}
                 />
                 <PhoneInput
                   label={t('form.phone')}
                   placeholder={t('placeholders.phone')}
                   formatHint={t('form.phoneHint')}
                   error={errors.phone ? t('form.invalidPhone') : undefined}
-                  {...register('phone')}
+                  {...register('phone', {
+                    required: 'invalidPhone',
+                    pattern: { value: SAUDI_PHONE_REGEX, message: 'invalidPhone' },
+                  })}
                 />
               </div>
 
@@ -118,7 +131,7 @@ export default function Contact() {
                 options={cityOptions}
                 placeholder={t('placeholders.city')}
                 error={errors.city?.message}
-                {...register('city')}
+                {...register('city', { required: 'Please select a city' })}
               />
 
               <Textarea
@@ -126,7 +139,13 @@ export default function Contact() {
                 placeholder={t('placeholders.message')}
                 rows={4}
                 error={errors.message?.message}
-                {...register('message')}
+                {...register('message', {
+                  required: 'Message must be at least 10 characters',
+                  minLength: {
+                    value: 10,
+                    message: 'Message must be at least 10 characters',
+                  },
+                })}
               />
 
               <Button
@@ -276,10 +295,12 @@ export default function Contact() {
         isOpen={isWhatsAppModalOpen}
         onClose={() => setIsWhatsAppModalOpen(false)}
       />
-      <MaintenanceModal
-        isOpen={isMaintenanceOpen}
-        onClose={() => setIsMaintenanceOpen(false)}
-      />
+      {isMaintenanceOpen && (
+        <MaintenanceModal
+          isOpen
+          onClose={() => setIsMaintenanceOpen(false)}
+        />
+      )}
     </section>
   );
 }

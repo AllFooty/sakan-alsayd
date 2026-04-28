@@ -4,12 +4,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui';
-import BookingModal from '@/components/ui/BookingModal';
 import { cn } from '@/lib/utils';
 import LanguageSwitcher from './LanguageSwitcher';
+
+// Lazy-loaded on first open. Pulls react-hook-form + zod + form-resolver
+// (~70 KB gz) out of the per-page bundle so the marketing pages don't pay
+// for a wizard the user may never trigger.
+const BookingModal = dynamic(() => import('@/components/ui/BookingModal'), {
+  ssr: false,
+});
 
 type NavItem = {
   href: string;
@@ -86,7 +93,7 @@ export default function Header() {
                   alt="سكن السيد - Sakan Alsayd"
                   fill
                   className="object-contain"
-                  priority
+                  sizes="160px"
                   onError={() => setLogoError(true)}
                 />
               </div>
@@ -202,10 +209,12 @@ export default function Header() {
           </div>
         </div>
       </div>
-      <BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-      />
+      {isBookingOpen && (
+        <BookingModal
+          isOpen
+          onClose={() => setIsBookingOpen(false)}
+        />
+      )}
     </header>
   );
 }

@@ -21,6 +21,7 @@ const HISTORICAL_APPLIED_OUT_OF_BAND = new Set([
   '011_role_expansion_enum.sql',     // recorded with the leading "011_" prefix retained in the name
   '012_role_expansion_rls.sql',      // recorded with the leading "012_" prefix retained in the name
   '013_role_expansion_followup.sql', // recorded with the leading "013_" prefix retained in the name
+  '016_buildings_photos_bucket.sql', // recorded with the leading "016_" prefix retained in the name
 ]);
 
 const PROJECT_REF = 'xvcpyofwhmuohpvinrry';

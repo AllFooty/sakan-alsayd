@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,7 +23,7 @@ import {
   Bus,
   BusFront,
 } from 'lucide-react';
-import { locations, getCities } from '@/data/locations';
+import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
 import { formatPrice, cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 
@@ -95,7 +95,7 @@ export default function BookingModal({
   const t = useTranslations('bookingModal');
   const tRooms = useTranslations('rooms');
 
-  const cities = useMemo(() => getCities(), []);
+  const { buildings, cities } = usePublicBuildings();
 
   // Selection state
   const [selectedCity, setSelectedCity] = useState('');
@@ -142,12 +142,23 @@ export default function BookingModal({
   const preselectedRoomType = preselected?.roomType;
   const preselectedBathroomType = preselected?.bathroomType;
 
-  useEffect(() => {
-    if (!isOpen || !preselectedLocationId) return;
+  // Apply preselection exactly once per open. The `buildings` reference can
+  // change underneath us (cache revalidation, router.refresh, etc.); without
+  // this guard the effect re-runs and snaps the user back to 'personal' /
+  // 'room', wiping any in-progress wizard state.
+  const preselectAppliedRef = useRef(false);
 
-    const loc = locations.find((l) => l.id === preselectedLocationId);
+  useEffect(() => {
+    if (!isOpen) {
+      preselectAppliedRef.current = false;
+      return;
+    }
+    if (preselectAppliedRef.current || !preselectedLocationId) return;
+
+    const loc = buildings.find((l) => l.id === preselectedLocationId);
     if (!loc) return;
 
+    preselectAppliedRef.current = true;
     setSelectedCity(loc.city.toLowerCase());
     setSelectedLocationId(loc.id);
 
@@ -166,7 +177,7 @@ export default function BookingModal({
       }
     }
     setCurrentStep('room');
-  }, [isOpen, preselectedLocationId, preselectedRoomType, preselectedBathroomType]);
+  }, [isOpen, preselectedLocationId, preselectedRoomType, preselectedBathroomType, buildings]);
 
   // Reset on close
   const handleClose = useCallback(() => {
@@ -196,13 +207,13 @@ export default function BookingModal({
   }, [isOpen, handleClose]);
 
   const selectedLocation = useMemo(
-    () => locations.find((l) => l.id === selectedLocationId),
-    [selectedLocationId]
+    () => buildings.find((l) => l.id === selectedLocationId),
+    [selectedLocationId, buildings]
   );
 
   const cityBuildings = useMemo(
-    () => locations.filter((l) => l.city.toLowerCase() === selectedCity),
-    [selectedCity]
+    () => buildings.filter((l) => l.city.toLowerCase() === selectedCity),
+    [selectedCity, buildings]
   );
 
   const stepIndex = STEPS.indexOf(currentStep);
@@ -219,9 +230,9 @@ export default function BookingModal({
     setSelectedCity(city.toLowerCase());
     setSelectedLocationId('');
     setSelectedRoom(null);
-    const buildings = locations.filter((l) => l.city.toLowerCase() === city.toLowerCase());
-    if (buildings.length === 1) {
-      setSelectedLocationId(buildings[0].id);
+    const cityMatches = buildings.filter((l) => l.city.toLowerCase() === city.toLowerCase());
+    if (cityMatches.length === 1) {
+      setSelectedLocationId(cityMatches[0].id);
       setCurrentStep('room');
     } else {
       setCurrentStep('building');
@@ -474,7 +485,7 @@ export default function BookingModal({
                       {isArabic ? city.nameAr : city.name}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {locations.filter((l) => l.city === city.name).length}{' '}
+                      {buildings.filter((l) => l.city === city.name).length}{' '}
                       {t('steps.city.buildings')}
                     </p>
                   </div>

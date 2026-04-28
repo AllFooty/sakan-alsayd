@@ -17,7 +17,7 @@ import {
   Wrench,
   Camera,
 } from 'lucide-react';
-import { locations, getCities } from '@/data/locations';
+import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
 import { cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 
@@ -50,7 +50,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const isArabic = locale === 'ar';
   const t = useTranslations('maintenanceModal');
 
-  const cities = useMemo(() => getCities(), []);
+  const { buildings, cities } = usePublicBuildings();
 
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedLocationId, setSelectedLocationId] = useState('');
@@ -136,13 +136,13 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   }, [isOpen, handleClose]);
 
   const selectedLocation = useMemo(
-    () => locations.find((l) => l.id === selectedLocationId),
-    [selectedLocationId]
+    () => buildings.find((l) => l.id === selectedLocationId),
+    [selectedLocationId, buildings]
   );
 
   const cityBuildings = useMemo(
-    () => locations.filter((l) => l.city.toLowerCase() === selectedCity),
-    [selectedCity]
+    () => buildings.filter((l) => l.city.toLowerCase() === selectedCity),
+    [selectedCity, buildings]
   );
 
   const stepIndex = STEPS.indexOf(currentStep);
@@ -150,9 +150,9 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const handleCitySelect = (city: string) => {
     setSelectedCity(city.toLowerCase());
     setSelectedLocationId('');
-    const buildings = locations.filter((l) => l.city.toLowerCase() === city.toLowerCase());
-    if (buildings.length === 1) {
-      setSelectedLocationId(buildings[0].id);
+    const cityMatches = buildings.filter((l) => l.city.toLowerCase() === city.toLowerCase());
+    if (cityMatches.length === 1) {
+      setSelectedLocationId(cityMatches[0].id);
       setCitySelected(true);
       setCurrentStep('details');
     } else {
@@ -354,7 +354,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                       {isArabic ? city.nameAr : city.name}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {locations.filter((l) => l.city === city.name).length}{' '}
+                      {buildings.filter((l) => l.city === city.name).length}{' '}
                       {t('steps.building.buildings')}
                     </p>
                   </div>

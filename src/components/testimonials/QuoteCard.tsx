@@ -68,6 +68,7 @@ export default function QuoteCard({ testimonial, isArabic }: QuoteCardProps) {
                 alt={isArabic ? testimonial.nameAr : testimonial.name}
                 fill
                 className="object-cover"
+                sizes="48px"
               />
             ) : (
               <span className="text-coral font-semibold text-sm">

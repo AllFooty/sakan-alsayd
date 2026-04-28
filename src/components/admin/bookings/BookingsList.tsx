@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
   Search,
   Eye,
@@ -16,9 +17,13 @@ import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/
 import { formatDate } from '@/lib/utils';
 import EmptyState from '@/components/admin/shared/EmptyState';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
-import BookingModal from '@/components/ui/BookingModal';
 import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
 import { generateCsv, downloadCsv } from '@/lib/export';
+
+// Lazy: only admins clicking "New booking" pull the wizard chunk.
+const BookingModal = dynamic(() => import('@/components/ui/BookingModal'), {
+  ssr: false,
+});
 
 interface BookingRequest {
   id: string;
@@ -52,8 +57,11 @@ let cachedStaffList: { id: string; full_name: string }[] | null = null;
 export default function BookingsList() {
   const t = useTranslations('admin.bookings');
   const tb = useTranslations('admin.bulk');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const isArabic = locale === 'ar';
+  const PrevIcon = isArabic ? ChevronRight : ChevronLeft;
+  const NextIcon = isArabic ? ChevronLeft : ChevronRight;
   const router = useRouter();
 
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
@@ -465,8 +473,9 @@ export default function BookingsList() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={tCommon('pagination.previous')}
                 >
-                  <ChevronLeft size={16} />
+                  <PrevIcon size={16} />
                 </button>
                 <span className="text-sm text-gray-600">
                   {page} / {totalPages}
@@ -475,8 +484,9 @@ export default function BookingsList() {
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={tCommon('pagination.next')}
                 >
-                  <ChevronRight size={16} />
+                  <NextIcon size={16} />
                 </button>
               </div>
             </div>
@@ -496,13 +506,15 @@ export default function BookingsList() {
         loading={bulkLoading}
       />
 
-      <BookingModal
-        isOpen={showNewBooking}
-        onClose={() => {
-          setShowNewBooking(false);
-          fetchBookings();
-        }}
-      />
+      {showNewBooking && (
+        <BookingModal
+          isOpen
+          onClose={() => {
+            setShowNewBooking(false);
+            fetchBookings();
+          }}
+        />
+      )}
     </div>
   );
 }

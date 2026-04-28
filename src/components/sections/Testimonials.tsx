@@ -103,6 +103,7 @@ export default function Testimonials() {
                         alt={isArabic ? testimonial.nameAr : testimonial.name}
                         fill
                         className="object-cover"
+                        sizes="48px"
                       />
                     ) : (
                       <span className="text-coral font-semibold text-sm">
@@ -176,6 +177,7 @@ export default function Testimonials() {
                         alt={isArabic ? currentTestimonial.nameAr : currentTestimonial.name}
                         fill
                         className="object-cover"
+                        sizes="48px"
                       />
                     ) : (
                       <span className="text-coral font-semibold text-sm">

@@ -102,6 +102,7 @@ export default function QuoteModal({
                   alt={isArabic ? testimonial.nameAr : testimonial.name}
                   fill
                   className="object-cover"
+                  sizes="64px"
                 />
               ) : (
                 <span className="text-coral font-semibold text-lg">

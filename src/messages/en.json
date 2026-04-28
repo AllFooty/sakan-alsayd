@@ -289,7 +289,17 @@
     "month": "month",
     "learnMore": "Learn More",
     "close": "Close",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "pagination": {
+      "previous": "Previous page",
+      "next": "Next page"
+    }
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "subtitle": "We'll be right back. Please try again in a moment.",
+    "tryAgain": "Try again",
+    "goHome": "Go to home page"
   },
   "whatsappModal": {
     "title": "Choose Your Region",
@@ -803,6 +813,354 @@
         "cancel": "Cancel"
       }
     },
+    "buildings": {
+      "title": "Buildings & Rooms",
+      "subtitle": "Manage residential buildings, rooms, and photos.",
+      "addButton": "Add Building",
+      "view": {
+        "grid": "Grid",
+        "table": "Table"
+      },
+      "filters": {
+        "search": "Search by neighborhood, city, or slug...",
+        "city": "City",
+        "allCities": "All cities",
+        "status": "Status",
+        "allStatuses": "All",
+        "active": "Active",
+        "inactive": "Inactive",
+        "advancedFilters": "Filters",
+        "clearFilters": "Clear"
+      },
+      "table": {
+        "city": "City",
+        "neighborhood": "Neighborhood",
+        "rooms": "Rooms",
+        "occupancy": "Occupancy",
+        "status": "Status",
+        "updatedAt": "Updated"
+      },
+      "card": {
+        "totalRooms": "{count} rooms",
+        "occupied": "{count} occupied",
+        "available": "{count} available",
+        "noPhoto": "No photo"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "placeholder": "Placeholder"
+      },
+      "empty": {
+        "title": "No buildings yet",
+        "description": "Add your first building to get started.",
+        "filteredTitle": "No buildings match your filters",
+        "filteredDescription": "Try adjusting your search or clearing filters."
+      },
+      "pagination": {
+        "summary": "{count} buildings"
+      },
+      "toast": {
+        "genericError": "Something went wrong. Please try again."
+      },
+      "detail": {
+        "backToList": "Back to buildings",
+        "editButton": "Edit",
+        "deactivate": "Deactivate",
+        "reactivate": "Reactivate",
+        "deactivateConfirm": {
+          "title": "Deactivate building?",
+          "description": "{name} will be hidden from the public site and from new bookings. Existing rooms and residents are kept. You can reactivate it any time.",
+          "cancel": "Cancel"
+        },
+        "toast": {
+          "deactivated": "Building deactivated",
+          "reactivated": "Building reactivated"
+        },
+        "coverPhoto": "Cover",
+        "about": "About",
+        "noDescription": "No description added yet.",
+        "landmarks": "Nearby landmarks",
+        "noLandmarks": "No landmarks listed.",
+        "photoGallery": "Photo gallery",
+        "noPhotos": "No photos uploaded yet.",
+        "location": "Location",
+        "openInMaps": "Open in Google Maps",
+        "noMap": "No map link.",
+        "residents": "Active residents",
+        "activeAssignmentsHint": "Currently checked-in to a room",
+        "metadata": "Details",
+        "bilingualNames": "Bilingual labels",
+        "bilingual": {
+          "english": "English",
+          "arabic": "Arabic"
+        },
+        "meta": {
+          "slug": "Slug",
+          "sortOrder": "Sort order",
+          "createdAt": "Created",
+          "updatedAt": "Updated"
+        },
+        "stats": {
+          "totalRooms": "Total rooms",
+          "available": "Available",
+          "occupied": "Occupied",
+          "activeMaintenance": "Active maintenance",
+          "occupancyPct": "({pct}%)"
+        },
+        "tabsLabel": "Building sections",
+        "tabs": {
+          "overview": "Overview",
+          "rooms": "Rooms"
+        },
+        "notFound": {
+          "title": "Building not found",
+          "description": "It may have been removed, or you may not have access."
+        }
+      },
+      "form": {
+        "createTitle": "New building",
+        "editTitle": "Edit building",
+        "createSubtitle": "Bilingual fields support both Arabic and English. Photos can be added after the building is created.",
+        "editSubtitle": "Bilingual fields support both Arabic and English. Manage photos from the building detail page.",
+        "create": "Create building",
+        "save": "Save changes",
+        "cancel": "Cancel",
+        "addLandmark": "Add landmark",
+        "removeLandmark": "Remove landmark",
+        "landmarkN": "Landmark {n}",
+        "noLandmarks": "No landmarks yet. Click “Add landmark” to list nearby points of interest.",
+        "sections": {
+          "basics": "Identifier & display",
+          "names": "Bilingual names",
+          "description": "Description",
+          "location": "Map link",
+          "landmarks": "Nearby landmarks"
+        },
+        "fields": {
+          "slug": "Slug",
+          "sortOrder": "Sort order",
+          "isActive": "Active",
+          "isPlaceholder": "Placeholder",
+          "cityEn": "City (English)",
+          "cityAr": "City (Arabic)",
+          "neighborhoodEn": "Neighborhood (English)",
+          "neighborhoodAr": "Neighborhood (Arabic)",
+          "descriptionEn": "Description (English)",
+          "descriptionAr": "Description (Arabic)",
+          "mapUrl": "Google Maps URL",
+          "landmarkNameEn": "Name (English)",
+          "landmarkNameAr": "Name (Arabic)",
+          "landmarkDistanceEn": "Distance (English)",
+          "landmarkDistanceAr": "Distance (Arabic)"
+        },
+        "helpers": {
+          "slug": "Lowercase letters, numbers, and dashes only. Used in URLs.",
+          "isActive": "Inactive buildings are hidden from the public site.",
+          "isPlaceholder": "Reserve a slot before details are confirmed.",
+          "mapUrl": "Optional. Paste a Google Maps share link."
+        },
+        "errors": {
+          "fixBelow": "Please fix the errors below.",
+          "required": "This field is required.",
+          "slugRequired": "Slug is required.",
+          "slugInvalid": "Slug must use only lowercase letters, numbers, and dashes.",
+          "slugTaken": "This slug is already in use. Choose another.",
+          "urlInvalid": "Please enter a valid URL starting with http:// or https://.",
+          "numberInvalid": "Please enter a valid number.",
+          "landmarkBilingual": "Both English and Arabic names are required for each landmark.",
+          "requiredMissing": "Some required fields are missing."
+        },
+        "toast": {
+          "created": "Building created",
+          "updated": "Changes saved",
+          "reactivated": "Building reactivated",
+          "genericError": "Something went wrong. Please try again."
+        },
+        "forbidden": {
+          "title": "Access restricted",
+          "description": "Only super admins, deputies, or branch managers can edit buildings."
+        },
+        "notFound": {
+          "title": "Building not found",
+          "description": "It may have been removed, or you may not have access."
+        },
+        "inactiveBanner": {
+          "title": "This building is deactivated",
+          "descriptionAdmin": "Edits and photo changes are paused while the building is inactive. Reactivate it to resume editing.",
+          "descriptionScoped": "Edits and photo changes are paused while the building is inactive. A super admin can reactivate it.",
+          "reactivate": "Reactivate"
+        }
+      },
+      "photos": {
+        "title": "Photos",
+        "add": "Add photo",
+        "uploading": "Uploading...",
+        "coverBadge": "Cover",
+        "emptyTitle": "No photos yet",
+        "emptyHint": "Drop an image here, or click to choose. JPEG, PNG, or WebP — up to 5 MB each.",
+        "disabledEmptyHint": "Photos can be added after the building is reactivated.",
+        "helpText": "The cover photo appears on the public building page and at the top of this view. Drag is not yet supported — use the arrows to reorder.",
+        "disabledHelpText": "Photos are read-only while the building is deactivated. Reactivate the building to upload, reorder, or remove photos.",
+        "actions": {
+          "setCover": "Set as cover",
+          "moveUp": "Move up",
+          "moveDown": "Move down",
+          "delete": "Remove photo"
+        },
+        "toast": {
+          "uploaded": "Photo uploaded",
+          "coverSet": "Cover photo updated",
+          "deleted": "Photo removed"
+        },
+        "errors": {
+          "invalidType": "Only JPEG, PNG, or WebP images are allowed.",
+          "tooLarge": "File is too large. Maximum size is 5 MB.",
+          "tooMany": "You can only have up to {max} photos.",
+          "uploadFailed": "Upload failed. Please try again."
+        }
+      },
+      "roomStatus": {
+        "available": "Available",
+        "occupied": "Occupied",
+        "maintenance": "Maintenance",
+        "reserved": "Reserved"
+      },
+      "roomsTab": {
+        "searchPlaceholder": "Search by room number...",
+        "allStatuses": "All statuses",
+        "allTypes": "All types",
+        "clearFilters": "Clear",
+        "addRoom": "Add room",
+        "rowActions": "Actions",
+        "rowEdit": "Edit room",
+        "rowDelete": "Delete room",
+        "table": {
+          "roomNumber": "Room",
+          "floor": "Floor",
+          "type": "Type",
+          "bathroom": "Bathroom",
+          "price": "Monthly",
+          "status": "Status"
+        },
+        "unnumbered": "(no number)",
+        "summary": "{count, plural, one {# room} other {# rooms}}",
+        "clickHint": "Click any room to see its current occupant and history.",
+        "emptyTitle": "No rooms in this building yet",
+        "emptyDescription": "Click \"Add room\" to create the first one.",
+        "emptyFilteredTitle": "No rooms match your filters",
+        "emptyFilteredDescription": "Try clearing the filters or adjusting your search.",
+        "errorTitle": "Couldn't load rooms",
+        "errorDescription": "Please try again or refresh the page."
+      },
+      "roomForm": {
+        "createTitle": "New room",
+        "editTitle": "Edit room",
+        "createSubtitle": "Set the room's type, pricing, and status. Photos can be added later.",
+        "editSubtitle": "Update pricing, status, or notes for this room.",
+        "create": "Create room",
+        "save": "Save changes",
+        "cancel": "Cancel",
+        "delete": "Delete room",
+        "deleting": "Deleting...",
+        "buildingLabel": "Building",
+        "sections": {
+          "basics": "Room details",
+          "pricing": "Pricing",
+          "status": "Status & notes"
+        },
+        "fields": {
+          "roomNumber": "Room number",
+          "floor": "Floor",
+          "roomType": "Room type",
+          "bathroomType": "Bathroom type",
+          "monthlyPrice": "Monthly price (SAR)",
+          "discountedPrice": "Discounted price (SAR)",
+          "status": "Status",
+          "notes": "Internal notes"
+        },
+        "helpers": {
+          "roomNumber": "Optional. Building-friendly identifier (e.g. 101, A-3).",
+          "floor": "Optional. Use 0 for ground floor; negative for basement.",
+          "discountedPrice": "Optional. Must be lower than the monthly price.",
+          "statusOccupied": "Use the residents move-in flow to assign a tenant. This only updates display status.",
+          "notes": "Visible to staff only. Up to 5000 characters."
+        },
+        "discount": {
+          "percentOff": "{pct}% off"
+        },
+        "errors": {
+          "fixBelow": "Please fix the errors below.",
+          "required": "This field is required.",
+          "priceRequired": "Monthly price is required.",
+          "priceInvalid": "Enter a positive number.",
+          "discountInvalid": "Enter a non-negative number.",
+          "discountTooHigh": "Discounted price can't exceed the monthly price.",
+          "floorInvalid": "Floor must be a whole number.",
+          "notesTooLong": "Notes must be 5000 characters or fewer.",
+          "requiredMissing": "Some required fields are missing.",
+          "buildingNotFound": "Couldn't find the parent building.",
+          "roomHasAssignments": "This room has assignment history and can't be deleted. Set its status to maintenance to take it offline instead."
+        },
+        "toast": {
+          "created": "Room created",
+          "updated": "Changes saved",
+          "deleted": "Room deleted",
+          "genericError": "Something went wrong. Please try again."
+        },
+        "deleteConfirm": {
+          "title": "Delete this room?",
+          "description": "Permanently delete this room? Rooms with past assignments can't be deleted anyway — to take a room offline while keeping its history, cancel and set its status to Maintenance instead.",
+          "confirm": "Delete room",
+          "cancel": "Keep room"
+        },
+        "forbidden": {
+          "title": "Access restricted",
+          "description": "Only super admins, deputies, or branch managers can manage rooms."
+        },
+        "notFound": {
+          "title": "Room not found",
+          "description": "It may have been removed, or you may not have access."
+        }
+      },
+      "roomDetail": {
+        "backToRooms": "Back to rooms",
+        "roomTitle": "Room {number}",
+        "unnumbered": "Unnumbered room",
+        "floorN": "Floor {n}",
+        "active": "Active",
+        "ended": "Ended",
+        "present": "Present",
+        "currency": "SAR",
+        "monthlyPrice": "Monthly price",
+        "semesterPrice": "Semester (5 months)",
+        "semesterHint": "Estimated, before any upfront discount.",
+        "checkInDate": "Check-in",
+        "checkOutDate": "Check-out",
+        "noCurrentOccupant": "This room is not currently assigned to a resident.",
+        "noAssignments": "No prior assignments recorded.",
+        "noMaintenance": "No maintenance requests for this room.",
+        "noPhotos": "No photos for this room.",
+        "noNotes": "No notes added.",
+        "unknownResident": "Unknown resident",
+        "call": "Call",
+        "whatsapp": "WhatsApp",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "notFoundTitle": "Room not found",
+        "notFoundDescription": "It may have been removed, or you may not have access.",
+        "sections": {
+          "pricing": "Pricing",
+          "currentOccupant": "Current occupant",
+          "assignmentHistory": "Assignment history",
+          "maintenanceHistory": "Maintenance history",
+          "building": "Building",
+          "photos": "Photos",
+          "notes": "Internal notes",
+          "metadata": "Details"
+        }
+      }
+    },
     "users": {
       "title": "Users",
       "subtitle": "Manage staff members and their roles",
@@ -984,7 +1342,9 @@
           "list": "View buildings",
           "update": "Edit building details",
           "create": "Create a new building",
-          "delete": "Delete a building"
+          "delete": "Deactivate a building (soft delete)",
+          "photosUpload": "Upload building photos",
+          "photosDelete": "Delete building photos"
         },
         "rooms": {
           "list": "View rooms",

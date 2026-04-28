@@ -215,18 +215,11 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
     rows: [
       {
         key: 'buildings.list',
-        access: Object.fromEntries(ALL_ROLES.map((r) => [r, 'full'])) as Partial<
-          Record<UserRole, Access>
-        >,
-        source: [
-          'supabase/migrations/002_rls.sql:90-91',
-          'src/app/api/buildings/route.ts:6-13',
-        ],
-      },
-      {
-        key: 'buildings.update',
+        // Admin tier: full read. Other roles: read scoped to assigned
+        // buildings via the admin list API. RLS itself permits all auth
+        // users to SELECT all buildings (used by the public-facing API),
+        // but the admin surface narrows non-admin-tier to their assignments.
         scopeNoteKey: 'assignedBuilding',
-        noteKey: 'noApiYet',
         access: {
           ...ADMIN_TIER,
           branch_manager: 'scoped',
@@ -238,7 +231,29 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
           supervision_staff: 'scoped',
           finance_staff: 'scoped',
         },
-        source: ['supabase/migrations/002_rls.sql:101-104'],
+        source: [
+          'supabase/migrations/002_rls.sql:90-91',
+          'src/app/api/buildings/route.ts:6-13',
+          'src/app/api/admin/buildings/route.ts:51-86',
+          'src/app/api/admin/buildings/[id]/route.ts:31-62',
+        ],
+      },
+      {
+        key: 'buildings.update',
+        // Admin tier: full. branch_manager: scoped to assigned buildings via
+        // PATCH gate (auth allows branch_manager, then `getAssignedBuildingIds`
+        // narrows). RLS at 002_rls.sql:101-104 still permits other staff
+        // roles to update assigned buildings, but the admin API does not
+        // expose that path — so the matrix reflects API reality.
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+        },
+        source: [
+          'supabase/migrations/002_rls.sql:101-104',
+          'src/app/api/admin/buildings/[id]/route.ts:174-193',
+        ],
       },
       {
         key: 'buildings.create',
@@ -246,14 +261,42 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         source: [
           'supabase/migrations/002_rls.sql:96-99',
           'supabase/migrations/012_role_expansion_rls.sql:42-47',
+          'src/app/api/admin/buildings/route.ts:233-237',
         ],
       },
       {
         key: 'buildings.delete',
+        // Soft-delete via `is_active=false`; no hard-delete API exists.
+        // Admin tier only.
         access: { ...ADMIN_TIER },
         source: [
           'supabase/migrations/002_rls.sql:96-99',
           'supabase/migrations/012_role_expansion_rls.sql:42-47',
+          'src/app/api/admin/buildings/[id]/route.ts:388-402',
+        ],
+      },
+      {
+        key: 'buildings.photosUpload',
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+        },
+        source: [
+          'supabase/migrations/016_buildings_photos_bucket.sql',
+          'src/app/api/uploads/building-photo/route.ts:20-56',
+        ],
+      },
+      {
+        key: 'buildings.photosDelete',
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+        },
+        source: [
+          'supabase/migrations/016_buildings_photos_bucket.sql',
+          'src/app/api/uploads/building-photo/route.ts:110-132',
         ],
       },
     ],
@@ -263,61 +306,65 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
     rows: [
       {
         key: 'rooms.list',
-        access: Object.fromEntries(ALL_ROLES.map((r) => [r, 'full'])) as Partial<
-          Record<UserRole, Access>
-        >,
-        source: ['supabase/migrations/002_rls.sql:110-111'],
+        // Mirrors buildings.list — RLS lets all auth users SELECT rooms (the
+        // public site uses this), but the admin API narrows non-admin-tier
+        // to their assigned buildings.
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          maintenance_manager: 'scoped',
+          transportation_manager: 'scoped',
+          finance_manager: 'scoped',
+          maintenance_staff: 'scoped',
+          transportation_staff: 'scoped',
+          supervision_staff: 'scoped',
+          finance_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/002_rls.sql:110-111',
+          'src/app/api/admin/rooms/route.ts:69-96',
+          'src/app/api/admin/rooms/[id]/route.ts:52-98',
+        ],
       },
       {
         key: 'rooms.create',
-        scopeNoteKey: 'assignedBuilding',
-        noteKey: 'noApiYet',
-        access: {
-          ...ADMIN_TIER,
-          branch_manager: 'scoped',
-          maintenance_manager: 'scoped',
-          transportation_manager: 'scoped',
-          finance_manager: 'scoped',
-          maintenance_staff: 'scoped',
-          transportation_staff: 'scoped',
-          supervision_staff: 'scoped',
-          finance_staff: 'scoped',
-        },
-        source: ['supabase/migrations/002_rls.sql:122-124'],
+        // POST is admin-tier only (mirror of POST /api/admin/buildings).
+        // RLS at 002_rls.sql:122-124 still permits other roles to insert
+        // into assigned buildings, but no API exposes that path.
+        access: { ...ADMIN_TIER },
+        source: [
+          'supabase/migrations/002_rls.sql:122-124',
+          'src/app/api/admin/rooms/route.ts:182-189',
+        ],
       },
       {
         key: 'rooms.update',
+        // PATCH allows admin tier + branch_manager scoped to the room's
+        // building (looked up via rooms.building_id then
+        // getAssignedBuildingIds). Other roles have no admin-API path.
         scopeNoteKey: 'assignedBuilding',
-        noteKey: 'noApiYet',
         access: {
           ...ADMIN_TIER,
           branch_manager: 'scoped',
-          maintenance_manager: 'scoped',
-          transportation_manager: 'scoped',
-          finance_manager: 'scoped',
-          maintenance_staff: 'scoped',
-          transportation_staff: 'scoped',
-          supervision_staff: 'scoped',
-          finance_staff: 'scoped',
         },
-        source: ['supabase/migrations/002_rls.sql:126-129'],
+        source: [
+          'supabase/migrations/002_rls.sql:126-129',
+          'src/app/api/admin/rooms/[id]/route.ts:196-234',
+        ],
       },
       {
         key: 'rooms.delete',
-        scopeNoteKey: 'assignedBuilding',
-        noteKey: 'noApiYet',
-        access: {
-          ...ADMIN_TIER,
-          branch_manager: 'scoped',
-          maintenance_manager: 'scoped',
-          transportation_manager: 'scoped',
-          finance_manager: 'scoped',
-          maintenance_staff: 'scoped',
-          transportation_staff: 'scoped',
-          supervision_staff: 'scoped',
-          finance_staff: 'scoped',
-        },
-        source: ['supabase/migrations/002_rls.sql:131-133'],
+        // Hard-delete; admin tier only. Postgres FK
+        // `room_assignments.room_id ON DELETE RESTRICT` blocks delete for
+        // any room with assignment history (surfaced to the UI as
+        // `roomHasAssignments`). Use `room_status='maintenance'` to take a
+        // room offline instead.
+        access: { ...ADMIN_TIER },
+        source: [
+          'supabase/migrations/002_rls.sql:131-133',
+          'src/app/api/admin/rooms/[id]/route.ts:355-370',
+        ],
       },
     ],
   },

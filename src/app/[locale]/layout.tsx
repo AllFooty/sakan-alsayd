@@ -80,7 +80,6 @@ export default async function LocaleLayout({
   // Enable static rendering
   setRequestLocale(locale);
 
-  // Get messages for the current locale
   const messages = await getMessages();
 
   const direction = getDirection(locale);

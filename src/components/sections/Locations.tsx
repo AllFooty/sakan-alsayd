@@ -4,27 +4,21 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { MapPin, Clock, ChevronRight } from 'lucide-react';
+import { MapPin, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Card, Button } from '@/components/ui';
-import { locations, getCities } from '@/data/locations';
+import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
 import { cn } from '@/lib/utils';
 
-// Get location image from location data
-const getLocationImage = (location: { image: string }): string => {
-  return location.image || '/images/locations/placeholder.jpg';
-};
-
 export default function Locations() {
+  const { buildings, cities } = usePublicBuildings();
   const t = useTranslations('locations');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
-  const cities = getCities();
-
-  const filteredLocations = selectedCity
-    ? locations.filter((loc) => loc.city === selectedCity)
-    : locations;
+  const filteredBuildings = selectedCity
+    ? buildings.filter((b) => b.city === selectedCity)
+    : buildings;
 
   return (
     <section id="locations" className="section-padding bg-cream">
@@ -70,19 +64,19 @@ export default function Locations() {
 
         {/* Locations Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredLocations.map((location) => (
-            <Card key={location.id} variant="elevated" hover className="overflow-hidden">
+          {filteredBuildings.map((building) => (
+            <Card key={building.id} variant="elevated" hover className="overflow-hidden">
               {/* Location Image */}
               <div className="relative h-48">
                 <Image
-                  src={getLocationImage(location)}
-                  alt={`${isArabic ? location.neighborhoodAr : location.neighborhood} - ${isArabic ? location.cityAr : location.city}`}
+                  src={building.coverImage}
+                  alt={`${isArabic ? building.neighborhoodAr : building.neighborhood} - ${isArabic ? building.cityAr : building.city}`}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 {/* Placeholder Badge */}
-                {location.isPlaceholder && (
+                {building.isPlaceholder && (
                   <div className="absolute top-4 end-4 bg-navy/80 text-white text-xs px-2 py-1 rounded">
                     {isArabic ? 'قريباً' : 'Coming Soon'}
                   </div>
@@ -91,7 +85,7 @@ export default function Locations() {
                 <div className="absolute bottom-4 start-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-coral" />
                   <span className="text-sm font-semibold text-navy">
-                    {isArabic ? location.cityAr : location.city}
+                    {isArabic ? building.cityAr : building.city}
                   </span>
                 </div>
               </div>
@@ -99,39 +93,43 @@ export default function Locations() {
               <div className="p-6">
                 {/* Neighborhood */}
                 <h3 className="text-xl font-semibold text-navy mb-2">
-                  {isArabic ? location.neighborhoodAr : location.neighborhood}
+                  {isArabic ? building.neighborhoodAr : building.neighborhood}
                 </h3>
                 <p className="text-navy/60 text-sm mb-4 line-clamp-2">
-                  {isArabic ? location.descriptionAr : location.description}
+                  {isArabic ? building.descriptionAr : building.description}
                 </p>
 
                 {/* Nearby Places */}
-                <div className="space-y-2 mb-6">
-                  <h4 className="text-sm font-medium text-navy">{t('nearbyPlaces')}</h4>
-                  {location.nearbyLandmarks.slice(0, 3).map((landmark) => (
-                    <div key={landmark.id} className="flex items-center justify-between text-sm">
-                      <span className="text-navy/70">
-                        {isArabic ? landmark.nameAr : landmark.name}
-                      </span>
-                      <span className="flex items-center gap-1 text-coral">
-                        <Clock className="w-3 h-3" />
-                        {isArabic ? landmark.distanceAr : landmark.distance}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                {building.nearbyLandmarks.length > 0 && (
+                  <div className="space-y-2 mb-6">
+                    <h4 className="text-sm font-medium text-navy">{t('nearbyPlaces')}</h4>
+                    {building.nearbyLandmarks.slice(0, 3).map((landmark) => (
+                      <div key={landmark.id} className="flex items-center justify-between text-sm">
+                        <span className="text-navy/70">
+                          {isArabic ? landmark.nameAr : landmark.name}
+                        </span>
+                        <span className="flex items-center gap-1 text-coral">
+                          <Clock className="w-3 h-3" />
+                          {isArabic ? landmark.distanceAr : landmark.distance}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* CTA */}
                 <div className="flex gap-2">
-                  <a href={location.mapUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full">
-                      {t('viewLocation')}
-                    </Button>
-                  </a>
-                  <Link href={`/${locale}/buildings/${location.id}`} className="flex-1">
+                  {building.mapUrl && (
+                    <a href={building.mapUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full">
+                        {t('viewLocation')}
+                      </Button>
+                    </a>
+                  )}
+                  <Link href={`/${locale}/buildings/${building.id}`} className="flex-1">
                     <Button variant="primary" size="sm" className="w-full">
                       {t('viewRooms')}
-                      <ChevronRight className="w-4 h-4" />
+                      {isArabic ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                     </Button>
                   </Link>
                 </div>

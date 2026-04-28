@@ -3,6 +3,9 @@
 import { Suspense, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+
+// Skip prerender — Next 16 was emitting a 307-to-self for this route
+// during static generation, causing a redirect loop on /admin/login.
 import Image from 'next/image';
 import { Mail, Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -52,7 +55,10 @@ function LoginForm() {
   const locale = useLocale();
   const t = useTranslations('admin.login');
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || `/${locale}/admin`;
+  const rawRedirectTo = searchParams.get('redirectTo');
+  const isSafeAdminPath = (path: string | null): path is string =>
+    !!path && /^\/(ar|en)\/admin(\/|$|\?)/.test(path);
+  const redirectTo = isSafeAdminPath(rawRedirectTo) ? rawRedirectTo : `/${locale}/admin`;
   const supabase = createClient();
 
   async function handlePasswordLogin(e: React.FormEvent) {

@@ -1,13 +1,16 @@
 // Drift guard for the read-only Roles & Permissions matrix.
 //
 // Verifies these invariants:
-//   1. Every UserRole literal in src/lib/auth/providers.tsx is listed in ALL_ROLES.
+//   1. Every UserRole literal in src/lib/auth/types.ts is listed in ALL_ROLES.
 //   2. Every group key, row key, scopeNoteKey, and noteKey has a matching
 //      translation in BOTH en.json and ar.json.
 //   3. Every UserRole has an `admin.topbar.roles.<role>` translation in both
 //      locales — the matrix renders these labels at runtime.
 //   4. Every row's `source` citation points at a real file, AND when a line
 //      range is given (`:N` or `:N-M`), the cited file has at least M lines.
+//   5. Source citations under `src/app/api/` reference a file that calls
+//      `authenticateApiRequest`, and citations under `supabase/migrations/`
+//      end in `.sql`. Catches accidental redirects to a non-gate file.
 //
 // Run via `npm run check:permissions`.
 
@@ -39,13 +42,18 @@ function hasKey(obj, dottedPath) {
 }
 
 function extractUserRoleLiterals() {
+  // The UserRole union is the canonical source of role identifiers; the
+  // matrix-renderer cards/table iterate ALL_ROLES from permissions-matrix.ts
+  // and must stay in sync. Currently declared in types.ts and re-exported
+  // through providers.tsx — read types.ts directly so a re-export rename
+  // doesn't silently break this check.
   const src = readFileSync(
-    join(repoRoot, 'src', 'lib', 'auth', 'providers.tsx'),
+    join(repoRoot, 'src', 'lib', 'auth', 'types.ts'),
     'utf8'
   );
   const match = src.match(/type\s+UserRole\s*=\s*([^;]+);/);
   if (!match) {
-    fail('Could not locate UserRole type in src/lib/auth/providers.tsx');
+    fail('Could not locate UserRole type in src/lib/auth/types.ts');
     return [];
   }
   return Array.from(match[1].matchAll(/'([a-z_]+)'/g)).map((m) => m[1]);
@@ -167,6 +175,14 @@ function fileLineCount(absPath) {
   return count;
 }
 
+const fileContentCache = new Map();
+function fileContains(absPath, needle) {
+  if (!fileContentCache.has(absPath)) {
+    fileContentCache.set(absPath, readFileSync(absPath, 'utf8'));
+  }
+  return fileContentCache.get(absPath).includes(needle);
+}
+
 for (const citation of sourceCitations) {
   const [path, range] = citation.split(':');
   const abs = join(repoRoot, path);
@@ -174,6 +190,21 @@ for (const citation of sourceCitations) {
     fail(`Source citation references missing file: ${path}`);
     continue;
   }
+
+  // Content-aware sanity checks: catches the case where a row's source was
+  // updated to point at the wrong path (e.g. an unrelated component instead
+  // of the API gate file, or a non-SQL file dropped into the migrations dir).
+  if (path.startsWith('src/app/api/') && !fileContains(abs, 'authenticateApiRequest')) {
+    fail(
+      `Source citation ${path} points at an API file that doesn't call authenticateApiRequest — likely the wrong path`
+    );
+  }
+  if (path.startsWith('supabase/migrations/') && !path.endsWith('.sql')) {
+    fail(
+      `Source citation ${path} is under supabase/migrations/ but isn't a .sql file`
+    );
+  }
+
   if (!range) continue;
   const parts = range.split('-').map((s) => parseInt(s, 10));
   const maxLine = parts.length === 2 ? parts[1] : parts[0];

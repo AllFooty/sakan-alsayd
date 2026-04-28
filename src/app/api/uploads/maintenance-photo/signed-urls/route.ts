@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
+import { isRateLimited } from '@/lib/rate-limit';
 
 const PHOTO_PATH_RE = /^(temp|[0-9a-f-]{36})\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
 const MAX_PATHS = 20;
@@ -9,6 +10,11 @@ export async function POST(request: NextRequest) {
     const auth = await authenticateApiRequest();
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;
+
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (await isRateLimited(`signed-url:${ip}`, 30, 60_000)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
 
     const { paths } = await request.json();
 

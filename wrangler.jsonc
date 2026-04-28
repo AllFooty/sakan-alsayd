@@ -12,5 +12,36 @@
       "binding": "RATE_LIMIT_KV",
       "id": "0417f6cd53564997affd94540d94e862"
     }
-  ]
+  ],
+  // OpenNext-on-Cloudflare cache bindings. The binding NAMES below are
+  // significant — OpenNext's r2-incremental-cache and d1-next-tag-cache
+  // overrides look for env.NEXT_INC_CACHE_R2_BUCKET and env.NEXT_TAG_CACHE_D1
+  // specifically. Don't rename without updating open-next.config.ts.
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "sakan-alsayd-next-cache"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "sakan-alsayd-next-tags",
+      "database_id": "7e448658-1b30-4d33-b14c-bcaa32b67212"
+    }
+  ],
+  // Cloudflare Image Transformations. OpenNext's /_next/image handler looks
+  // for env.IMAGES; when present, it pipes the source image through CF's
+  // resize/encode pipeline (WebP/AVIF, q=75 by default). Without this, the
+  // worker passes the original bytes through unmodified — ignoring next/image
+  // ?w= and ?q= params.
+  //
+  // Requires Image Transformations enabled on the account (Dashboard → Speed
+  // → Optimization → Image Transformations → Enable for Zone, OR Workers &
+  // Pages → settings → enable for Workers). Until enabled, the binding is
+  // undefined at runtime and OpenNext falls back to unoptimized passthrough,
+  // so there's no regression risk in shipping the binding.
+  "images": {
+    "binding": "IMAGES"
+  }
 }

@@ -289,7 +289,17 @@
     "month": "شهر",
     "learnMore": "اعرفي المزيد",
     "close": "إغلاق",
-    "loading": "جاري التحميل..."
+    "loading": "جاري التحميل...",
+    "pagination": {
+      "previous": "الصفحة السابقة",
+      "next": "الصفحة التالية"
+    }
+  },
+  "errors": {
+    "title": "حدث خطأ ما",
+    "subtitle": "سنعود قريباً. يرجى المحاولة مرة أخرى بعد لحظات.",
+    "tryAgain": "حاولي مرة أخرى",
+    "goHome": "العودة إلى الصفحة الرئيسية"
   },
   "whatsappModal": {
     "title": "اختاري الفرع",
@@ -803,6 +813,354 @@
         "cancel": "إلغاء"
       }
     },
+    "buildings": {
+      "title": "المباني والغرف",
+      "subtitle": "إدارة المباني السكنية والغرف والصور.",
+      "addButton": "إضافة مبنى",
+      "view": {
+        "grid": "شبكة",
+        "table": "جدول"
+      },
+      "filters": {
+        "search": "ابحث بالحي أو المدينة أو المعرّف...",
+        "city": "المدينة",
+        "allCities": "كل المدن",
+        "status": "الحالة",
+        "allStatuses": "الكل",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "advancedFilters": "الفلاتر",
+        "clearFilters": "مسح"
+      },
+      "table": {
+        "city": "المدينة",
+        "neighborhood": "الحي",
+        "rooms": "الغرف",
+        "occupancy": "الإشغال",
+        "status": "الحالة",
+        "updatedAt": "آخر تحديث"
+      },
+      "card": {
+        "totalRooms": "{count} غرفة",
+        "occupied": "{count} مشغولة",
+        "available": "{count} متاحة",
+        "noPhoto": "لا توجد صورة"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "placeholder": "مؤقت"
+      },
+      "empty": {
+        "title": "لا توجد مبانٍ بعد",
+        "description": "أضف أول مبنى لتبدأ.",
+        "filteredTitle": "لا توجد مبانٍ تطابق الفلاتر",
+        "filteredDescription": "حاول تعديل البحث أو مسح الفلاتر."
+      },
+      "pagination": {
+        "summary": "{count} مبنى"
+      },
+      "toast": {
+        "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+      },
+      "detail": {
+        "backToList": "العودة إلى المباني",
+        "editButton": "تعديل",
+        "deactivate": "إيقاف",
+        "reactivate": "إعادة تفعيل",
+        "deactivateConfirm": {
+          "title": "إيقاف المبنى؟",
+          "description": "سيتم إخفاء {name} من الموقع العام ولن يقبل حجوزات جديدة. تبقى الغرف والمقيمون الحاليون كما هم، ويمكنك إعادة تفعيله في أي وقت.",
+          "cancel": "إلغاء"
+        },
+        "toast": {
+          "deactivated": "تم إيقاف المبنى",
+          "reactivated": "تم إعادة تفعيل المبنى"
+        },
+        "coverPhoto": "الغلاف",
+        "about": "نبذة",
+        "noDescription": "لم تتم إضافة وصف بعد.",
+        "landmarks": "المعالم القريبة",
+        "noLandmarks": "لا توجد معالم مدرجة.",
+        "photoGallery": "معرض الصور",
+        "noPhotos": "لم يتم رفع أي صور بعد.",
+        "location": "الموقع",
+        "openInMaps": "فتح في خرائط جوجل",
+        "noMap": "لا يوجد رابط للخريطة.",
+        "residents": "المقيمون الحاليون",
+        "activeAssignmentsHint": "المسجّلون في غرف حالياً",
+        "metadata": "التفاصيل",
+        "bilingualNames": "التسميات بالعربية والإنجليزية",
+        "bilingual": {
+          "english": "الإنجليزية",
+          "arabic": "العربية"
+        },
+        "meta": {
+          "slug": "المعرّف",
+          "sortOrder": "الترتيب",
+          "createdAt": "تاريخ الإنشاء",
+          "updatedAt": "آخر تحديث"
+        },
+        "tabsLabel": "أقسام المبنى",
+        "tabs": {
+          "overview": "نظرة عامة",
+          "rooms": "الغرف"
+        },
+        "stats": {
+          "totalRooms": "إجمالي الغرف",
+          "available": "متاحة",
+          "occupied": "مشغولة",
+          "activeMaintenance": "صيانة نشطة",
+          "occupancyPct": "({pct}%)"
+        },
+        "notFound": {
+          "title": "المبنى غير موجود",
+          "description": "ربما تمت إزالته أو ليس لديك صلاحية الوصول إليه."
+        }
+      },
+      "form": {
+        "createTitle": "مبنى جديد",
+        "editTitle": "تعديل المبنى",
+        "createSubtitle": "الحقول ثنائية اللغة تدعم العربية والإنجليزية. يمكن إضافة الصور بعد إنشاء المبنى.",
+        "editSubtitle": "الحقول ثنائية اللغة تدعم العربية والإنجليزية. أدر الصور من صفحة تفاصيل المبنى.",
+        "create": "إنشاء المبنى",
+        "save": "حفظ التغييرات",
+        "cancel": "إلغاء",
+        "addLandmark": "إضافة معلم",
+        "removeLandmark": "حذف المعلم",
+        "landmarkN": "المعلم {n}",
+        "noLandmarks": "لا توجد معالم بعد. اضغط «إضافة معلم» لإدراج النقاط القريبة.",
+        "sections": {
+          "basics": "المعرّف وخيارات العرض",
+          "names": "الأسماء بالعربية والإنجليزية",
+          "description": "الوصف",
+          "location": "رابط الخريطة",
+          "landmarks": "المعالم القريبة"
+        },
+        "fields": {
+          "slug": "المعرّف (Slug)",
+          "sortOrder": "ترتيب العرض",
+          "isActive": "نشط",
+          "isPlaceholder": "مؤقت",
+          "cityEn": "المدينة (إنجليزي)",
+          "cityAr": "المدينة (عربي)",
+          "neighborhoodEn": "الحي (إنجليزي)",
+          "neighborhoodAr": "الحي (عربي)",
+          "descriptionEn": "الوصف (إنجليزي)",
+          "descriptionAr": "الوصف (عربي)",
+          "mapUrl": "رابط خرائط جوجل",
+          "landmarkNameEn": "الاسم (إنجليزي)",
+          "landmarkNameAr": "الاسم (عربي)",
+          "landmarkDistanceEn": "المسافة (إنجليزي)",
+          "landmarkDistanceAr": "المسافة (عربي)"
+        },
+        "helpers": {
+          "slug": "أحرف إنجليزية صغيرة وأرقام وشرطات فقط. يُستخدم في الروابط.",
+          "isActive": "المباني غير النشطة لا تظهر في الموقع العام.",
+          "isPlaceholder": "احجز مكاناً قبل تأكيد التفاصيل.",
+          "mapUrl": "اختياري. الصق رابط مشاركة من خرائط جوجل."
+        },
+        "errors": {
+          "fixBelow": "يرجى تصحيح الأخطاء أدناه.",
+          "required": "هذا الحقل مطلوب.",
+          "slugRequired": "المعرّف مطلوب.",
+          "slugInvalid": "يُسمح فقط بالأحرف الإنجليزية الصغيرة والأرقام والشرطات.",
+          "slugTaken": "هذا المعرّف مستخدم بالفعل. اختر آخر.",
+          "urlInvalid": "يرجى إدخال رابط صالح يبدأ بـ http:// أو https://.",
+          "numberInvalid": "يرجى إدخال رقم صالح.",
+          "landmarkBilingual": "الاسم بالعربية والإنجليزية مطلوب لكل معلم.",
+          "requiredMissing": "بعض الحقول المطلوبة مفقودة."
+        },
+        "toast": {
+          "created": "تم إنشاء المبنى",
+          "updated": "تم حفظ التغييرات",
+          "reactivated": "تمت إعادة تفعيل المبنى",
+          "genericError": "حدث خطأ. حاول مرة أخرى."
+        },
+        "forbidden": {
+          "title": "الوصول مقيّد",
+          "description": "يمكن فقط للمشرف العام أو نائبه أو مدير الفرع تعديل المباني."
+        },
+        "notFound": {
+          "title": "المبنى غير موجود",
+          "description": "ربما تمت إزالته أو ليس لديك صلاحية الوصول إليه."
+        },
+        "inactiveBanner": {
+          "title": "هذا المبنى معطّل",
+          "descriptionAdmin": "تم إيقاف التعديلات وتغييرات الصور أثناء تعطيل المبنى. أعد تفعيله لمتابعة التحرير.",
+          "descriptionScoped": "تم إيقاف التعديلات وتغييرات الصور أثناء تعطيل المبنى. يمكن للمشرف العام إعادة تفعيله.",
+          "reactivate": "إعادة التفعيل"
+        }
+      },
+      "photos": {
+        "title": "الصور",
+        "add": "إضافة صورة",
+        "uploading": "جاري الرفع...",
+        "coverBadge": "غلاف",
+        "emptyTitle": "لا توجد صور بعد",
+        "emptyHint": "اسحب صورة هنا أو اضغط للاختيار. JPEG أو PNG أو WebP — حتى ٥ ميجابايت لكل صورة.",
+        "disabledEmptyHint": "يمكن إضافة الصور بعد إعادة تفعيل المبنى.",
+        "helpText": "تظهر صورة الغلاف في الصفحة العامة للمبنى وفي أعلى هذه الصفحة. السحب غير مدعوم بعد — استخدم الأسهم لإعادة الترتيب.",
+        "disabledHelpText": "الصور للقراءة فقط أثناء تعطيل المبنى. أعد تفعيل المبنى للرفع أو إعادة الترتيب أو الحذف.",
+        "actions": {
+          "setCover": "تعيين كغلاف",
+          "moveUp": "تحريك للأعلى",
+          "moveDown": "تحريك للأسفل",
+          "delete": "حذف الصورة"
+        },
+        "toast": {
+          "uploaded": "تم رفع الصورة",
+          "coverSet": "تم تحديث صورة الغلاف",
+          "deleted": "تم حذف الصورة"
+        },
+        "errors": {
+          "invalidType": "يُسمح فقط بصور JPEG أو PNG أو WebP.",
+          "tooLarge": "حجم الملف كبير. الحد الأقصى ٥ ميجابايت.",
+          "tooMany": "يمكن إضافة حتى {max} صور كحد أقصى.",
+          "uploadFailed": "فشل الرفع. حاول مرة أخرى."
+        }
+      },
+      "roomStatus": {
+        "available": "متاح",
+        "occupied": "مشغول",
+        "maintenance": "صيانة",
+        "reserved": "محجوز"
+      },
+      "roomsTab": {
+        "searchPlaceholder": "ابحث برقم الغرفة...",
+        "allStatuses": "جميع الحالات",
+        "allTypes": "جميع الأنواع",
+        "clearFilters": "مسح",
+        "addRoom": "إضافة غرفة",
+        "rowActions": "إجراءات",
+        "rowEdit": "تعديل الغرفة",
+        "rowDelete": "حذف الغرفة",
+        "table": {
+          "roomNumber": "الغرفة",
+          "floor": "الطابق",
+          "type": "النوع",
+          "bathroom": "الحمام",
+          "price": "الإيجار",
+          "status": "الحالة"
+        },
+        "unnumbered": "(بدون رقم)",
+        "summary": "{count, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
+        "clickHint": "اضغط على أي غرفة لرؤية الساكنة الحالية وسجلها.",
+        "emptyTitle": "لا توجد غرف في هذا المبنى بعد",
+        "emptyDescription": "اضغط «إضافة غرفة» لإنشاء أول غرفة.",
+        "emptyFilteredTitle": "لا توجد غرف مطابقة لعوامل التصفية",
+        "emptyFilteredDescription": "جرّب مسح عوامل التصفية أو تعديل البحث.",
+        "errorTitle": "تعذّر تحميل الغرف",
+        "errorDescription": "حاول مرة أخرى أو أعد تحميل الصفحة."
+      },
+      "roomForm": {
+        "createTitle": "غرفة جديدة",
+        "editTitle": "تعديل الغرفة",
+        "createSubtitle": "حدّد نوع الغرفة والسعر والحالة. يمكن إضافة الصور لاحقاً.",
+        "editSubtitle": "حدّث السعر أو الحالة أو الملاحظات لهذه الغرفة.",
+        "create": "إنشاء الغرفة",
+        "save": "حفظ التغييرات",
+        "cancel": "إلغاء",
+        "delete": "حذف الغرفة",
+        "deleting": "جارٍ الحذف...",
+        "buildingLabel": "المبنى",
+        "sections": {
+          "basics": "تفاصيل الغرفة",
+          "pricing": "السعر",
+          "status": "الحالة والملاحظات"
+        },
+        "fields": {
+          "roomNumber": "رقم الغرفة",
+          "floor": "الطابق",
+          "roomType": "نوع الغرفة",
+          "bathroomType": "نوع الحمام",
+          "monthlyPrice": "السعر الشهري (ريال)",
+          "discountedPrice": "السعر بعد الخصم (ريال)",
+          "status": "الحالة",
+          "notes": "ملاحظات داخلية"
+        },
+        "helpers": {
+          "roomNumber": "اختياري. معرّف مألوف داخل المبنى (مثل: 101 أو A-3).",
+          "floor": "اختياري. استخدم 0 للأرضي وقيمة سالبة للقبو.",
+          "discountedPrice": "اختياري. يجب أن يكون أقل من السعر الشهري.",
+          "statusOccupied": "استخدم خطوة إدخال الساكنة لتخصيص الغرفة. هذا الحقل يحدّث حالة العرض فقط.",
+          "notes": "تظهر للموظفين فقط. حتى ٥٠٠٠ حرف."
+        },
+        "discount": {
+          "percentOff": "خصم {pct}٪"
+        },
+        "errors": {
+          "fixBelow": "يرجى تصحيح الأخطاء أدناه.",
+          "required": "هذا الحقل مطلوب.",
+          "priceRequired": "السعر الشهري مطلوب.",
+          "priceInvalid": "أدخل رقماً موجباً.",
+          "discountInvalid": "أدخل رقماً غير سالب.",
+          "discountTooHigh": "لا يمكن أن يتجاوز السعر بعد الخصم السعر الشهري.",
+          "floorInvalid": "الطابق يجب أن يكون رقماً صحيحاً.",
+          "notesTooLong": "الملاحظات يجب ألا تتجاوز ٥٠٠٠ حرف.",
+          "requiredMissing": "بعض الحقول المطلوبة مفقودة.",
+          "buildingNotFound": "تعذّر العثور على المبنى الأصل.",
+          "roomHasAssignments": "هذه الغرفة لديها سجل إقامة سابق ولا يمكن حذفها. عيّن حالتها إلى «صيانة» لإخراجها من الخدمة بدلاً من ذلك."
+        },
+        "toast": {
+          "created": "تم إنشاء الغرفة",
+          "updated": "تم حفظ التغييرات",
+          "deleted": "تم حذف الغرفة",
+          "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+        },
+        "deleteConfirm": {
+          "title": "حذف هذه الغرفة؟",
+          "description": "حذف هذه الغرفة نهائيًا؟ الغرف التي لها سجل إقامة سابق لا يمكن حذفها أصلًا — لإخراج الغرفة من الخدمة مع الاحتفاظ بسجلها، ألغِ الحذف وعيّن حالتها إلى «صيانة» بدلاً من ذلك.",
+          "confirm": "حذف الغرفة",
+          "cancel": "الاحتفاظ بالغرفة"
+        },
+        "forbidden": {
+          "title": "الوصول مقيّد",
+          "description": "يمكن فقط للمشرف العام أو نائبه أو مدير الفرع إدارة الغرف."
+        },
+        "notFound": {
+          "title": "الغرفة غير موجودة",
+          "description": "ربما تمت إزالتها أو ليس لديك صلاحية الوصول."
+        }
+      },
+      "roomDetail": {
+        "backToRooms": "العودة إلى الغرف",
+        "roomTitle": "غرفة {number}",
+        "unnumbered": "غرفة بدون رقم",
+        "floorN": "الطابق {n}",
+        "active": "نشط",
+        "ended": "منتهٍ",
+        "present": "حتى الآن",
+        "currency": "ريال",
+        "monthlyPrice": "السعر الشهري",
+        "semesterPrice": "الفصل الدراسي (٥ أشهر)",
+        "semesterHint": "تقديري، قبل أي خصم على الدفع المسبق.",
+        "checkInDate": "تاريخ الدخول",
+        "checkOutDate": "تاريخ المغادرة",
+        "noCurrentOccupant": "هذه الغرفة غير مخصصة حالياً لأي ساكنة.",
+        "noAssignments": "لا توجد تخصيصات سابقة.",
+        "noMaintenance": "لا توجد طلبات صيانة لهذه الغرفة.",
+        "noPhotos": "لا توجد صور لهذه الغرفة.",
+        "noNotes": "لا توجد ملاحظات.",
+        "unknownResident": "ساكنة غير معروفة",
+        "call": "اتصال",
+        "whatsapp": "واتساب",
+        "createdAt": "أُنشئت",
+        "updatedAt": "آخر تحديث",
+        "notFoundTitle": "الغرفة غير موجودة",
+        "notFoundDescription": "ربما تمت إزالتها أو ليس لديك صلاحية الوصول.",
+        "sections": {
+          "pricing": "السعر",
+          "currentOccupant": "الساكنة الحالية",
+          "assignmentHistory": "سجل الإقامة",
+          "maintenanceHistory": "سجل الصيانة",
+          "building": "المبنى",
+          "photos": "الصور",
+          "notes": "ملاحظات داخلية",
+          "metadata": "تفاصيل"
+        }
+      }
+    },
     "users": {
       "title": "المستخدمون",
       "subtitle": "إدارة الموظفين وأدوارهم",
@@ -984,7 +1342,9 @@
           "list": "عرض المباني",
           "update": "تعديل بيانات المبنى",
           "create": "إنشاء مبنى جديد",
-          "delete": "حذف مبنى"
+          "delete": "تعطيل مبنى (حذف ناعم)",
+          "photosUpload": "رفع صور المباني",
+          "photosDelete": "حذف صور المباني"
         },
         "rooms": {
           "list": "عرض الغرف",

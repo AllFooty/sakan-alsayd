@@ -3,26 +3,37 @@ import { notFound } from 'next/navigation';
 import { Header, Footer } from '@/components/layout';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import BuildingRooms from '@/components/buildings/BuildingRooms';
-import { getLocationById, locations } from '@/data/locations';
+import { getPublicBuildingBySlug, getPublicBuildings } from '@/lib/buildings/public';
 import type { Metadata } from 'next';
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
 
+const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
-  const location = getLocationById(id);
   const isArabic = locale === 'ar';
 
-  if (!location) {
+  // Skip the Supabase round-trip when the locations feature is gated off —
+  // the page body will notFound() anyway, no point fetching for metadata.
+  if (!showLocations) {
     return {
       title: isArabic ? 'الصفحة غير موجودة | سكن السيد' : 'Page Not Found | Sakan Alsayd',
     };
   }
 
-  const buildingName = isArabic ? location.neighborhoodAr : location.neighborhood;
-  const cityName = isArabic ? location.cityAr : location.city;
+  const building = await getPublicBuildingBySlug(id);
+
+  if (!building) {
+    return {
+      title: isArabic ? 'الصفحة غير موجودة | سكن السيد' : 'Page Not Found | Sakan Alsayd',
+    };
+  }
+
+  const buildingName = isArabic ? building.neighborhoodAr : building.neighborhood;
+  const cityName = isArabic ? building.cityAr : building.city;
 
   return {
     title: isArabic
@@ -35,12 +46,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  return locations.map((location) => ({
-    id: location.id,
+  // Don't prerender any building paths when the feature is gated off.
+  if (!showLocations) return [];
+  const buildings = await getPublicBuildings();
+  return buildings.map((building) => ({
+    id: building.id,
   }));
 }
-
-const showLocations = process.env.NEXT_PUBLIC_SHOW_LOCATIONS === 'true';
 
 export default async function BuildingPage({ params }: Props) {
   const { locale, id } = await params;
@@ -50,9 +62,9 @@ export default async function BuildingPage({ params }: Props) {
     notFound();
   }
 
-  const location = getLocationById(id);
+  const building = await getPublicBuildingBySlug(id);
 
-  if (!location) {
+  if (!building) {
     notFound();
   }
 
@@ -60,7 +72,7 @@ export default async function BuildingPage({ params }: Props) {
     <>
       <Header />
       <main className="pt-20">
-        <BuildingRooms locationId={id} />
+        <BuildingRooms building={building} />
       </main>
       <Footer />
       <WhatsAppButton />

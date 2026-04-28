@@ -2,26 +2,31 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin, DoorOpen } from 'lucide-react';
 import { Card, Button, RoomImage } from '@/components/ui';
-import BookingModal from '@/components/ui/BookingModal';
-import { getLocationById } from '@/data/locations';
+import type { PublicBuilding } from '@/lib/buildings/public';
 import { formatPrice, cn } from '@/lib/utils';
+
+// Lazy-load the booking wizard — keeps zod + react-hook-form out of the
+// per-detail-page bundle until a room is actually selected.
+const BookingModal = dynamic(() => import('@/components/ui/BookingModal'), {
+  ssr: false,
+});
 
 type RoomType = 'all' | 'single' | 'double' | 'triple' | 'suite';
 
 interface BuildingRoomsProps {
-  locationId: string;
+  building: PublicBuilding;
 }
 
-// Map room configurations to image paths (location-specific)
 const getRoomImage = (locationId: string, type: string, bathroomType: string): string => {
   const key = `${type}-${bathroomType}`;
   return `/images/locations/${locationId}/rooms/${key}.jpg`;
 };
 
-export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
+export default function BuildingRooms({ building }: BuildingRoomsProps) {
   const t = useTranslations('rooms');
   const tBuildings = useTranslations('buildings');
   const locale = useLocale();
@@ -33,15 +38,10 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
     bathroomType: string;
   } | null>(null);
 
-  const location = getLocationById(locationId);
-
-  if (!location) {
-    return null;
-  }
-
-  const roomPrices = location.roomPrices;
-  const buildingName = isArabic ? location.neighborhoodAr : location.neighborhood;
-  const cityName = isArabic ? location.cityAr : location.city;
+  const locationId = building.id;
+  const roomPrices = building.roomPrices;
+  const buildingName = isArabic ? building.neighborhoodAr : building.neighborhood;
+  const cityName = isArabic ? building.cityAr : building.city;
 
   const availableTypes = new Set(roomPrices.map((room) => room.type));
 
@@ -217,7 +217,7 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
               <p className="text-navy font-medium">
                 {t('deposit')}: <span className="text-coral">{t('depositAmount')}</span>
               </p>
-              {location.roomPrices[0]?.discountedPrice ? (
+              {building.roomPrices[0]?.discountedPrice ? (
                 <p className="text-navy/60 text-sm">{t('yearlyDiscount')}</p>
               ) : (
                 <>
@@ -231,11 +231,13 @@ export default function BuildingRooms({ locationId }: BuildingRoomsProps) {
         </div>
       </div>
 
-      <BookingModal
-        isOpen={!!bookingPreselect}
-        onClose={() => setBookingPreselect(null)}
-        preselected={bookingPreselect || undefined}
-      />
+      {bookingPreselect && (
+        <BookingModal
+          isOpen
+          onClose={() => setBookingPreselect(null)}
+          preselected={bookingPreselect}
+        />
+      )}
     </section>
   );
 }

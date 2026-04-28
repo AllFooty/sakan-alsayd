@@ -36,10 +36,10 @@ function getLocaleFromPath(pathname: string): string {
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Run intl middleware first for locale handling
-  const intlResponse = intlMiddleware(request);
-
-  // Check if this is an admin route (not login)
+  // Admin routes already always carry the locale prefix in the URL, so
+  // next-intl's middleware has nothing to add for them. Running it here
+  // triggered a redirect-to-self loop on Next 16. Bypass it for /admin/*
+  // and only run the Supabase session check.
   if (isAdminRoute(pathname)) {
     const { user, supabaseResponse } = await updateSession(request);
 
@@ -50,22 +50,21 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Copy intl headers/cookies to supabase response
-    intlResponse.headers.forEach((value, key) => {
-      supabaseResponse.headers.set(key, value);
-    });
-
     return supabaseResponse;
   }
 
-  // For admin login, just pass through (no auth check needed)
   if (isAdminLoginRoute(pathname)) {
-    return intlResponse;
+    return NextResponse.next();
   }
 
-  return intlResponse;
+  // Public routes: run next-intl middleware for locale routing.
+  return intlMiddleware(request);
 }
 
+// Stays as `middleware.ts` (not the Next 16 `proxy.ts` convention) because
+// opennextjs-cloudflare 1.17 requires Edge-runtime middleware, while Next
+// 16's `proxy.ts` is Node-runtime-only. The deprecation warning on every
+// `next build` is the lesser evil; revisit once either side closes the gap.
 export const config = {
   matcher: ['/((?!api|_next|.*\\..*).*)'],
 };

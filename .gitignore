@@ -38,6 +38,17 @@ yarn-error.log*
 
 # cloudflare
 .open-next/
+.wrangler/
+
+# supabase cli temp
+supabase/.temp/
+
+# MCP config — may contain personal access tokens (e.g. Supabase sbp_*)
+.mcp.json
+
+# internal planning documents
+CLOUDFLARE_MIGRATION_PLAN.md
+Sakan_Alsayd_Platform_Proposal*.md
 
 # typescript
 *.tsbuildinfo
