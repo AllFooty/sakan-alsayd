@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 import { getAssignedBuildingIds, hasAdminAccess } from '@/lib/auth/guards';
+import {
+  type BedStatus,
+  type BedTotals,
+  type RoomOccupancyInput,
+  addBucketsToTotals,
+  computeBedStatuses,
+  emptyBedTotals,
+  normalizeCapacity,
+} from '@/lib/rooms/occupancy';
 
 interface BuildingRow {
   id: string;
@@ -17,8 +26,8 @@ interface RoomRow {
   building_id: string;
   room_number: string | null;
   floor: number | null;
-  capacity: number | null;
-  occupancy_mode: 'private' | 'shared' | null;
+  capacity: number;
+  occupancy_mode: 'private' | 'shared';
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
 }
 
@@ -26,50 +35,12 @@ interface AssignmentCountRow {
   room_id: string;
 }
 
-type BedStatus = 'vacant' | 'occupied' | 'maintenance' | 'reserved';
-
 interface RoomOccupancy {
   id: string;
   room_number: string | null;
   floor: number | null;
   capacity: number;
   bed_statuses: BedStatus[];
-}
-
-interface BedTotals {
-  total_beds: number;
-  vacant_beds: number;
-  occupied_beds: number;
-  maintenance_beds: number;
-  reserved_beds: number;
-}
-
-function emptyTotals(): BedTotals {
-  return {
-    total_beds: 0,
-    vacant_beds: 0,
-    occupied_beds: 0,
-    maintenance_beds: 0,
-    reserved_beds: 0,
-  };
-}
-
-function computeBedStatuses(
-  room: RoomRow,
-  activeAssignmentCount: number
-): BedStatus[] {
-  const capacity = Math.max(1, room.capacity ?? 1);
-  if (room.status === 'maintenance') return Array(capacity).fill('maintenance');
-  if (room.status === 'reserved') return Array(capacity).fill('reserved');
-  if (room.occupancy_mode === 'shared') {
-    const occupied = Math.min(activeAssignmentCount, capacity);
-    return [
-      ...Array(occupied).fill('occupied' as BedStatus),
-      ...Array(capacity - occupied).fill('vacant' as BedStatus),
-    ];
-  }
-  if (activeAssignmentCount > 0) return Array(capacity).fill('occupied');
-  return Array(capacity).fill('vacant');
 }
 
 export async function GET() {
@@ -91,7 +62,7 @@ export async function GET() {
     if (!hasAdminAccess(profile.role)) {
       assignedIds = await getAssignedBuildingIds(profile.id);
       if (assignedIds.length === 0) {
-        return NextResponse.json({ totals: emptyTotals(), buildings: [] });
+        return NextResponse.json({ totals: emptyBedTotals(), buildings: [] });
       }
     }
 
@@ -115,7 +86,7 @@ export async function GET() {
 
     const buildings = (buildingsData || []) as BuildingRow[];
     if (buildings.length === 0) {
-      return NextResponse.json({ totals: emptyTotals(), buildings: [] });
+      return NextResponse.json({ totals: emptyBedTotals(), buildings: [] });
     }
 
     const buildingIds = buildings.map((b) => b.id);
@@ -154,7 +125,7 @@ export async function GET() {
     const perBuilding = new Map<string, BedTotals>();
     const roomsByBuilding = new Map<string, RoomOccupancy[]>();
     for (const id of buildingIds) {
-      perBuilding.set(id, emptyTotals());
+      perBuilding.set(id, emptyBedTotals());
       roomsByBuilding.set(id, []);
     }
 
@@ -162,30 +133,25 @@ export async function GET() {
       const stats = perBuilding.get(room.building_id);
       const roomList = roomsByBuilding.get(room.building_id);
       if (!stats || !roomList) continue;
-      const capacity = Math.max(1, room.capacity ?? 1);
-      const activeCount = activeAssignmentsByRoom.get(room.id) ?? 0;
-      const bedStatuses = computeBedStatuses(room, activeCount);
-
-      stats.total_beds += capacity;
-      for (const s of bedStatuses) {
-        if (s === 'vacant') stats.vacant_beds += 1;
-        else if (s === 'occupied') stats.occupied_beds += 1;
-        else if (s === 'maintenance') stats.maintenance_beds += 1;
-        else if (s === 'reserved') stats.reserved_beds += 1;
-      }
-
+      const input: RoomOccupancyInput = {
+        capacity: room.capacity,
+        occupancy_mode: room.occupancy_mode,
+        status: room.status,
+        active_assignments_count: activeAssignmentsByRoom.get(room.id) ?? 0,
+      };
+      addBucketsToTotals(stats, input);
       roomList.push({
         id: room.id,
         room_number: room.room_number,
         floor: room.floor,
-        capacity,
-        bed_statuses: bedStatuses,
+        capacity: normalizeCapacity(room.capacity),
+        bed_statuses: computeBedStatuses(input),
       });
     }
 
-    const totals = emptyTotals();
+    const totals = emptyBedTotals();
     const buildingsOut = buildings.map((b) => {
-      const stats = perBuilding.get(b.id) ?? emptyTotals();
+      const stats = perBuilding.get(b.id) ?? emptyBedTotals();
       const roomList = roomsByBuilding.get(b.id) ?? [];
       totals.total_beds += stats.total_beds;
       totals.vacant_beds += stats.vacant_beds;

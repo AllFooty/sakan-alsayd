@@ -1229,8 +1229,8 @@
         "vacancyPct": "Overall vacancy"
       },
       "card": {
-        "residents": "residents",
-        "vacantBeds": "vacant beds",
+        "residents": "{count, plural, one {resident} other {residents}}",
+        "vacantBeds": "{count, plural, one {vacant bed} other {vacant beds}}",
         "percentEmpty": "{pct}% empty",
         "heatmapAria": "{name}: {vacant} of {total} beds vacant"
       },
@@ -1249,6 +1249,13 @@
         "title": "Couldn't load vacancy map",
         "description": "Something went wrong. Please try again.",
         "retry": "Retry"
+      },
+      "refresh": {
+        "button": "Refresh",
+        "lastUpdated": "Updated {time}",
+        "justNow": "just now",
+        "minutesAgo": "{count, plural, one {1 min ago} other {{count} min ago}}",
+        "hoursAgo": "{count, plural, one {1 hr ago} other {{count} hr ago}}"
       }
     },
     "users": {

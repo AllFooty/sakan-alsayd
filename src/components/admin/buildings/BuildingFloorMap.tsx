@@ -6,6 +6,11 @@ import { Bed, Wrench, Clock, LayoutGrid } from 'lucide-react';
 import EmptyState from '@/components/admin/shared/EmptyState';
 import RoomDetailPanel from './RoomDetailPanel';
 import { cn } from '@/lib/utils';
+import {
+  getRoomBuckets as getRoomBucketsShared,
+  type RoomBuckets,
+  type RoomOccupancyInput,
+} from '@/lib/rooms/occupancy';
 
 export interface FloorMapRoom {
   id: string;
@@ -67,22 +72,17 @@ function getRoomTone(room: FloorMapRoom): TileTone {
   return room.active_assignments_count >= room.capacity ? 'occupied' : 'vacant';
 }
 
-function getRoomBuckets(room: FloorMapRoom): {
-  occupied: number;
-  vacant: number;
-  unavailable: number;
-} {
-  if (room.status === 'maintenance' || room.status === 'reserved') {
-    return { occupied: 0, vacant: 0, unavailable: room.capacity };
-  }
-  if (room.occupancy_mode === 'private') {
-    if (room.active_assignments_count > 0) {
-      return { occupied: room.capacity, vacant: 0, unavailable: 0 };
-    }
-    return { occupied: 0, vacant: room.capacity, unavailable: 0 };
-  }
-  const occupied = Math.min(room.active_assignments_count, room.capacity);
-  return { occupied, vacant: room.capacity - occupied, unavailable: 0 };
+function toInput(room: FloorMapRoom): RoomOccupancyInput {
+  return {
+    capacity: room.capacity,
+    occupancy_mode: room.occupancy_mode,
+    status: room.status,
+    active_assignments_count: room.active_assignments_count,
+  };
+}
+
+function getRoomBuckets(room: FloorMapRoom): RoomBuckets {
+  return getRoomBucketsShared(toInput(room));
 }
 
 interface FloorGroup {

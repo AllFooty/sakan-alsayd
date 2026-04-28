@@ -1229,8 +1229,8 @@
         "vacancyPct": "نسبة الشواغر الإجمالية"
       },
       "card": {
-        "residents": "ساكنة",
-        "vacantBeds": "سرير شاغر",
+        "residents": "{count, plural, zero {بدون مقيمين} one {مقيم} two {مقيمان} few {مقيمين} many {مقيماً} other {مقيم}}",
+        "vacantBeds": "{count, plural, zero {بدون أسرّة شاغرة} one {سرير شاغر} two {سريران شاغران} few {أسرّة شاغرة} many {سريراً شاغراً} other {سرير شاغر}}",
         "percentEmpty": "{pct}% شاغرة",
         "heatmapAria": "{name}: {vacant} من أصل {total} سرير شاغرة"
       },
@@ -1249,6 +1249,13 @@
         "title": "تعذّر تحميل خريطة الشواغر",
         "description": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
         "retry": "إعادة المحاولة"
+      },
+      "refresh": {
+        "button": "تحديث",
+        "lastUpdated": "آخر تحديث {time}",
+        "justNow": "الآن",
+        "minutesAgo": "{count, plural, zero {الآن} one {قبل دقيقة} two {قبل دقيقتين} few {قبل {count} دقائق} many {قبل {count} دقيقة} other {قبل {count} دقيقة}}",
+        "hoursAgo": "{count, plural, zero {قبل أقل من ساعة} one {قبل ساعة} two {قبل ساعتين} few {قبل {count} ساعات} many {قبل {count} ساعة} other {قبل {count} ساعة}}"
       }
     },
     "users": {

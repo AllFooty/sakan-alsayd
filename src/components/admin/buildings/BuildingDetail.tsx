@@ -100,19 +100,20 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  // Deep-link via URL hash so Slice 3's "View floor map" links land directly
+  // on the right tab without a separate route. Use a lazy initializer so the
+  // first paint already shows the right tab — the previous useEffect-based
+  // approach flashed 'overview' for one frame before swapping.
   const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'floorMap'>(
-    'overview'
-  );
-
-  // Deep-link via URL hash so Slice 3's "View floor map" links can land
-  // directly on the right tab without a separate route.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const hash = window.location.hash.replace(/^#/, '');
-    if (hash === 'floorMap' || hash === 'rooms' || hash === 'overview') {
-      setActiveTab(hash);
+    () => {
+      if (typeof window === 'undefined') return 'overview';
+      const hash = window.location.hash.replace(/^#/, '');
+      if (hash === 'floorMap' || hash === 'rooms' || hash === 'overview') {
+        return hash;
+      }
+      return 'overview';
     }
-  }, []);
+  );
 
   useEffect(() => {
     let cancelled = false;

@@ -287,10 +287,13 @@ export async function POST(request: NextRequest) {
       occupancy_mode = b.occupancy_mode as (typeof OCCUPANCY_MODES)[number];
     }
     // A 1-bed room can't meaningfully be "shared" — there's no second tenant
-    // to share with. Force private at the API boundary so a malformed client
-    // can't introduce nonsensical state.
+    // to share with. Reject explicitly so PATCH and POST surface the same
+    // error code (the form already handles `sharedRequiresMultipleBeds`).
     if (capacity === 1 && occupancy_mode === 'shared') {
-      occupancy_mode = 'private';
+      return NextResponse.json(
+        { error: 'sharedRequiresMultipleBeds' },
+        { status: 400 }
+      );
     }
 
     const room_number = trimStr(b.room_number, MAX_ROOM_NUMBER);

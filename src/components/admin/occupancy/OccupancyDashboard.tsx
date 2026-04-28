@@ -3,11 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { Activity } from 'lucide-react';
+import { Activity, Bed, Clock, RefreshCw, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import EmptyState from '@/components/admin/shared/EmptyState';
-
-type BedStatus = 'vacant' | 'occupied' | 'maintenance' | 'reserved';
+import { type BedStatus, vacancyPctOfRentable } from '@/lib/rooms/occupancy';
 
 interface RoomOccupancy {
   id: string;
@@ -50,12 +49,25 @@ const STATUS_COLORS: Record<BedStatus, string> = {
   reserved: 'bg-navy',
 };
 
+// Icon-per-bed so the heatmap doesn't rely on color alone (a11y + the
+// project's "every tile must carry a glyph" rule). Icons stay subtle at the
+// 14px tile size — they're discriminator hints, not decoration.
+const STATUS_ICONS: Record<BedStatus, typeof Bed> = {
+  vacant: Bed,
+  occupied: Bed,
+  maintenance: Wrench,
+  reserved: Clock,
+};
+
 const intFmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const pctFmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-function vacancyPct(b: { total_beds: number; vacant_beds: number }): number {
-  if (b.total_beds === 0) return 0;
-  return (b.vacant_beds / b.total_beds) * 100;
+// Vacancy % is computed against RENTABLE beds (total minus
+// maintenance + reserved) so it stays consistent with BuildingFloorMap's
+// summary. A building with 4 of 10 beds in maintenance and 3 vacant should
+// read "50% empty" (3 of 6 rentable), not "30% empty".
+function vacancyPct(b: BuildingOccupancy | Totals): number {
+  return vacancyPctOfRentable(b);
 }
 
 export default function OccupancyDashboard() {
@@ -68,6 +80,8 @@ export default function OccupancyDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [sort, setSort] = useState<SortKey>('most_empty');
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -78,6 +92,7 @@ export default function OccupancyDashboard() {
       const json = (await res.json()) as { totals: Totals; buildings: BuildingOccupancy[] };
       setTotals(json.totals);
       setBuildings(json.buildings || []);
+      setLastRefreshed(new Date());
     } catch {
       setError(true);
     } finally {
@@ -88,6 +103,28 @@ export default function OccupancyDashboard() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Drive a "x min ago" relative-time string that ticks every 30s without
+  // re-fetching. The dashboard doesn't auto-refresh — bookings flow updates
+  // are only visible after a manual refresh — but the staleness indicator
+  // makes that obvious instead of misleading the user.
+  useEffect(() => {
+    const id = window.setInterval(() => setRefreshTick((n) => n + 1), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const refreshedLabel = useMemo(() => {
+    if (!lastRefreshed) return null;
+    const seconds = Math.max(0, Math.floor((Date.now() - lastRefreshed.getTime()) / 1000));
+    if (seconds < 60) return t('refresh.justNow');
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return t('refresh.minutesAgo', { count: minutes });
+    const hours = Math.floor(minutes / 60);
+    return t('refresh.hoursAgo', { count: hours });
+    // refreshTick is intentionally part of the dep list — it's the only
+    // reason the relative-time string updates without a new fetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastRefreshed, refreshTick, t]);
 
   const sortedBuildings = useMemo(() => {
     const list = [...buildings];
@@ -111,9 +148,7 @@ export default function OccupancyDashboard() {
     return list;
   }, [buildings, sort, isArabic]);
 
-  const overallPct = totals && totals.total_beds > 0
-    ? (totals.vacant_beds / totals.total_beds) * 100
-    : 0;
+  const overallPct = totals ? vacancyPct(totals) : 0;
 
   function name(b: BuildingOccupancy) {
     return isArabic ? b.neighborhood_ar : b.neighborhood_en;
@@ -129,7 +164,21 @@ export default function OccupancyDashboard() {
           <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
           <p className="text-sm text-gray-500 mt-0.5">{t('subtitle')}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {refreshedLabel && (
+            <span className="text-xs text-gray-400 tabular-nums">
+              {t('refresh.lastUpdated', { time: refreshedLabel })}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => fetchData()}
+            disabled={loading}
+            aria-label={t('refresh.button')}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 text-gray-600 bg-white hover:text-coral hover:border-coral/40 disabled:opacity-50 transition-colors"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : undefined} />
+          </button>
           <label className="text-sm text-gray-600" htmlFor="occupancy-sort">
             {t('sortLabel')}
           </label>
@@ -148,7 +197,7 @@ export default function OccupancyDashboard() {
 
       {loading ? (
         <SummarySkeleton />
-      ) : error ? null : totals ? (
+      ) : error ? null : totals && sortedBuildings.length > 0 ? (
         <SummaryRow totals={totals} overallPct={overallPct} t={t} />
       ) : null}
 
@@ -253,21 +302,32 @@ function SummaryStat({
 }
 
 function Legend({ t }: { t: ReturnType<typeof useTranslations> }) {
-  const items: { color: string; label: string }[] = [
-    { color: STATUS_COLORS.vacant, label: t('legend.vacant') },
-    { color: STATUS_COLORS.occupied, label: t('legend.occupied') },
-    { color: STATUS_COLORS.maintenance, label: t('legend.maintenance') },
-    { color: STATUS_COLORS.reserved, label: t('legend.reserved') },
+  const items: { status: BedStatus; label: string }[] = [
+    { status: 'vacant', label: t('legend.vacant') },
+    { status: 'occupied', label: t('legend.occupied') },
+    { status: 'maintenance', label: t('legend.maintenance') },
+    { status: 'reserved', label: t('legend.reserved') },
   ];
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-600">
       <span className="font-medium text-gray-500">{t('legend.title')}</span>
-      {items.map((item) => (
-        <span key={item.label} className="inline-flex items-center gap-1.5">
-          <span className={`inline-block w-3 h-3 rounded-sm ${item.color}`} aria-hidden />
-          <span>{item.label}</span>
-        </span>
-      ))}
+      {items.map(({ status, label }) => {
+        const Icon = STATUS_ICONS[status];
+        return (
+          <span key={status} className="inline-flex items-center gap-1.5">
+            <span
+              className={cn(
+                'inline-flex items-center justify-center w-4 h-4 rounded-sm text-white',
+                STATUS_COLORS[status]
+              )}
+              aria-hidden
+            >
+              <Icon size={10} strokeWidth={2.5} />
+            </span>
+            <span>{label}</span>
+          </span>
+        );
+      })}
     </div>
   );
 }
@@ -311,13 +371,17 @@ function BuildingCard({
           <span className="text-xl font-semibold text-coral tabular-nums">
             {intFmt.format(building.occupied_beds)}
           </span>
-          <span className="text-gray-500">{t('card.residents')}</span>
+          <span className="text-gray-500">
+            {t('card.residents', { count: building.occupied_beds })}
+          </span>
         </span>
         <span className="inline-flex items-baseline gap-1.5">
           <span className="text-xl font-semibold text-emerald-600 tabular-nums">
             {intFmt.format(building.vacant_beds)}
           </span>
-          <span className="text-gray-500">{t('card.vacantBeds')}</span>
+          <span className="text-gray-500">
+            {t('card.vacantBeds', { count: building.vacant_beds })}
+          </span>
         </span>
         <span className="ms-auto text-xs font-medium text-gray-500 tabular-nums">
           {t('card.percentEmpty', { pct: pctFmt.format(pct) })}
@@ -396,15 +460,30 @@ function SeatMap({
                 className="inline-flex gap-px"
                 title={room.room_number ?? undefined}
               >
-                {room.bed_statuses.map((status, i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      'block w-3.5 h-3.5 rounded-[3px]',
-                      STATUS_COLORS[status]
-                    )}
-                  />
-                ))}
+                {room.bed_statuses.map((status, i) => {
+                  const Icon = STATUS_ICONS[status];
+                  // Occupied vs vacant share the Bed icon — distinguish them
+                  // with reduced icon opacity on vacant tiles so the
+                  // "filled" feel reads at a glance even in monochrome.
+                  const iconOpacity =
+                    status === 'vacant' ? 'opacity-60' : 'opacity-95';
+                  return (
+                    <span
+                      key={i}
+                      className={cn(
+                        'inline-flex items-center justify-center w-4 h-4 rounded-[3px] text-white',
+                        STATUS_COLORS[status]
+                      )}
+                    >
+                      <Icon
+                        size={9}
+                        strokeWidth={2.5}
+                        className={iconOpacity}
+                        aria-hidden
+                      />
+                    </span>
+                  );
+                })}
               </div>
             ))}
           </div>
