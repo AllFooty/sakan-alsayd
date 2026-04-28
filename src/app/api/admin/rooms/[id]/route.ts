@@ -12,6 +12,8 @@ interface RoomRow {
   floor: number | null;
   room_type: string;
   bathroom_type: string;
+  capacity: number;
+  occupancy_mode: 'private' | 'shared';
   monthly_price: number;
   discounted_price: number | null;
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
@@ -76,7 +78,7 @@ export async function GET(
     const { data: room, error: roomErr } = await supabase
       .from('rooms')
       .select(
-        'id, building_id, room_number, floor, room_type, bathroom_type, monthly_price, discounted_price, status, images, notes, created_at, updated_at'
+        'id, building_id, room_number, floor, room_type, bathroom_type, capacity, occupancy_mode, monthly_price, discounted_price, status, images, notes, created_at, updated_at'
       )
       .eq('id', id)
       .maybeSingle<RoomRow>();
@@ -161,6 +163,9 @@ export async function GET(
 
 const ROOM_STATUS = ['available', 'occupied', 'maintenance', 'reserved'] as const;
 const ROOM_TYPES = ['single', 'double', 'triple', 'suite'] as const;
+const OCCUPANCY_MODES = ['private', 'shared'] as const;
+const MIN_CAPACITY = 1;
+const MAX_CAPACITY = 20;
 const BATHROOM_TYPES = [
   'shared',
   'shared-a',
@@ -212,7 +217,7 @@ export async function PATCH(
     const { data: existing, error: fetchErr } = await supabase
       .from('rooms')
       .select(
-        'id, building_id, monthly_price, discounted_price, building:buildings!building_id(is_active)'
+        'id, building_id, monthly_price, discounted_price, capacity, occupancy_mode, building:buildings!building_id(is_active)'
       )
       .eq('id', id)
       .maybeSingle<{
@@ -220,6 +225,8 @@ export async function PATCH(
         building_id: string;
         monthly_price: number;
         discounted_price: number | null;
+        capacity: number;
+        occupancy_mode: 'private' | 'shared';
         building: { is_active: boolean } | null;
       }>();
     if (fetchErr) {
@@ -318,6 +325,42 @@ export async function PATCH(
 
     if (nextDiscounted !== null && nextDiscounted > nextMonthly) {
       return NextResponse.json({ error: 'discountExceedsPrice' }, { status: 400 });
+    }
+
+    // Capacity / occupancy_mode interact: a 1-bed room can't be shared.
+    // Resolve next values from inputs OR existing, then validate the joint
+    // constraint regardless of which (or both) fields were sent.
+    const capacityProvided = Object.prototype.hasOwnProperty.call(b, 'capacity');
+    const occupancyModeProvided = Object.prototype.hasOwnProperty.call(b, 'occupancy_mode');
+
+    let nextCapacity = existing.capacity;
+    if (capacityProvided) {
+      const v = b.capacity;
+      if (
+        typeof v !== 'number' ||
+        !Number.isFinite(v) ||
+        !Number.isInteger(v) ||
+        v < MIN_CAPACITY ||
+        v > MAX_CAPACITY
+      ) {
+        return NextResponse.json({ error: 'invalidCapacity' }, { status: 400 });
+      }
+      nextCapacity = v;
+      updates.capacity = v;
+    }
+
+    let nextOccupancyMode = existing.occupancy_mode;
+    if (occupancyModeProvided) {
+      const v = b.occupancy_mode;
+      if (typeof v !== 'string' || !(OCCUPANCY_MODES as readonly string[]).includes(v)) {
+        return NextResponse.json({ error: 'invalidOccupancyMode' }, { status: 400 });
+      }
+      nextOccupancyMode = v as 'private' | 'shared';
+      updates.occupancy_mode = nextOccupancyMode;
+    }
+
+    if (nextCapacity === 1 && nextOccupancyMode === 'shared') {
+      return NextResponse.json({ error: 'sharedRequiresMultipleBeds' }, { status: 400 });
     }
 
     if (Object.prototype.hasOwnProperty.call(b, 'status')) {

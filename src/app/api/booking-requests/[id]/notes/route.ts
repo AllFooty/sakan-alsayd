@@ -10,7 +10,8 @@ export async function GET(
       'branch_manager',
       'finance_staff',
       'finance_manager',
-      'supervision_staff'
+      'supervision_staff',
+      'maintenance_manager'
     );
     if (isAuthError(auth)) return auth;
     const { supabase } = auth;

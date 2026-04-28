@@ -11,7 +11,9 @@ import {
   Plus,
   Trash2,
   AlertCircle,
+  DoorOpen,
 } from 'lucide-react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -315,6 +317,31 @@ export default function BuildingForm({
           {mode === 'edit' ? t('editSubtitle') : t('createSubtitle')}
         </p>
       </div>
+
+      {mode === 'edit' && buildingId && (
+        <div className="flex flex-col gap-2 rounded-xl border border-coral/20 bg-coral/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-coral/10 text-coral flex items-center justify-center flex-shrink-0">
+              <DoorOpen size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-navy">
+                {t('manageRoomsTitle')}
+              </p>
+              <p className="text-xs text-gray-600 mt-0.5">
+                {t('manageRoomsDescription')}
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/${locale}/admin/buildings/${buildingId}#rooms`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-coral/30 text-coral text-sm font-medium rounded-lg hover:bg-coral/10 transition-colors whitespace-nowrap self-start sm:self-auto"
+          >
+            <DoorOpen size={14} />
+            {t('manageRoomsCta')}
+          </Link>
+        </div>
+      )}
 
       <fieldset disabled={readOnly} className="space-y-4 m-0 p-0 border-0 disabled:opacity-70">
       {/* Section: Identifiers + display */}

@@ -18,6 +18,8 @@ interface RoomApi {
   floor: number | null;
   room_type: string;
   bathroom_type: string;
+  capacity: number;
+  occupancy_mode: 'private' | 'shared';
   monthly_price: number;
   discounted_price: number | null;
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
@@ -127,6 +129,8 @@ export default function EditRoomPage({
           floor: r.floor !== null ? String(r.floor) : '',
           room_type: asRoomType(r.room_type),
           bathroom_type: asBathroomType(r.bathroom_type),
+          capacity: String(r.capacity),
+          occupancy_mode: r.occupancy_mode === 'shared' ? 'shared' : 'private',
           monthly_price: String(r.monthly_price),
           discounted_price:
             r.discounted_price !== null ? String(r.discounted_price) : '',

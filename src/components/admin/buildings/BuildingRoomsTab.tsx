@@ -36,6 +36,8 @@ interface RoomRow {
   floor: number | null;
   room_type: string;
   bathroom_type: string;
+  capacity: number;
+  occupancy_mode: 'private' | 'shared';
   monthly_price: number;
   discounted_price: number | null;
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
@@ -51,6 +53,7 @@ export default function BuildingRoomsTab({ buildingId }: BuildingRoomsTabProps) 
   const tStatus = useTranslations('admin.buildings.roomStatus');
   const tType = useTranslations('rooms.types');
   const tBath = useTranslations('rooms.bathroom');
+  const tMode = useTranslations('rooms.occupancyMode');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const router = useRouter();
@@ -299,7 +302,14 @@ export default function BuildingRoomsTab({ buildingId }: BuildingRoomsTabProps) 
                       <Td className="tabular-nums text-gray-600">
                         {r.floor ?? '—'}
                       </Td>
-                      <Td className="text-gray-700">{tType(r.room_type)}</Td>
+                      <Td className="text-gray-700">
+                        <div className="flex flex-col leading-tight">
+                          <span>{tType(r.room_type)} {tMode(r.occupancy_mode)}</span>
+                          <span className="text-xs text-gray-400 tabular-nums">
+                            {t('table.bedsLabel', { count: r.capacity })}
+                          </span>
+                        </div>
+                      </Td>
                       <Td className="text-gray-600">{tBath(r.bathroom_type)}</Td>
                       <Td align="end" className="tabular-nums">
                         {hasDiscount ? (

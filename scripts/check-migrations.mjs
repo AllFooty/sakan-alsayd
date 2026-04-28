@@ -22,6 +22,9 @@ const HISTORICAL_APPLIED_OUT_OF_BAND = new Set([
   '012_role_expansion_rls.sql',      // recorded with the leading "012_" prefix retained in the name
   '013_role_expansion_followup.sql', // recorded with the leading "013_" prefix retained in the name
   '016_buildings_photos_bucket.sql', // recorded with the leading "016_" prefix retained in the name
+  '020_buildings_active_id_idx.sql', // applied via Dashboard SQL Editor; not registered in schema_migrations
+  '021_rooms_capacity_and_mode.sql', // recorded with the leading "021_" prefix retained in the name
+  '022_booking_select_for_maintenance_manager.sql', // applied via Dashboard SQL Editor; not registered in schema_migrations
 ]);
 
 const PROJECT_REF = 'xvcpyofwhmuohpvinrry';

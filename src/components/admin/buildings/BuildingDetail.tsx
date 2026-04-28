@@ -29,6 +29,7 @@ import StatusBadge from '@/components/admin/shared/StatusBadge';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BuildingPhotosManager from './BuildingPhotosManager';
 import BuildingRoomsTab from './BuildingRoomsTab';
+import BuildingFloorMap, { type FloorMapRoom } from './BuildingFloorMap';
 import { useAuth } from '@/lib/auth/hooks';
 import { formatDate } from '@/lib/utils';
 
@@ -66,6 +67,7 @@ interface Building {
   created_at: string;
   updated_at: string;
   room_stats: RoomStats;
+  rooms: FloorMapRoom[];
   active_maintenance_count: number;
   active_residents_count: number;
 }
@@ -98,7 +100,19 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'rooms'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'floorMap'>(
+    'overview'
+  );
+
+  // Deep-link via URL hash so Slice 3's "View floor map" links can land
+  // directly on the right tab without a separate route.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash === 'floorMap' || hash === 'rooms' || hash === 'overview') {
+      setActiveTab(hash);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -362,11 +376,19 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
           >
             {t('detail.tabs.rooms')}
           </TabButton>
+          <TabButton
+            active={activeTab === 'floorMap'}
+            onClick={() => setActiveTab('floorMap')}
+          >
+            {t('floorMap.tabLabel')}
+          </TabButton>
         </nav>
       </div>
 
       {activeTab === 'rooms' ? (
         <BuildingRoomsTab buildingId={building.id} />
+      ) : activeTab === 'floorMap' ? (
+        <BuildingFloorMap rooms={building.rooms ?? []} />
       ) : (
       <>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

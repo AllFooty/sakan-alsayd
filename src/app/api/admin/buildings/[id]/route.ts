@@ -23,8 +23,18 @@ interface BuildingRow {
   updated_at: string;
 }
 
-interface RoomCountRow {
+interface RoomFloorMapRow {
+  id: string;
+  room_number: string | null;
+  floor: number | null;
+  room_type: string;
+  capacity: number;
+  occupancy_mode: 'private' | 'shared';
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
+}
+
+interface AssignmentRoomIdRow {
+  room_id: string;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -77,9 +87,15 @@ export async function GET(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    // Run aggregate queries in parallel.
+    // Run aggregate queries in parallel. Rooms now carry the per-room fields
+    // the floor-map tab needs (capacity, occupancy_mode); active assignments
+    // are pulled with their room_id so we can compute per-room occupied-bed
+    // counts client-side without N round-trips.
     const [roomsRes, activeMaintRes, activeAssignmentsRes] = await Promise.all([
-      supabase.from('rooms').select('status').eq('building_id', id),
+      supabase
+        .from('rooms')
+        .select('id, room_number, floor, room_type, capacity, occupancy_mode, status')
+        .eq('building_id', id),
       supabase
         .from('maintenance_requests')
         .select('id', { count: 'exact', head: true })
@@ -87,13 +103,14 @@ export async function GET(
         .not('status', 'in', '(completed,cancelled)'),
       supabase
         .from('room_assignments')
-        .select('id', { count: 'exact', head: true })
+        .select('room_id')
         .eq('building_id', id)
-        .eq('status', 'active'),
+        .eq('status', 'active')
+        .returns<AssignmentRoomIdRow[]>(),
     ]);
 
     if (roomsRes.error) {
-      console.error('Error fetching room counts:', roomsRes.error);
+      console.error('Error fetching rooms:', roomsRes.error);
       return NextResponse.json({ error: 'Failed to fetch building' }, { status: 500 });
     }
     if (activeMaintRes.error) {
@@ -101,22 +118,42 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch building' }, { status: 500 });
     }
     if (activeAssignmentsRes.error) {
-      console.error('Error fetching assignments count:', activeAssignmentsRes.error);
+      console.error('Error fetching assignments:', activeAssignmentsRes.error);
       return NextResponse.json({ error: 'Failed to fetch building' }, { status: 500 });
     }
 
-    const stats = { total: 0, available: 0, occupied: 0, maintenance: 0, reserved: 0 };
-    for (const row of (roomsRes.data || []) as RoomCountRow[]) {
-      stats.total += 1;
-      stats[row.status] += 1;
+    const roomRows = (roomsRes.data || []) as RoomFloorMapRow[];
+    const activeAssignments = (activeAssignmentsRes.data || []) as AssignmentRoomIdRow[];
+
+    const activeCountByRoom = new Map<string, number>();
+    for (const a of activeAssignments) {
+      activeCountByRoom.set(a.room_id, (activeCountByRoom.get(a.room_id) ?? 0) + 1);
     }
+
+    const stats = { total: 0, available: 0, occupied: 0, maintenance: 0, reserved: 0 };
+    for (const r of roomRows) {
+      stats.total += 1;
+      stats[r.status] += 1;
+    }
+
+    const rooms = roomRows.map((r) => ({
+      id: r.id,
+      room_number: r.room_number,
+      floor: r.floor,
+      room_type: r.room_type,
+      capacity: r.capacity,
+      occupancy_mode: r.occupancy_mode,
+      status: r.status,
+      active_assignments_count: activeCountByRoom.get(r.id) ?? 0,
+    }));
 
     return NextResponse.json({
       data: {
         ...building,
         room_stats: stats,
+        rooms,
         active_maintenance_count: activeMaintRes.count ?? 0,
-        active_residents_count: activeAssignmentsRes.count ?? 0,
+        active_residents_count: activeAssignments.length,
       },
     });
   } catch (error) {

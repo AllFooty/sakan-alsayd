@@ -16,6 +16,7 @@ import {
   ImageOff,
   ExternalLink,
   Hash,
+  Pencil,
 } from 'lucide-react';
 import StatusBadge, {
   getRoomStatusVariant,
@@ -23,6 +24,7 @@ import StatusBadge, {
   getMaintenancePriorityVariant,
 } from '@/components/admin/shared/StatusBadge';
 import { formatDate, formatPrice, toWhatsAppUrl } from '@/lib/utils';
+import { useAuth } from '@/lib/auth/hooks';
 
 interface ResidentLite {
   id: string;
@@ -96,6 +98,12 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const BackIcon = isArabic ? ArrowRight : ArrowLeft;
+  const { profile } = useAuth();
+  const canEdit =
+    !!profile &&
+    (profile.role === 'super_admin' ||
+      profile.role === 'deputy_general_manager' ||
+      profile.role === 'branch_manager');
 
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -179,15 +187,26 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
 
   return (
     <div className="space-y-4">
-      {/* Top strip — back button */}
-      <button
-        type="button"
-        onClick={onBack}
-        className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
-      >
-        <BackIcon size={16} />
-        {t('backToRooms')}
-      </button>
+      {/* Top strip — back button + edit affordance */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+        >
+          <BackIcon size={16} />
+          {t('backToRooms')}
+        </button>
+        {canEdit && room.building_id && (
+          <Link
+            href={`/${locale}/admin/buildings/${room.building_id}/rooms/${room.id}/edit`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-coral text-white text-sm font-medium rounded-lg hover:bg-coral/90 transition-colors shadow-sm"
+          >
+            <Pencil size={14} />
+            {t('editRoom')}
+          </Link>
+        )}
+      </div>
 
       {/* Header card */}
       <section className="bg-white rounded-xl border border-gray-200 p-5">

@@ -80,6 +80,10 @@
       "triple": "Triple",
       "suite": "Suite"
     },
+    "occupancyMode": {
+      "private": "Private",
+      "shared": "Shared"
+    },
     "bathroom": {
       "shared": "Shared Bathroom",
       "shared-a": "Shared Bathroom (Class A)",
@@ -474,11 +478,20 @@
       "bookings": "Booking Requests",
       "maintenance": "Maintenance",
       "buildings": "Buildings & Rooms",
+      "occupancy": "Vacancy Map",
       "residents": "Residents",
       "users": "Users",
       "content": "Content",
       "settings": "Settings",
-      "version": "v{version}"
+      "version": "v{version}",
+      "section": {
+        "operations": "Operations",
+        "properties": "Properties",
+        "people": "People",
+        "admin": "Admin"
+      },
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
     },
     "topbar": {
       "welcome": "Welcome",
@@ -918,6 +931,32 @@
           "description": "It may have been removed, or you may not have access."
         }
       },
+      "floorMap": {
+        "tabLabel": "Floor Map",
+        "summaryTotal": "Total beds",
+        "summaryOccupied": "Occupied",
+        "summaryVacant": "Vacant",
+        "summaryPercent": "Vacancy",
+        "floorLabel": "Floor {floor}",
+        "floorUnassigned": "Unassigned floor",
+        "floorSummary": "{vacant} vacant / {total} beds",
+        "roomLabel": "Room {number}",
+        "roomUnnumbered": "Unnumbered room",
+        "cardCapacityPrivate": "{count, plural, one {1 bed (private)} other {# beds (private)}}",
+        "cardCapacityShared": "{occupied} of {capacity} beds occupied",
+        "cardCapacityUnavailable": "{count, plural, one {1 bed offline} other {# beds offline}}",
+        "cardAriaLabel": "{room}, {type} {mode}, {occupied} occupied of {capacity} beds, status {status}",
+        "clickHint": "Click any room to see its current occupant and history.",
+        "emptyTitle": "No rooms in this building yet",
+        "emptyDescription": "Add rooms from the Rooms tab to populate the floor map.",
+        "legend": {
+          "title": "Legend",
+          "vacant": "Vacant",
+          "occupied": "Occupied",
+          "maintenance": "Maintenance",
+          "reserved": "Reserved"
+        }
+      },
       "form": {
         "createTitle": "New building",
         "editTitle": "Edit building",
@@ -930,6 +969,9 @@
         "removeLandmark": "Remove landmark",
         "landmarkN": "Landmark {n}",
         "noLandmarks": "No landmarks yet. Click “Add landmark” to list nearby points of interest.",
+        "manageRoomsTitle": "Manage rooms separately",
+        "manageRoomsDescription": "Rooms — including floor, capacity, pricing, and status — are edited from the Rooms tab on this building's detail page.",
+        "manageRoomsCta": "Open Rooms",
         "sections": {
           "basics": "Identifier & display",
           "names": "Bilingual names",
@@ -1041,7 +1083,8 @@
           "type": "Type",
           "bathroom": "Bathroom",
           "price": "Monthly",
-          "status": "Status"
+          "status": "Status",
+          "bedsLabel": "{count, plural, one {# bed} other {# beds}}"
         },
         "unnumbered": "(no number)",
         "summary": "{count, plural, one {# room} other {# rooms}}",
@@ -1056,8 +1099,8 @@
       "roomForm": {
         "createTitle": "New room",
         "editTitle": "Edit room",
-        "createSubtitle": "Set the room's type, pricing, and status. Photos can be added later.",
-        "editSubtitle": "Update pricing, status, or notes for this room.",
+        "createSubtitle": "Set the room's type, capacity, pricing, and status. Photos can be added later.",
+        "editSubtitle": "Update capacity, pricing, status, or notes for this room.",
         "create": "Create room",
         "save": "Save changes",
         "cancel": "Cancel",
@@ -1074,6 +1117,8 @@
           "floor": "Floor",
           "roomType": "Room type",
           "bathroomType": "Bathroom type",
+          "capacity": "Beds (capacity)",
+          "occupancyMode": "Occupancy mode",
           "monthlyPrice": "Monthly price (SAR)",
           "discountedPrice": "Discounted price (SAR)",
           "status": "Status",
@@ -1082,6 +1127,9 @@
         "helpers": {
           "roomNumber": "Optional. Building-friendly identifier (e.g. 101, A-3).",
           "floor": "Optional. Use 0 for ground floor; negative for basement.",
+          "capacity": "Number of beds in this room. Defaults from room type; override for non-standard layouts.",
+          "occupancyMode": "Private = the room rents as one unit on one contract. Shared = each bed rents independently.",
+          "occupancyModeSingle": "A 1-bed room is always private — there's no second tenant to share with.",
           "discountedPrice": "Optional. Must be lower than the monthly price.",
           "statusOccupied": "Use the residents move-in flow to assign a tenant. This only updates display status.",
           "notes": "Visible to staff only. Up to 5000 characters."
@@ -1097,6 +1145,9 @@
           "discountInvalid": "Enter a non-negative number.",
           "discountTooHigh": "Discounted price can't exceed the monthly price.",
           "floorInvalid": "Floor must be a whole number.",
+          "capacityRequired": "Bed count is required.",
+          "capacityInvalid": "Enter a whole number between 1 and 20.",
+          "sharedRequiresMultipleBeds": "Shared mode needs at least 2 beds. Increase the bed count or keep this room private.",
           "notesTooLong": "Notes must be 5000 characters or fewer.",
           "requiredMissing": "Some required fields are missing.",
           "buildingNotFound": "Couldn't find the parent building.",
@@ -1125,6 +1176,7 @@
       },
       "roomDetail": {
         "backToRooms": "Back to rooms",
+        "editRoom": "Edit room",
         "roomTitle": "Room {number}",
         "unnumbered": "Unnumbered room",
         "floorN": "Floor {n}",
@@ -1159,6 +1211,44 @@
           "notes": "Internal notes",
           "metadata": "Details"
         }
+      }
+    },
+    "occupancy": {
+      "title": "Vacancy Map",
+      "subtitle": "Portfolio-wide bed-level vacancy at a glance, by building.",
+      "sortLabel": "Sort by",
+      "sort": {
+        "mostEmpty": "Most empty first",
+        "name": "Name",
+        "buildingNumber": "Building number"
+      },
+      "summary": {
+        "totalBeds": "Total beds",
+        "occupied": "Occupied",
+        "vacant": "Vacant",
+        "vacancyPct": "Overall vacancy"
+      },
+      "card": {
+        "residents": "residents",
+        "vacantBeds": "vacant beds",
+        "percentEmpty": "{pct}% empty",
+        "heatmapAria": "{name}: {vacant} of {total} beds vacant"
+      },
+      "legend": {
+        "title": "Legend:",
+        "vacant": "Vacant",
+        "occupied": "Occupied",
+        "maintenance": "Maintenance",
+        "reserved": "Reserved"
+      },
+      "empty": {
+        "title": "No buildings to display",
+        "description": "You don't have any assigned buildings yet. Ask a super admin to assign you to one."
+      },
+      "error": {
+        "title": "Couldn't load vacancy map",
+        "description": "Something went wrong. Please try again.",
+        "retry": "Retry"
       }
     },
     "users": {
@@ -1344,7 +1434,8 @@
           "create": "Create a new building",
           "delete": "Deactivate a building (soft delete)",
           "photosUpload": "Upload building photos",
-          "photosDelete": "Delete building photos"
+          "photosDelete": "Delete building photos",
+          "occupancyRead": "View occupancy dashboard"
         },
         "rooms": {
           "list": "View rooms",

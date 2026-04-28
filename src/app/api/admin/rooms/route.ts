@@ -19,6 +19,9 @@ function isSortColumn(value: unknown): value is SortColumn {
 
 const ROOM_STATUS = ['available', 'occupied', 'maintenance', 'reserved'] as const;
 const ROOM_TYPES = ['single', 'double', 'triple', 'suite'] as const;
+const OCCUPANCY_MODES = ['private', 'shared'] as const;
+const MIN_CAPACITY = 1;
+const MAX_CAPACITY = 20;
 const BATHROOM_TYPES = [
   'shared',
   'shared-a',
@@ -58,6 +61,8 @@ interface RoomRow {
   floor: number | null;
   room_type: string;
   bathroom_type: string;
+  capacity: number;
+  occupancy_mode: 'private' | 'shared';
   monthly_price: number;
   discounted_price: number | null;
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
@@ -111,7 +116,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('rooms')
       .select(
-        'id, building_id, room_number, floor, room_type, bathroom_type, monthly_price, discounted_price, status, images, notes, created_at, updated_at',
+        'id, building_id, room_number, floor, room_type, bathroom_type, capacity, occupancy_mode, monthly_price, discounted_price, status, images, notes, created_at, updated_at',
         { count: 'exact' }
       )
       .eq('building_id', buildingId)
@@ -174,10 +179,22 @@ interface RoomInsert {
   floor: number | null;
   room_type: (typeof ROOM_TYPES)[number];
   bathroom_type: (typeof BATHROOM_TYPES)[number];
+  capacity: number;
+  occupancy_mode: (typeof OCCUPANCY_MODES)[number];
   monthly_price: number;
   discounted_price: number | null;
   status: (typeof ROOM_STATUS)[number];
   notes: string | null;
+}
+
+function defaultCapacityForType(rt: (typeof ROOM_TYPES)[number]): number {
+  // Mirrors migration 021's backfill logic so the API matches existing data.
+  switch (rt) {
+    case 'single': return 1;
+    case 'double': return 2;
+    case 'triple': return 3;
+    case 'suite':  return 2;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -245,6 +262,37 @@ export async function POST(request: NextRequest) {
       floor = Math.trunc(b.floor);
     }
 
+    let capacity = defaultCapacityForType(room_type as (typeof ROOM_TYPES)[number]);
+    if (b.capacity !== undefined && b.capacity !== null && b.capacity !== '') {
+      if (
+        typeof b.capacity !== 'number' ||
+        !Number.isFinite(b.capacity) ||
+        !Number.isInteger(b.capacity) ||
+        b.capacity < MIN_CAPACITY ||
+        b.capacity > MAX_CAPACITY
+      ) {
+        return NextResponse.json({ error: 'invalidCapacity' }, { status: 400 });
+      }
+      capacity = b.capacity;
+    }
+
+    let occupancy_mode: (typeof OCCUPANCY_MODES)[number] = 'private';
+    if (b.occupancy_mode !== undefined && b.occupancy_mode !== null) {
+      if (
+        typeof b.occupancy_mode !== 'string' ||
+        !(OCCUPANCY_MODES as readonly string[]).includes(b.occupancy_mode)
+      ) {
+        return NextResponse.json({ error: 'invalidOccupancyMode' }, { status: 400 });
+      }
+      occupancy_mode = b.occupancy_mode as (typeof OCCUPANCY_MODES)[number];
+    }
+    // A 1-bed room can't meaningfully be "shared" — there's no second tenant
+    // to share with. Force private at the API boundary so a malformed client
+    // can't introduce nonsensical state.
+    if (capacity === 1 && occupancy_mode === 'shared') {
+      occupancy_mode = 'private';
+    }
+
     const room_number = trimStr(b.room_number, MAX_ROOM_NUMBER);
     const notes = trimStr(b.notes, MAX_NOTES);
 
@@ -273,6 +321,8 @@ export async function POST(request: NextRequest) {
       floor,
       room_type: room_type as (typeof ROOM_TYPES)[number],
       bathroom_type: bathroom_type as (typeof BATHROOM_TYPES)[number],
+      capacity,
+      occupancy_mode,
       monthly_price,
       discounted_price,
       status,

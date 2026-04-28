@@ -54,10 +54,11 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
           supervision_staff: 'full',
           finance_staff: 'full',
           finance_manager: 'full',
+          maintenance_manager: 'full',
         },
         source: [
-          'supabase/migrations/012_role_expansion_rls.sql:144-150',
-          'src/app/api/booking-requests/route.ts:25-30',
+          'supabase/migrations/022_booking_select_for_maintenance_manager.sql:12-18',
+          'src/app/api/booking-requests/route.ts:25-31',
         ],
       },
       {
@@ -76,13 +77,13 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         },
         source: [
           'supabase/migrations/002_rls.sql:215-220',
-          'src/app/api/booking-requests/[id]/route.ts:45-50',
+          'src/app/api/booking-requests/[id]/route.ts:46-51',
         ],
       },
       {
         key: 'bookings.delete',
         access: { ...ADMIN_TIER },
-        source: ['src/app/api/booking-requests/[id]/route.ts:130'],
+        source: ['src/app/api/booking-requests/[id]/route.ts:131'],
       },
       {
         key: 'bookings.export',
@@ -91,12 +92,12 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
           branch_manager: 'full',
           finance_manager: 'full',
         },
-        source: ['src/app/api/booking-requests/route.ts:46-53'],
+        source: ['src/app/api/booking-requests/route.ts:47-54'],
       },
       {
         key: 'bookings.skipTransition',
         access: { ...ADMIN_TIER },
-        source: ['src/app/api/booking-requests/[id]/route.ts:76-77'],
+        source: ['src/app/api/booking-requests/[id]/route.ts:77-78'],
       },
       {
         key: 'bookings.notesRead',
@@ -106,8 +107,9 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
           supervision_staff: 'full',
           finance_staff: 'full',
           finance_manager: 'full',
+          maintenance_manager: 'full',
         },
-        source: ['supabase/migrations/012_role_expansion_rls.sql:155-161'],
+        source: ['supabase/migrations/022_booking_select_for_maintenance_manager.sql:21-27'],
       },
       {
         key: 'bookings.notesWrite',
@@ -299,6 +301,22 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
           'src/app/api/uploads/building-photo/route.ts:110-132',
         ],
       },
+      {
+        key: 'buildings.occupancyRead',
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          maintenance_manager: 'scoped',
+          transportation_manager: 'scoped',
+          finance_manager: 'scoped',
+          maintenance_staff: 'scoped',
+          transportation_staff: 'scoped',
+          supervision_staff: 'scoped',
+          finance_staff: 'scoped',
+        },
+        source: ['src/app/api/admin/occupancy/route.ts:49-68'],
+      },
     ],
   },
   {
@@ -323,19 +341,21 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         },
         source: [
           'supabase/migrations/002_rls.sql:110-111',
-          'src/app/api/admin/rooms/route.ts:69-96',
-          'src/app/api/admin/rooms/[id]/route.ts:52-98',
+          'src/app/api/admin/rooms/route.ts:75-102',
+          'src/app/api/admin/rooms/[id]/route.ts:55-101',
         ],
       },
       {
         key: 'rooms.create',
         // POST is admin-tier only (mirror of POST /api/admin/buildings).
         // RLS at 002_rls.sql:122-124 still permits other roles to insert
-        // into assigned buildings, but no API exposes that path.
+        // into assigned buildings, but no API exposes that path. POST also
+        // accepts `capacity` and `occupancy_mode` (migration 021).
         access: { ...ADMIN_TIER },
         source: [
           'supabase/migrations/002_rls.sql:122-124',
-          'src/app/api/admin/rooms/route.ts:182-189',
+          'supabase/migrations/021_rooms_capacity_and_mode.sql',
+          'src/app/api/admin/rooms/route.ts:200-207',
         ],
       },
       {
@@ -343,6 +363,9 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         // PATCH allows admin tier + branch_manager scoped to the room's
         // building (looked up via rooms.building_id then
         // getAssignedBuildingIds). Other roles have no admin-API path.
+        // Editable fields include capacity and occupancy_mode (migration
+        // 021); the joint constraint "shared requires capacity > 1" is
+        // enforced at the API boundary.
         scopeNoteKey: 'assignedBuilding',
         access: {
           ...ADMIN_TIER,
@@ -350,7 +373,8 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         },
         source: [
           'supabase/migrations/002_rls.sql:126-129',
-          'src/app/api/admin/rooms/[id]/route.ts:196-234',
+          'supabase/migrations/021_rooms_capacity_and_mode.sql',
+          'src/app/api/admin/rooms/[id]/route.ts:202-251',
         ],
       },
       {
@@ -363,7 +387,7 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         access: { ...ADMIN_TIER },
         source: [
           'supabase/migrations/002_rls.sql:131-133',
-          'src/app/api/admin/rooms/[id]/route.ts:355-370',
+          'src/app/api/admin/rooms/[id]/route.ts:409-424',
         ],
       },
     ],

@@ -33,19 +33,36 @@ const BATHROOM_TYPES = [
   'suite',
 ] as const;
 const ROOM_STATUSES = ['available', 'occupied', 'maintenance', 'reserved'] as const;
+const OCCUPANCY_MODES = ['private', 'shared'] as const;
 
 type RoomType = (typeof ROOM_TYPES)[number];
 type BathroomType = (typeof BATHROOM_TYPES)[number];
 type RoomStatus = (typeof ROOM_STATUSES)[number];
+type OccupancyMode = (typeof OCCUPANCY_MODES)[number];
 
 const MAX_NOTES = 5000;
 const MAX_ROOM_NUMBER = 50;
+const MIN_CAPACITY = 1;
+const MAX_CAPACITY = 20;
+
+// Mirrors migration 021's backfill mapping. Used to seed `capacity` when
+// `room_type` changes and the user hasn't manually edited the value yet.
+function defaultCapacityForType(rt: RoomType): number {
+  switch (rt) {
+    case 'single': return 1;
+    case 'double': return 2;
+    case 'triple': return 3;
+    case 'suite':  return 2;
+  }
+}
 
 export interface RoomFormValues {
   room_number: string;
   floor: string; // kept as string for the input; parsed on submit
   room_type: RoomType;
   bathroom_type: BathroomType;
+  capacity: string; // string for input, parsed on submit
+  occupancy_mode: OccupancyMode;
   monthly_price: string; // string for input, parsed on submit
   discounted_price: string;
   status: RoomStatus;
@@ -66,6 +83,8 @@ const EMPTY_VALUES: RoomFormValues = {
   floor: '',
   room_type: 'single',
   bathroom_type: 'shared',
+  capacity: '1',
+  occupancy_mode: 'private',
   monthly_price: '',
   discounted_price: '',
   status: 'available',
@@ -84,6 +103,7 @@ export default function RoomForm({
   const tType = useTranslations('rooms.types');
   const tBath = useTranslations('rooms.bathroom');
   const tStatus = useTranslations('admin.buildings.roomStatus');
+  const tMode = useTranslations('rooms.occupancyMode');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const router = useRouter();
@@ -111,12 +131,53 @@ export default function RoomForm({
     () => ROOM_STATUSES.map((v) => ({ value: v, label: tStatus(v) })),
     [tStatus]
   );
+  const capacityNum = useMemo(() => {
+    const n = parseInt(values.capacity, 10);
+    return Number.isFinite(n) ? n : NaN;
+  }, [values.capacity]);
+
+  // A 1-bed room can't be "shared" — there's no second tenant to share with.
+  // The select is disabled and force-locked to 'private' in that case.
+  const sharedDisabled = capacityNum === 1;
+
+  const occupancyModeOptions = useMemo(
+    () => OCCUPANCY_MODES.map((v) => ({ value: v, label: tMode(v) })),
+    [tMode]
+  );
 
   function update<K extends keyof RoomFormValues>(
     key: K,
     value: RoomFormValues[K]
   ) {
     setValues((v) => ({ ...v, [key]: value }));
+  }
+
+  function handleRoomTypeChange(rt: RoomType) {
+    setValues((v) => {
+      const newDefault = defaultCapacityForType(rt);
+      const currentDefault = defaultCapacityForType(v.room_type);
+      const currentCapNum = parseInt(v.capacity, 10);
+      // Only auto-update capacity if the user hadn't deviated from the
+      // previous type's default — preserves manual overrides like a "suite"
+      // bumped to 4.
+      const capacity =
+        Number.isFinite(currentCapNum) && currentCapNum === currentDefault
+          ? String(newDefault)
+          : v.capacity;
+      const nextCapNum = parseInt(capacity, 10) || newDefault;
+      const occupancy_mode: OccupancyMode =
+        nextCapNum === 1 ? 'private' : v.occupancy_mode;
+      return { ...v, room_type: rt, capacity, occupancy_mode };
+    });
+  }
+
+  function handleCapacityChange(raw: string) {
+    setValues((v) => {
+      const n = parseInt(raw, 10);
+      const occupancy_mode: OccupancyMode =
+        Number.isFinite(n) && n === 1 ? 'private' : v.occupancy_mode;
+      return { ...v, capacity: raw, occupancy_mode };
+    });
   }
 
   // Live discount percentage when both prices are set and valid.
@@ -160,6 +221,23 @@ export default function RoomForm({
       }
     }
 
+    // capacity: required integer in [MIN_CAPACITY, MAX_CAPACITY]
+    const c = parseInt(values.capacity, 10);
+    if (!values.capacity.trim()) {
+      errs.capacity = t('errors.capacityRequired');
+    } else if (
+      !Number.isFinite(c) ||
+      !Number.isInteger(c) ||
+      c < MIN_CAPACITY ||
+      c > MAX_CAPACITY
+    ) {
+      errs.capacity = t('errors.capacityInvalid');
+    } else if (c === 1 && values.occupancy_mode === 'shared') {
+      // Defensive: the change handlers should already prevent this, but
+      // guard against external state mutations or stale form values.
+      errs.occupancy_mode = t('errors.sharedRequiresMultipleBeds');
+    }
+
     if (values.notes.length > MAX_NOTES) {
       errs.notes = t('errors.notesTooLong');
     }
@@ -181,6 +259,8 @@ export default function RoomForm({
       const payload: Record<string, unknown> = {
         room_type: values.room_type,
         bathroom_type: values.bathroom_type,
+        capacity: Math.trunc(parseInt(values.capacity, 10)),
+        occupancy_mode: values.occupancy_mode,
         status: values.status,
         monthly_price: parseFloat(values.monthly_price),
         room_number: values.room_number.trim()
@@ -226,6 +306,17 @@ export default function RoomForm({
           toast.error(t('errors.requiredMissing'));
         } else if (code === 'invalidStatus') {
           toast.error(t('errors.requiredMissing'));
+        } else if (code === 'invalidCapacity') {
+          setErrors((e) => ({ ...e, capacity: t('errors.capacityInvalid') }));
+          toast.error(t('errors.capacityInvalid'));
+        } else if (code === 'invalidOccupancyMode') {
+          toast.error(t('errors.requiredMissing'));
+        } else if (code === 'sharedRequiresMultipleBeds') {
+          setErrors((e) => ({
+            ...e,
+            occupancy_mode: t('errors.sharedRequiresMultipleBeds'),
+          }));
+          toast.error(t('errors.sharedRequiresMultipleBeds'));
         } else if (code === 'buildingNotFound' || code === 'invalidBuildingId') {
           toast.error(t('errors.buildingNotFound'));
         } else {
@@ -361,7 +452,7 @@ export default function RoomForm({
           <Select
             label={t('fields.roomType')}
             value={values.room_type}
-            onChange={(e) => update('room_type', e.target.value as RoomType)}
+            onChange={(e) => handleRoomTypeChange(e.target.value as RoomType)}
             options={roomTypeOptions}
           />
           <Select
@@ -372,6 +463,44 @@ export default function RoomForm({
             }
             options={bathroomTypeOptions}
           />
+          <Input
+            label={t('fields.capacity')}
+            type="number"
+            value={values.capacity}
+            onChange={(e) => handleCapacityChange(e.target.value)}
+            placeholder="1"
+            dir="ltr"
+            lang="en"
+            inputMode="numeric"
+            step={1}
+            min={MIN_CAPACITY}
+            max={MAX_CAPACITY}
+            error={errors.capacity}
+            helperText={errors.capacity ? undefined : t('helpers.capacity')}
+          />
+          <div>
+            <Select
+              label={t('fields.occupancyMode')}
+              value={values.occupancy_mode}
+              onChange={(e) =>
+                update('occupancy_mode', e.target.value as OccupancyMode)
+              }
+              options={
+                sharedDisabled
+                  ? occupancyModeOptions.filter((o) => o.value === 'private')
+                  : occupancyModeOptions
+              }
+              error={errors.occupancy_mode}
+              disabled={sharedDisabled}
+            />
+            {!errors.occupancy_mode && (
+              <p className="mt-1.5 text-xs text-gray-500">
+                {sharedDisabled
+                  ? t('helpers.occupancyModeSingle')
+                  : t('helpers.occupancyMode')}
+              </p>
+            )}
+          </div>
         </div>
       </Section>
 

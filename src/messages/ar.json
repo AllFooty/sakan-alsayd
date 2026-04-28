@@ -80,6 +80,10 @@
       "triple": "ثلاثية",
       "suite": "جناح"
     },
+    "occupancyMode": {
+      "private": "خاص",
+      "shared": "مشترك"
+    },
     "bathroom": {
       "shared": "دورة مياه مشتركة",
       "shared-a": "دورة مياه مشتركة (فئة أ)",
@@ -474,11 +478,20 @@
       "bookings": "طلبات الحجز",
       "maintenance": "الصيانة",
       "buildings": "المباني والغرف",
+      "occupancy": "خريطة الشواغر",
       "residents": "الساكنات",
       "users": "المستخدمون",
       "content": "المحتوى",
       "settings": "الإعدادات",
-      "version": "v{version}"
+      "version": "v{version}",
+      "section": {
+        "operations": "العمليات",
+        "properties": "العقارات",
+        "people": "الأفراد",
+        "admin": "الإدارة"
+      },
+      "collapse": "طيّ القائمة الجانبية",
+      "expand": "توسيع القائمة الجانبية"
     },
     "topbar": {
       "welcome": "مرحباً",
@@ -918,6 +931,32 @@
           "description": "ربما تمت إزالته أو ليس لديك صلاحية الوصول إليه."
         }
       },
+      "floorMap": {
+        "tabLabel": "خريطة الطوابق",
+        "summaryTotal": "إجمالي الأسرّة",
+        "summaryOccupied": "مشغولة",
+        "summaryVacant": "شاغرة",
+        "summaryPercent": "نسبة الشواغر",
+        "floorLabel": "الطابق {floor}",
+        "floorUnassigned": "بدون طابق محدد",
+        "floorSummary": "{vacant} شواغر / {total} سرير",
+        "roomLabel": "الغرفة {number}",
+        "roomUnnumbered": "غرفة بدون رقم",
+        "cardCapacityPrivate": "{count, plural, zero {لا أسرّة (خاصة)} one {سرير واحد (خاصة)} two {سريران (خاصة)} few {# أسرّة (خاصة)} many {# سريراً (خاصة)} other {# سرير (خاصة)}}",
+        "cardCapacityShared": "{occupied} من {capacity} أسرّة مشغولة",
+        "cardCapacityUnavailable": "{count, plural, zero {لا أسرّة متوقفة} one {سرير واحد متوقف} two {سريران متوقفان} few {# أسرّة متوقفة} many {# سريراً متوقفاً} other {# سرير متوقف}}",
+        "cardAriaLabel": "{room}، {type} {mode}، {occupied} مشغولة من {capacity} أسرّة، الحالة {status}",
+        "clickHint": "اضغط على أي غرفة لعرض ساكنيها الحاليين وسجلها.",
+        "emptyTitle": "لا توجد غرف في هذا المبنى بعد",
+        "emptyDescription": "أضف الغرف من تبويب «الغرف» لتظهر هنا في خريطة الطوابق.",
+        "legend": {
+          "title": "الدليل",
+          "vacant": "شاغر",
+          "occupied": "مشغول",
+          "maintenance": "صيانة",
+          "reserved": "محجوز"
+        }
+      },
       "form": {
         "createTitle": "مبنى جديد",
         "editTitle": "تعديل المبنى",
@@ -930,6 +969,9 @@
         "removeLandmark": "حذف المعلم",
         "landmarkN": "المعلم {n}",
         "noLandmarks": "لا توجد معالم بعد. اضغط «إضافة معلم» لإدراج النقاط القريبة.",
+        "manageRoomsTitle": "تُدار الغرف بشكل منفصل",
+        "manageRoomsDescription": "تُحرَّر الغرف — بما في ذلك الطابق والسعة والسعر والحالة — من تبويب «الغرف» في صفحة تفاصيل هذا المبنى.",
+        "manageRoomsCta": "فتح الغرف",
         "sections": {
           "basics": "المعرّف وخيارات العرض",
           "names": "الأسماء بالعربية والإنجليزية",
@@ -1041,7 +1083,8 @@
           "type": "النوع",
           "bathroom": "الحمام",
           "price": "الإيجار",
-          "status": "الحالة"
+          "status": "الحالة",
+          "bedsLabel": "{count, plural, zero {لا أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}"
         },
         "unnumbered": "(بدون رقم)",
         "summary": "{count, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
@@ -1056,8 +1099,8 @@
       "roomForm": {
         "createTitle": "غرفة جديدة",
         "editTitle": "تعديل الغرفة",
-        "createSubtitle": "حدّد نوع الغرفة والسعر والحالة. يمكن إضافة الصور لاحقاً.",
-        "editSubtitle": "حدّث السعر أو الحالة أو الملاحظات لهذه الغرفة.",
+        "createSubtitle": "حدّد نوع الغرفة وعدد الأسرّة والسعر والحالة. يمكن إضافة الصور لاحقاً.",
+        "editSubtitle": "حدّث عدد الأسرّة أو السعر أو الحالة أو الملاحظات لهذه الغرفة.",
         "create": "إنشاء الغرفة",
         "save": "حفظ التغييرات",
         "cancel": "إلغاء",
@@ -1074,6 +1117,8 @@
           "floor": "الطابق",
           "roomType": "نوع الغرفة",
           "bathroomType": "نوع الحمام",
+          "capacity": "عدد الأسرّة",
+          "occupancyMode": "نمط الإيجار",
           "monthlyPrice": "السعر الشهري (ريال)",
           "discountedPrice": "السعر بعد الخصم (ريال)",
           "status": "الحالة",
@@ -1082,6 +1127,9 @@
         "helpers": {
           "roomNumber": "اختياري. معرّف مألوف داخل المبنى (مثل: 101 أو A-3).",
           "floor": "اختياري. استخدم 0 للأرضي وقيمة سالبة للقبو.",
+          "capacity": "عدد الأسرّة في هذه الغرفة. القيمة الافتراضية مأخوذة من نوع الغرفة، ويمكن تعديلها للحالات غير القياسية.",
+          "occupancyMode": "خاص: يتم تأجير الغرفة كاملة لعقد واحد. مشترك: يُؤجَّر كل سرير بشكل مستقل.",
+          "occupancyModeSingle": "الغرفة المفردة دائماً خاصة — لا يوجد ساكن آخر للمشاركة.",
           "discountedPrice": "اختياري. يجب أن يكون أقل من السعر الشهري.",
           "statusOccupied": "استخدم خطوة إدخال الساكنة لتخصيص الغرفة. هذا الحقل يحدّث حالة العرض فقط.",
           "notes": "تظهر للموظفين فقط. حتى ٥٠٠٠ حرف."
@@ -1097,6 +1145,9 @@
           "discountInvalid": "أدخل رقماً غير سالب.",
           "discountTooHigh": "لا يمكن أن يتجاوز السعر بعد الخصم السعر الشهري.",
           "floorInvalid": "الطابق يجب أن يكون رقماً صحيحاً.",
+          "capacityRequired": "عدد الأسرّة مطلوب.",
+          "capacityInvalid": "أدخل رقماً صحيحاً بين 1 و 20.",
+          "sharedRequiresMultipleBeds": "يحتاج النمط المشترك إلى سريرين على الأقل. زد عدد الأسرّة أو اجعل الغرفة خاصة.",
           "notesTooLong": "الملاحظات يجب ألا تتجاوز ٥٠٠٠ حرف.",
           "requiredMissing": "بعض الحقول المطلوبة مفقودة.",
           "buildingNotFound": "تعذّر العثور على المبنى الأصل.",
@@ -1125,6 +1176,7 @@
       },
       "roomDetail": {
         "backToRooms": "العودة إلى الغرف",
+        "editRoom": "تعديل الغرفة",
         "roomTitle": "غرفة {number}",
         "unnumbered": "غرفة بدون رقم",
         "floorN": "الطابق {n}",
@@ -1159,6 +1211,44 @@
           "notes": "ملاحظات داخلية",
           "metadata": "تفاصيل"
         }
+      }
+    },
+    "occupancy": {
+      "title": "خريطة الشواغر",
+      "subtitle": "نظرة شاملة على شواغر الأسرّة في كل المباني.",
+      "sortLabel": "ترتيب حسب",
+      "sort": {
+        "mostEmpty": "الأكثر شغوراً أولاً",
+        "name": "الاسم",
+        "buildingNumber": "رقم المبنى"
+      },
+      "summary": {
+        "totalBeds": "إجمالي الأسرّة",
+        "occupied": "مشغولة",
+        "vacant": "شاغرة",
+        "vacancyPct": "نسبة الشواغر الإجمالية"
+      },
+      "card": {
+        "residents": "ساكنة",
+        "vacantBeds": "سرير شاغر",
+        "percentEmpty": "{pct}% شاغرة",
+        "heatmapAria": "{name}: {vacant} من أصل {total} سرير شاغرة"
+      },
+      "legend": {
+        "title": "المفتاح:",
+        "vacant": "شاغر",
+        "occupied": "مشغول",
+        "maintenance": "صيانة",
+        "reserved": "محجوز"
+      },
+      "empty": {
+        "title": "لا توجد مبانٍ للعرض",
+        "description": "لا توجد لديك مبانٍ معيّنة بعد. يرجى التواصل مع المدير العام لإسنادك إلى مبنى."
+      },
+      "error": {
+        "title": "تعذّر تحميل خريطة الشواغر",
+        "description": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+        "retry": "إعادة المحاولة"
       }
     },
     "users": {
@@ -1344,7 +1434,8 @@
           "create": "إنشاء مبنى جديد",
           "delete": "تعطيل مبنى (حذف ناعم)",
           "photosUpload": "رفع صور المباني",
-          "photosDelete": "حذف صور المباني"
+          "photosDelete": "حذف صور المباني",
+          "occupancyRead": "عرض لوحة الإشغال"
         },
         "rooms": {
           "list": "عرض الغرف",
