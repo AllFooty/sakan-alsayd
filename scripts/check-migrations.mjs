@@ -25,6 +25,11 @@ const HISTORICAL_APPLIED_OUT_OF_BAND = new Set([
   '020_buildings_active_id_idx.sql', // applied via Dashboard SQL Editor; not registered in schema_migrations
   '021_rooms_capacity_and_mode.sql', // recorded with the leading "021_" prefix retained in the name
   '022_booking_select_for_maintenance_manager.sql', // applied via Dashboard SQL Editor; not registered in schema_migrations
+  '023_rooms_capacity_mode_check.sql', // applied via Dashboard SQL Editor; constraint rooms_capacity_mode_check confirmed present on prod (42710 on re-apply)
+  '024_residents_date_of_birth.sql',   // applied via Dashboard SQL Editor; column + index confirmed present on prod
+  '025_maintenance_manager_full_update.sql', // applied via Dashboard SQL Editor; maintenance_manager_role_update policy confirmed present on prod
+  '026_contracts_bucket.sql',          // applied via Dashboard SQL Editor; bucket + helper fn + 3 storage policies confirmed present on prod
+  '027_residents_supervision_staff_and_capacity.sql', // applied via Dashboard SQL Editor; broadened RLS + uniq index + capacity trigger confirmed present on prod
 ]);
 
 const PROJECT_REF = 'xvcpyofwhmuohpvinrry';

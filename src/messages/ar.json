@@ -225,10 +225,6 @@
       "cleaning_service": {
         "question": "هل تتوفر خدمة تنظيف الغرف؟",
         "answer": "نعم، تتوفر خدمة تنظيف اختيارية: 15 ريال للساعة للغرف، و10 ريال للساعة للوحدات السكنية."
-      },
-      "ejar": {
-        "question": "هل يتم توثيق العقد في شبكة إيجار؟",
-        "answer": "نعم، يتم توثيق العقد في شبكة إيجار الإلكترونية برسوم 2.5% من قيمة العقد."
       }
     },
     "downloadTerms": "تحميل الشروط والأحكام كاملة",
@@ -592,7 +588,9 @@
           "markComplete": "إتمام الحجز",
           "reject": "رفض",
           "cancel": "إلغاء",
-          "reopen": "إعادة فتح"
+          "reopen": "إعادة فتح",
+          "convertToResident": "تحويل إلى مقيم",
+          "viewResident": "عرض المقيم"
         },
         "assignAndProceed": "إسناد ومتابعة",
         "selectStaffForDept": "اختر موظف {department}"
@@ -1213,6 +1211,273 @@
         }
       }
     },
+    "residents": {
+      "title": "المقيمون",
+      "subtitle": "إدارة جميع المقيمين وتعيينات غرفهم",
+      "addButton": "إضافة مقيم",
+      "filters": {
+        "search": "البحث بالاسم أو الهاتف أو البريد أو الهوية...",
+        "status": "الحالة",
+        "building": "المبنى",
+        "nationality": "الجنسية",
+        "allStatuses": "كل الحالات",
+        "allBuildings": "كل المباني",
+        "allNationalities": "كل الجنسيات",
+        "advancedFilters": "المرشحات",
+        "clearFilters": "مسح المرشحات"
+      },
+      "status": {
+        "active": "نشط",
+        "checked_out": "خرج",
+        "suspended": "موقوف"
+      },
+      "view": {
+        "grid": "شبكة",
+        "table": "جدول"
+      },
+      "table": {
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "nationality": "الجنسية",
+        "building": "المبنى",
+        "room": "الغرفة",
+        "checkIn": "تاريخ الدخول",
+        "status": "الحالة",
+        "updatedAt": "آخر تحديث"
+      },
+      "card": {
+        "noPhoto": "لا توجد صورة",
+        "nationalityUnknown": "—",
+        "notAssigned": "غير مُعيَّن",
+        "roomLabel": "غرفة {number}",
+        "floorLabel": "الدور {floor}"
+      },
+      "detail": {
+        "backToList": "العودة إلى المقيمين",
+        "profile": "الملف الشخصي",
+        "contactInfo": "معلومات التواصل",
+        "emergencyContact": "جهة اتصال الطوارئ",
+        "identity": "الهوية",
+        "documents": "المستندات",
+        "notes": "ملاحظات",
+        "currentAssignment": "التعيين الحالي",
+        "assignmentHistory": "سجل التعيينات",
+        "maintenanceHistory": "سجل الصيانة",
+        "noAssignment": "لا يوجد تعيين نشط",
+        "noAssignmentHistory": "لا يوجد سجل تعيينات",
+        "noMaintenance": "لا توجد طلبات صيانة",
+        "noDocuments": "لم يتم رفع مستندات",
+        "noNotes": "لا توجد ملاحظات",
+        "nationalIdLabel": "رقم الهوية / الإقامة",
+        "universityWorkplaceLabel": "الجامعة / جهة العمل",
+        "phoneLabel": "الهاتف",
+        "emailLabel": "البريد الإلكتروني",
+        "nationalityLabel": "الجنسية",
+        "emergencyNameLabel": "الاسم",
+        "emergencyPhoneLabel": "الهاتف",
+        "checkInLabel": "تاريخ الدخول",
+        "checkOutLabel": "تاريخ الخروج",
+        "buildingLabel": "المبنى",
+        "roomLabel": "الغرفة",
+        "statusLabel": "الحالة",
+        "notProvided": "غير متوفر",
+        "callPhone": "اتصال",
+        "whatsappContact": "واتساب",
+        "sendEmail": "بريد إلكتروني",
+        "editButton": "تعديل",
+        "archiveButton": "أرشفة",
+        "archiveConfirm": {
+          "title": "أرشفة هذا المقيم؟",
+          "description": "سيتم تعليم {name} كخارج وإخفاؤه من قائمة المقيمين النشطين. يمكنك استعادته لاحقاً بتعديل حالته.",
+          "confirm": "أرشفة",
+          "cancel": "إلغاء"
+        },
+        "moveInButton": "تسكين",
+        "checkOutButton": "تسجيل خروج",
+        "checkOutCurrentLabel": "إنهاء هذا التعيين"
+      },
+      "empty": {
+        "title": "لا يوجد مقيمون حتى الآن",
+        "description": "سيظهر المقيمون هنا عند إضافتهم أو تحويل حجوزاتهم المكتملة.",
+        "filteredTitle": "لا يوجد مقيمون مطابقون للمرشحات",
+        "filteredDescription": "حاول تعديل المرشحات أو مسحها."
+      },
+      "toast": {
+        "genericError": "حدث خطأ. الرجاء المحاولة مرة أخرى.",
+        "notFound": "المقيم غير موجود"
+      },
+      "pagination": {
+        "summary": "{count, plural, zero {# مقيم} one {# مقيم} two {# مقيمَين} few {# مقيمين} many {# مقيمًا} other {# مقيم}}"
+      },
+      "form": {
+        "title": {
+          "create": "إضافة مقيم",
+          "edit": "تعديل المقيم"
+        },
+        "sections": {
+          "personal": "المعلومات الشخصية",
+          "emergency": "جهة اتصال الطوارئ",
+          "statusNotes": "الحالة والملاحظات"
+        },
+        "fields": {
+          "full_name": "الاسم الكامل",
+          "phone": "الهاتف",
+          "email": "البريد الإلكتروني",
+          "national_id_or_iqama": "رقم الهوية / الإقامة",
+          "nationality": "الجنسية",
+          "date_of_birth": "تاريخ الميلاد",
+          "university_or_workplace": "الجامعة / جهة العمل",
+          "emergency_contact_name": "اسم جهة اتصال الطوارئ",
+          "emergency_contact_phone": "هاتف جهة اتصال الطوارئ",
+          "profile_image": "رابط الصورة الشخصية",
+          "status": "الحالة",
+          "notes": "ملاحظات"
+        },
+        "placeholders": {
+          "phone": "+9665XXXXXXXX",
+          "email": "name@example.com",
+          "national_id_or_iqama": "1XXXXXXXXX",
+          "profile_image": "https://...",
+          "notes": "ملاحظات داخلية عن هذا المقيم...",
+          "datePlaceholder": "يوم/شهر/سنة"
+        },
+        "validation": {
+          "nameRequired": "الاسم الكامل مطلوب",
+          "phoneInvalid": "رقم الهاتف غير صالح (6 أرقام أو أكثر)",
+          "emailInvalid": "البريد الإلكتروني غير صالح",
+          "dobInvalid": "تاريخ الميلاد غير صالح",
+          "urlInvalid": "الرابط يجب أن يبدأ بـ http:// أو https://",
+          "statusInvalid": "الحالة غير صالحة"
+        },
+        "actions": {
+          "save": "حفظ",
+          "saving": "جاري الحفظ...",
+          "cancel": "إلغاء"
+        },
+        "toast": {
+          "createSuccess": "تم إضافة المقيم",
+          "updateSuccess": "تم حفظ التغييرات",
+          "deleteSuccess": "تم أرشفة المقيم",
+          "requiredFields": "الرجاء تعبئة الحقول المطلوبة",
+          "noChanges": "لا توجد تغييرات للحفظ",
+          "deleteConflict": "هذا المقيم لديه تعيين نشط. الرجاء تسجيل خروجه أولاً."
+        }
+      },
+      "moveIn": {
+        "title": "تسكين مقيم",
+        "subtitle": "تعيين {name} إلى غرفة",
+        "steps": {
+          "building": "المبنى",
+          "room": "الغرفة",
+          "dates": "التواريخ",
+          "confirm": "التأكيد"
+        },
+        "fields": {
+          "building": "المبنى",
+          "room": "الغرفة",
+          "checkIn": "تاريخ الدخول",
+          "checkOut": "تاريخ الخروج (اختياري)"
+        },
+        "placeholders": {
+          "checkIn": "يوم/شهر/سنة",
+          "checkOut": "يوم/شهر/سنة",
+          "datePlaceholder": "يوم/شهر/سنة"
+        },
+        "validation": {
+          "buildingRequired": "الرجاء اختيار مبنى",
+          "roomRequired": "الرجاء اختيار غرفة متاحة",
+          "checkInRequired": "تاريخ الدخول مطلوب",
+          "checkOutAfterCheckIn": "تاريخ الخروج يجب أن يكون بعد تاريخ الدخول"
+        },
+        "actions": {
+          "next": "التالي",
+          "back": "السابق",
+          "confirm": "تأكيد التسكين",
+          "confirming": "جاري التسكين...",
+          "cancel": "إلغاء"
+        },
+        "toast": {
+          "success": "تم تسكين المقيم",
+          "error": "تعذر إكمال التسكين. الرجاء المحاولة مرة أخرى.",
+          "roomFull": "هذه الغرفة ممتلئة",
+          "residentAlreadyAssigned": "هذا المقيم لديه تعيين نشط بالفعل",
+          "roomUnavailable": "هذه الغرفة تحت الصيانة أو محجوزة ولا يمكن تسكين مقيمين فيها",
+          "residentNotActive": "هذا المقيم غير نشط ولا يمكن تسكينه"
+        },
+        "empty": {
+          "noBuildings": "لا توجد مبانٍ متاحة",
+          "noRooms": "لا توجد غرف في هذا المبنى"
+        },
+        "roomCard": {
+          "available": "متاحة",
+          "full": "ممتلئة",
+          "maintenance": "صيانة",
+          "reserved": "محجوزة",
+          "bedsLabel": "{occupied}/{capacity} سرير",
+          "floorLabel": "الدور {floor}"
+        }
+      },
+      "fromBooking": {
+        "loading": "جاري تحميل الحجز...",
+        "bannerTitle": "تحويل من طلب حجز",
+        "bannerDescription": "تم تعبئة بعض الحقول من طلب الحجز المقدم من {name}. الرجاء مراجعتها وإكمال المعلومات الناقصة."
+      },
+      "documents": {
+        "uploadLabel": "رفع عقد",
+        "uploadingLabel": "جاري الرفع...",
+        "openLabel": "فتح",
+        "deleteLabel": "حذف",
+        "dropHint": "اسحب الملفات هنا أو انقر لاختيارها",
+        "constraintsHint": "PDF أو JPG أو PNG · الحد الأقصى 10 ميجابايت",
+        "privacyHint": "المستندات خاصة. روابط التحميل تنتهي خلال 5 دقائق.",
+        "deleteConfirm": {
+          "title": "حذف هذا المستند؟",
+          "description": "سيتم حذف الملف نهائياً من التخزين. لا يمكن التراجع عن هذا الإجراء.",
+          "confirm": "حذف",
+          "cancel": "إلغاء"
+        },
+        "toast": {
+          "uploadSuccess": "تم رفع المستند",
+          "uploadError": "تعذر رفع المستند",
+          "invalidFileType": "يُسمح فقط بملفات PDF أو JPG أو PNG",
+          "fileTooLarge": "الملف كبير جداً (الحد الأقصى 10 ميجابايت)",
+          "tooManyDocuments": "بلغ هذا المقيم الحد الأقصى لعدد المستندات",
+          "openError": "تعذر فتح المستند",
+          "deleteSuccess": "تم حذف المستند",
+          "deleteError": "تعذر حذف المستند"
+        }
+      },
+      "checkOut": {
+        "title": "تسجيل خروج المقيم",
+        "subtitleWithRoom": "إنهاء تعيين {name}",
+        "fields": {
+          "checkOutDate": "تاريخ الخروج",
+          "reason": "السبب (اختياري)"
+        },
+        "placeholders": {
+          "reason": "لماذا يقوم هذا المقيم بتسجيل الخروج؟ ملاحظة داخلية اختيارية.",
+          "datePlaceholder": "يوم/شهر/سنة"
+        },
+        "info": {
+          "checkInLabel": "تاريخ الدخول",
+          "locationLabel": "الموقع"
+        },
+        "validation": {
+          "dateRequired": "تاريخ الخروج مطلوب",
+          "dateAfterCheckIn": "تاريخ الخروج يجب أن يكون في تاريخ الدخول أو بعده"
+        },
+        "actions": {
+          "confirm": "تأكيد تسجيل الخروج",
+          "confirming": "جاري تسجيل الخروج...",
+          "cancel": "إلغاء"
+        },
+        "toast": {
+          "success": "تم تسجيل خروج المقيم",
+          "error": "تعذر إكمال تسجيل الخروج. الرجاء المحاولة مرة أخرى."
+        },
+        "charCounter": "{count, number} / 1000 حرف"
+      }
+    },
     "occupancy": {
       "title": "خريطة الشواغر",
       "subtitle": "نظرة شاملة على شواغر الأسرّة في كل المباني.",
@@ -1451,10 +1716,15 @@
           "delete": "حذف الغرف"
         },
         "residents": {
-          "list": "عرض السكان",
-          "create": "إنشاء سجلات سكان",
-          "update": "تعديل بيانات السكان",
-          "delete": "حذف سجلات السكان"
+          "list": "عرض المقيمين",
+          "create": "إنشاء سجلات مقيمين",
+          "update": "تعديل بيانات المقيمين",
+          "archive": "أرشفة مقيم (حذف ناعم عبر الحالة checked_out)",
+          "moveIn": "تسكين مقيم في غرفة",
+          "checkOut": "تسجيل خروج المقيم من غرفته",
+          "documentsUpload": "رفع عقود / مستندات",
+          "documentsDownload": "تحميل العقود عبر روابط موقّعة",
+          "documentsDelete": "حذف المستندات المرفوعة"
         },
         "users": {
           "list": "عرض قائمة الموظفين",

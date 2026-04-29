@@ -9,6 +9,7 @@ import {
   Phone,
   MessageCircle,
   User,
+  UserPlus,
   MapPin,
   Clock,
   Send,
@@ -25,6 +26,7 @@ import {
   Megaphone,
   AlertTriangle,
 } from 'lucide-react';
+import Link from 'next/link';
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BookingPipelineStepper, { getDepartmentForStatus, getRoleForHandoff } from './BookingPipelineStepper';
@@ -68,6 +70,7 @@ interface BookingRequest {
     room_type?: string;
     bathroom_type?: string;
     building_id?: string;
+    resident_id?: string;
   } | null;
 }
 
@@ -749,6 +752,28 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                   <RotateCcw size={14} />
                   {t('pipeline.actions.reopen')}
                 </button>
+              )}
+
+              {/* Convert to resident (only when completed and not yet linked) */}
+              {booking.status === 'completed' && !booking.metadata?.resident_id && (
+                <Link
+                  href={`/${locale}/admin/residents/new?from_booking=${booking.id}`}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-coral text-white text-sm font-semibold rounded-lg hover:bg-coral/90 transition-colors shadow-sm"
+                >
+                  <UserPlus size={16} />
+                  {t('pipeline.actions.convertToResident')}
+                </Link>
+              )}
+
+              {/* View resident link (already linked) */}
+              {booking.status === 'completed' && booking.metadata?.resident_id && (
+                <Link
+                  href={`/${locale}/admin/residents/${booking.metadata.resident_id}`}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
+                >
+                  <User size={14} />
+                  {t('pipeline.actions.viewResident')}
+                </Link>
               )}
             </div>
           </div>

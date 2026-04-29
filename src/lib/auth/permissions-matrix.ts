@@ -156,6 +156,7 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
         source: [
           'supabase/migrations/002_rls.sql:262-264',
           'supabase/migrations/012_role_expansion_rls.sql:181-188',
+          'supabase/migrations/025_maintenance_manager_full_update.sql:39-45',
           'src/app/api/maintenance-requests/[id]/route.ts:47-53',
         ],
       },
@@ -397,53 +398,152 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
     rows: [
       {
         key: 'residents.list',
+        // GET list and detail both gate on `branch_manager` + `supervision_staff`
+        // (admin-tier passes automatically via authenticateApiRequest).
+        // residents_manager_select (last set in 027) covers both roles with
+        // the same building-scope JOIN.
         scopeNoteKey: 'assignedResidents',
         access: {
           ...ADMIN_TIER,
           branch_manager: 'scoped',
-          maintenance_manager: 'scoped',
-          transportation_manager: 'scoped',
-          finance_manager: 'scoped',
-          maintenance_staff: 'scoped',
-          transportation_staff: 'scoped',
           supervision_staff: 'scoped',
-          finance_staff: 'scoped',
         },
-        source: ['supabase/migrations/002_rls.sql:144-152'],
+        source: [
+          'supabase/migrations/027_residents_supervision_staff_and_capacity.sql:41-51',
+          'src/app/api/admin/residents/route.ts:53-65',
+          'src/app/api/admin/residents/[id]/route.ts:48-65',
+        ],
       },
       {
         key: 'residents.create',
-        noteKey: 'noApiYet',
+        // POST accepts `from_booking_id` to link a converted booking to the
+        // newly-created resident (Slice 5e of Phase 5).
         access: {
           ...ADMIN_TIER,
           branch_manager: 'full',
           supervision_staff: 'full',
         },
-        source: ['supabase/migrations/002_rls.sql:154-158'],
+        source: [
+          'supabase/migrations/002_rls.sql:154-158',
+          'src/app/api/admin/residents/route.ts:256-265',
+        ],
       },
       {
         key: 'residents.update',
+        // PATCH allows partial updates of every editable resident field. The
+        // API gate is admin-tier + branch_manager + supervision_staff.
+        // residents_manager_update (last set in 027) covers both roles via
+        // building-scope JOIN.
         scopeNoteKey: 'assignedResidents',
-        noteKey: 'noApiYet',
         access: {
           ...ADMIN_TIER,
           branch_manager: 'scoped',
-          maintenance_manager: 'scoped',
-          transportation_manager: 'scoped',
-          finance_manager: 'scoped',
-          maintenance_staff: 'scoped',
-          transportation_staff: 'scoped',
           supervision_staff: 'scoped',
-          finance_staff: 'scoped',
         },
-        source: ['supabase/migrations/002_rls.sql:160-168'],
+        source: [
+          'supabase/migrations/027_residents_supervision_staff_and_capacity.sql:54-64',
+          'src/app/api/admin/residents/[id]/route.ts:247-260',
+        ],
       },
       {
-        key: 'residents.delete',
-        access: { ...ADMIN_TIER },
+        key: 'residents.archive',
+        // Soft-delete via DELETE handler — sets resident.status='checked_out'
+        // (no hard delete because room_assignments has ON DELETE RESTRICT
+        // on resident_id). Returns 409 if any active assignment exists; the
+        // user must check the resident out first. Same residents_manager_update
+        // policy gates the underlying UPDATE.
+        scopeNoteKey: 'assignedResidents',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          supervision_staff: 'scoped',
+        },
         source: [
-          'supabase/migrations/002_rls.sql:139-142',
-          'supabase/migrations/012_role_expansion_rls.sql:56-61',
+          'supabase/migrations/027_residents_supervision_staff_and_capacity.sql:54-64',
+          'src/app/api/admin/residents/[id]/route.ts:483-500',
+        ],
+      },
+      {
+        key: 'residents.moveIn',
+        // POST .../residents/[id]/assignments. Inserts an active
+        // room_assignment and flips room.status to 'occupied' if the new
+        // assignment fills the room (private: any active; shared: active
+        // ≥ capacity). Scoped to the destination room's building.
+        // assignments_manager_insert (last set in 027) covers both roles.
+        // Migration 027 also adds DB-level over-assignment guards
+        // (uniq_active_assignment_per_resident + enforce_room_capacity trigger).
+        scopeNoteKey: 'assignedResidents',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          supervision_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/027_residents_supervision_staff_and_capacity.sql:80-85',
+          'src/app/api/admin/residents/[id]/assignments/route.ts:40-55',
+        ],
+      },
+      {
+        key: 'residents.checkOut',
+        // PATCH .../assignments/[id]/check-out. Ends an active assignment,
+        // sets check_out_date, and recomputes room.status (preserving any
+        // admin-overridden 'maintenance' or 'reserved' state).
+        // assignments_manager_update (last set in 027) covers both roles.
+        scopeNoteKey: 'assignedResidents',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          supervision_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/027_residents_supervision_staff_and_capacity.sql:88-93',
+          'src/app/api/admin/assignments/[id]/check-out/route.ts:44-60',
+        ],
+      },
+      {
+        key: 'residents.documentsUpload',
+        // Private contracts bucket (migration 026). Storage RLS scopes
+        // INSERT to staff who share a building with the resident's
+        // room_assignments via can_access_resident_contracts(uuid).
+        scopeNoteKey: 'assignedResidents',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          supervision_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/026_contracts_bucket.sql',
+          'src/app/api/uploads/contract/route.ts:39-55',
+        ],
+      },
+      {
+        key: 'residents.documentsDownload',
+        // Generates a 5-minute signed URL via supabase.storage.createSignedUrl.
+        // Same RLS scope as upload.
+        scopeNoteKey: 'assignedResidents',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          supervision_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/026_contracts_bucket.sql',
+          'src/app/api/admin/residents/[id]/documents/sign/route.ts:14-30',
+        ],
+      },
+      {
+        key: 'residents.documentsDelete',
+        // Removes the storage object and strips the path from
+        // residents.documents. Same RLS scope as upload.
+        scopeNoteKey: 'assignedResidents',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          supervision_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/026_contracts_bucket.sql',
+          'src/app/api/admin/residents/[id]/documents/route.ts:13-30',
         ],
       },
     ],

@@ -225,10 +225,6 @@
       "cleaning_service": {
         "question": "Is room cleaning service available?",
         "answer": "Yes, optional cleaning service is available: 15 SAR/hour for rooms, and 10 SAR/hour for residential units."
-      },
-      "ejar": {
-        "question": "Is the contract registered on the Ejar network?",
-        "answer": "Yes, the contract is registered on the Ejar electronic network at a fee of 2.5% of the contract value."
       }
     },
     "downloadTerms": "Download Full Terms & Conditions",
@@ -592,7 +588,9 @@
           "markComplete": "Mark Complete",
           "reject": "Reject",
           "cancel": "Cancel",
-          "reopen": "Reopen"
+          "reopen": "Reopen",
+          "convertToResident": "Convert to resident",
+          "viewResident": "View resident"
         },
         "assignAndProceed": "Assign & Proceed",
         "selectStaffForDept": "Select {department} staff"
@@ -1213,6 +1211,273 @@
         }
       }
     },
+    "residents": {
+      "title": "Residents",
+      "subtitle": "Manage all residents and their room assignments",
+      "addButton": "Add resident",
+      "filters": {
+        "search": "Search by name, phone, email, ID...",
+        "status": "Status",
+        "building": "Building",
+        "nationality": "Nationality",
+        "allStatuses": "All statuses",
+        "allBuildings": "All buildings",
+        "allNationalities": "All nationalities",
+        "advancedFilters": "Filters",
+        "clearFilters": "Clear filters"
+      },
+      "status": {
+        "active": "Active",
+        "checked_out": "Checked out",
+        "suspended": "Suspended"
+      },
+      "view": {
+        "grid": "Grid",
+        "table": "Table"
+      },
+      "table": {
+        "name": "Name",
+        "phone": "Phone",
+        "nationality": "Nationality",
+        "building": "Building",
+        "room": "Room",
+        "checkIn": "Check-in",
+        "status": "Status",
+        "updatedAt": "Updated"
+      },
+      "card": {
+        "noPhoto": "No photo",
+        "nationalityUnknown": "—",
+        "notAssigned": "Not assigned",
+        "roomLabel": "Room {number}",
+        "floorLabel": "Floor {floor}"
+      },
+      "detail": {
+        "backToList": "Back to residents",
+        "profile": "Profile",
+        "contactInfo": "Contact information",
+        "emergencyContact": "Emergency contact",
+        "identity": "Identity",
+        "documents": "Documents",
+        "notes": "Notes",
+        "currentAssignment": "Current assignment",
+        "assignmentHistory": "Assignment history",
+        "maintenanceHistory": "Maintenance history",
+        "noAssignment": "No active assignment",
+        "noAssignmentHistory": "No assignment history yet",
+        "noMaintenance": "No maintenance requests yet",
+        "noDocuments": "No documents uploaded yet",
+        "noNotes": "No notes",
+        "nationalIdLabel": "National ID / Iqama",
+        "universityWorkplaceLabel": "University / Workplace",
+        "phoneLabel": "Phone",
+        "emailLabel": "Email",
+        "nationalityLabel": "Nationality",
+        "emergencyNameLabel": "Name",
+        "emergencyPhoneLabel": "Phone",
+        "checkInLabel": "Check-in",
+        "checkOutLabel": "Check-out",
+        "buildingLabel": "Building",
+        "roomLabel": "Room",
+        "statusLabel": "Status",
+        "notProvided": "Not provided",
+        "callPhone": "Call",
+        "whatsappContact": "WhatsApp",
+        "sendEmail": "Email",
+        "editButton": "Edit",
+        "archiveButton": "Archive",
+        "archiveConfirm": {
+          "title": "Archive this resident?",
+          "description": "{name} will be marked as checked out and hidden from the active residents list. You can restore them later by editing their status.",
+          "confirm": "Archive",
+          "cancel": "Cancel"
+        },
+        "moveInButton": "Move in",
+        "checkOutButton": "Check out",
+        "checkOutCurrentLabel": "End this assignment"
+      },
+      "empty": {
+        "title": "No residents yet",
+        "description": "Residents will appear here as they're added or moved in from completed bookings.",
+        "filteredTitle": "No residents match your filters",
+        "filteredDescription": "Try adjusting the filters or clearing them."
+      },
+      "toast": {
+        "genericError": "Something went wrong. Please try again.",
+        "notFound": "Resident not found"
+      },
+      "pagination": {
+        "summary": "{count, plural, one {# resident} other {# residents}}"
+      },
+      "form": {
+        "title": {
+          "create": "Add resident",
+          "edit": "Edit resident"
+        },
+        "sections": {
+          "personal": "Personal information",
+          "emergency": "Emergency contact",
+          "statusNotes": "Status & notes"
+        },
+        "fields": {
+          "full_name": "Full name",
+          "phone": "Phone",
+          "email": "Email",
+          "national_id_or_iqama": "National ID / Iqama",
+          "nationality": "Nationality",
+          "date_of_birth": "Date of birth",
+          "university_or_workplace": "University / Workplace",
+          "emergency_contact_name": "Emergency contact name",
+          "emergency_contact_phone": "Emergency contact phone",
+          "profile_image": "Profile image URL",
+          "status": "Status",
+          "notes": "Notes"
+        },
+        "placeholders": {
+          "phone": "+9665XXXXXXXX",
+          "email": "name@example.com",
+          "national_id_or_iqama": "1XXXXXXXXX",
+          "profile_image": "https://...",
+          "notes": "Internal notes about this resident...",
+          "datePlaceholder": "DD/MM/YYYY"
+        },
+        "validation": {
+          "nameRequired": "Full name is required",
+          "phoneInvalid": "Phone must be a valid number (6+ digits)",
+          "emailInvalid": "Email is not valid",
+          "dobInvalid": "Date of birth must be a valid date",
+          "urlInvalid": "Must be a valid URL starting with http:// or https://",
+          "statusInvalid": "Status is not valid"
+        },
+        "actions": {
+          "save": "Save",
+          "saving": "Saving...",
+          "cancel": "Cancel"
+        },
+        "toast": {
+          "createSuccess": "Resident created",
+          "updateSuccess": "Changes saved",
+          "deleteSuccess": "Resident archived",
+          "requiredFields": "Please fill in the required fields",
+          "noChanges": "No changes to save",
+          "deleteConflict": "This resident has an active assignment. Check them out first."
+        }
+      },
+      "moveIn": {
+        "title": "Move in",
+        "subtitle": "Assign {name} to a room",
+        "steps": {
+          "building": "Building",
+          "room": "Room",
+          "dates": "Dates",
+          "confirm": "Confirm"
+        },
+        "fields": {
+          "building": "Building",
+          "room": "Room",
+          "checkIn": "Check-in date",
+          "checkOut": "Check-out date (optional)"
+        },
+        "placeholders": {
+          "checkIn": "DD/MM/YYYY",
+          "checkOut": "DD/MM/YYYY",
+          "datePlaceholder": "DD/MM/YYYY"
+        },
+        "validation": {
+          "buildingRequired": "Pick a building",
+          "roomRequired": "Pick an available room",
+          "checkInRequired": "Check-in date is required",
+          "checkOutAfterCheckIn": "Check-out date must be after check-in"
+        },
+        "actions": {
+          "next": "Next",
+          "back": "Back",
+          "confirm": "Confirm move-in",
+          "confirming": "Moving in...",
+          "cancel": "Cancel"
+        },
+        "toast": {
+          "success": "Resident moved in",
+          "error": "Could not complete move-in. Please try again.",
+          "roomFull": "This room is full",
+          "residentAlreadyAssigned": "This resident already has an active assignment",
+          "roomUnavailable": "This room is in maintenance or reserved and cannot accept new residents",
+          "residentNotActive": "This resident is not active and cannot be moved in"
+        },
+        "empty": {
+          "noBuildings": "No buildings available",
+          "noRooms": "No rooms in this building"
+        },
+        "roomCard": {
+          "available": "Available",
+          "full": "Full",
+          "maintenance": "Maintenance",
+          "reserved": "Reserved",
+          "bedsLabel": "{occupied}/{capacity} beds",
+          "floorLabel": "Floor {floor}"
+        }
+      },
+      "fromBooking": {
+        "loading": "Loading booking...",
+        "bannerTitle": "Converting from booking",
+        "bannerDescription": "Some fields are pre-filled from the booking submitted by {name}. Review and complete any missing information."
+      },
+      "documents": {
+        "uploadLabel": "Upload contract",
+        "uploadingLabel": "Uploading...",
+        "openLabel": "Open",
+        "deleteLabel": "Delete",
+        "dropHint": "Drop files here or click to browse",
+        "constraintsHint": "PDF, JPG, or PNG · max 10 MB",
+        "privacyHint": "Documents are private. Download links expire after 5 minutes.",
+        "deleteConfirm": {
+          "title": "Delete this document?",
+          "description": "This permanently removes the file from storage. This cannot be undone.",
+          "confirm": "Delete",
+          "cancel": "Cancel"
+        },
+        "toast": {
+          "uploadSuccess": "Document uploaded",
+          "uploadError": "Could not upload document",
+          "invalidFileType": "Only PDF, JPG, or PNG files are allowed",
+          "fileTooLarge": "File is too large (max 10 MB)",
+          "tooManyDocuments": "This resident has reached the document limit",
+          "openError": "Could not open document",
+          "deleteSuccess": "Document deleted",
+          "deleteError": "Could not delete document"
+        }
+      },
+      "checkOut": {
+        "title": "Check out resident",
+        "subtitleWithRoom": "End the assignment for {name}",
+        "fields": {
+          "checkOutDate": "Check-out date",
+          "reason": "Reason (optional)"
+        },
+        "placeholders": {
+          "reason": "Why is this resident checking out? Optional internal note.",
+          "datePlaceholder": "DD/MM/YYYY"
+        },
+        "info": {
+          "checkInLabel": "Check-in",
+          "locationLabel": "Location"
+        },
+        "validation": {
+          "dateRequired": "Check-out date is required",
+          "dateAfterCheckIn": "Check-out date must be on or after the check-in date"
+        },
+        "actions": {
+          "confirm": "Confirm check-out",
+          "confirming": "Checking out...",
+          "cancel": "Cancel"
+        },
+        "toast": {
+          "success": "Resident checked out",
+          "error": "Could not complete check-out. Please try again."
+        },
+        "charCounter": "{count, number} / 1000 characters"
+      }
+    },
     "occupancy": {
       "title": "Vacancy Map",
       "subtitle": "Portfolio-wide bed-level vacancy at a glance, by building.",
@@ -1454,7 +1719,12 @@
           "list": "View residents",
           "create": "Create resident records",
           "update": "Edit resident details",
-          "delete": "Delete resident records"
+          "archive": "Archive a resident (soft delete via status=checked_out)",
+          "moveIn": "Move a resident into a room",
+          "checkOut": "Check a resident out of their room",
+          "documentsUpload": "Upload contracts / documents",
+          "documentsDownload": "Download contracts via signed URLs",
+          "documentsDelete": "Delete uploaded documents"
         },
         "users": {
           "list": "View staff list",
