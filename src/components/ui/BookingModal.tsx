@@ -386,14 +386,13 @@ export default function BookingModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60"
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
       <div
         className={cn(
           'relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl',
-          'max-h-[90dvh] sm:max-h-[85vh] flex flex-col',
-          'transition-transform duration-300'
+          'max-h-[90dvh] sm:max-h-[85vh] flex flex-col'
         )}
       >
         {/* Header */}
@@ -471,7 +470,7 @@ export default function BookingModal({
                   key={city.name}
                   onClick={() => handleCitySelect(city.name)}
                   className={cn(
-                    'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
+                    'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-colors',
                     selectedCity === city.name.toLowerCase()
                       ? 'border-coral bg-coral/5'
                       : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
@@ -503,7 +502,7 @@ export default function BookingModal({
                   key={loc.id}
                   onClick={() => handleBuildingSelect(loc.id)}
                   className={cn(
-                    'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
+                    'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-colors',
                     selectedLocationId === loc.id
                       ? 'border-coral bg-coral/5'
                       : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
@@ -543,7 +542,7 @@ export default function BookingModal({
                     key={`${room.type}-${room.bathroomType}`}
                     onClick={() => handleRoomSelect(room.type, room.bathroomType, price)}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all',
+                      'w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-colors',
                       isSelected
                         ? 'border-coral bg-coral/5'
                         : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
@@ -752,7 +751,7 @@ export default function BookingModal({
                           type="button"
                           onClick={() => field.onChange(true)}
                           className={cn(
-                            'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                            'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors',
                             watchTransportation === true
                               ? 'border-coral bg-coral/5'
                               : 'border-gray-200 hover:border-coral/50'
@@ -770,7 +769,7 @@ export default function BookingModal({
                           type="button"
                           onClick={() => field.onChange(false)}
                           className={cn(
-                            'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                            'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors',
                             watchTransportation === false
                               ? 'border-coral bg-coral/5'
                               : 'border-gray-200 hover:border-coral/50'

@@ -14,9 +14,22 @@ import LanguageSwitcher from './LanguageSwitcher';
 // Lazy-loaded on first open. Pulls react-hook-form + zod + form-resolver
 // (~70 KB gz) out of the per-page bundle so the marketing pages don't pay
 // for a wizard the user may never trigger.
+//
+// `loading` renders a lightweight overlay the moment the user taps "Book
+// Now" so mobile users don't perceive a frozen page while the chunk is
+// still arriving over slow networks. The Header also preloads the chunk
+// during browser idle (see effect below) so the loading state usually
+// flashes for one frame at most.
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'), {
   ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-10 h-10 rounded-full border-[3px] border-white/30 border-t-white animate-spin" />
+    </div>
+  ),
 });
+
+type Preloadable = { preload?: () => void };
 
 type NavItem = {
   href: string;
@@ -56,6 +69,30 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Preload the BookingModal chunk during browser idle so the marketing
+  // page's primary CTA feels instant on mobile. Without this, the first
+  // tap on "Book Now" on a cold cache spends 500ms–1.5s downloading and
+  // parsing the wizard JS — clients reported this as a freeze/lag.
+  useEffect(() => {
+    const w = window as Window &
+      typeof globalThis & {
+        requestIdleCallback?: (cb: () => void) => number;
+        cancelIdleCallback?: (id: number) => void;
+      };
+    const preload = () => (BookingModal as unknown as Preloadable).preload?.();
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(preload);
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(preload, 1500);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  const handleOpenBooking = () => {
+    (BookingModal as unknown as Preloadable).preload?.();
+    setIsBookingOpen(true);
+  };
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -144,7 +181,7 @@ export default function Header() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => setIsBookingOpen(true)}
+              onClick={handleOpenBooking}
             >
               {t('bookNow')}
             </Button>
@@ -201,7 +238,7 @@ export default function Header() {
               className="mt-2"
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                setIsBookingOpen(true);
+                handleOpenBooking();
               }}
             >
               {t('bookNow')}

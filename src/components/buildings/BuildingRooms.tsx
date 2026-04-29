@@ -10,9 +10,15 @@ import type { PublicBuilding } from '@/lib/buildings/public';
 import { formatPrice, cn } from '@/lib/utils';
 
 // Lazy-load the booking wizard — keeps zod + react-hook-form out of the
-// per-detail-page bundle until a room is actually selected.
+// per-detail-page bundle until a room is actually selected. The `loading`
+// overlay gives mobile users immediate feedback while the chunk arrives.
 const BookingModal = dynamic(() => import('@/components/ui/BookingModal'), {
   ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-10 h-10 rounded-full border-[3px] border-white/30 border-t-white animate-spin" />
+    </div>
+  ),
 });
 
 type RoomType = 'all' | 'single' | 'double' | 'triple' | 'suite';
