@@ -284,7 +284,7 @@ export default function BuildingForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+          className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors w-fit"
         >
           <BackIcon size={16} />
           {t('cancel')}
@@ -295,7 +295,7 @@ export default function BuildingForm({
               type="button"
               onClick={() => router.back()}
               disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
             >
               {t('cancel')}
             </button>
@@ -312,30 +312,30 @@ export default function BuildingForm({
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-navy">{heading}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{heading}</h1>
+        <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
           {mode === 'edit' ? t('editSubtitle') : t('createSubtitle')}
         </p>
       </div>
 
       {mode === 'edit' && buildingId && (
-        <div className="flex flex-col gap-2 rounded-xl border border-coral/20 bg-coral/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 rounded-xl border border-coral/20 bg-coral/5 dark:bg-coral/10 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-lg bg-coral/10 text-coral flex items-center justify-center flex-shrink-0">
               <DoorOpen size={18} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-navy">
+              <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                 {t('manageRoomsTitle')}
               </p>
-              <p className="text-xs text-gray-600 mt-0.5">
+              <p className="text-xs text-gray-600 dark:text-[var(--admin-text-muted)] mt-0.5">
                 {t('manageRoomsDescription')}
               </p>
             </div>
           </div>
           <Link
-            href={`/${locale}/admin/buildings/${buildingId}#rooms`}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-coral/30 text-coral text-sm font-medium rounded-lg hover:bg-coral/10 transition-colors whitespace-nowrap self-start sm:self-auto"
+            href={`/${locale}/admin/buildings/${buildingId}#layout`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-[var(--admin-surface)] border border-coral/30 text-coral text-sm font-medium rounded-lg hover:bg-coral/10 transition-colors whitespace-nowrap self-start sm:self-auto"
           >
             <DoorOpen size={14} />
             {t('manageRoomsCta')}
@@ -467,22 +467,22 @@ export default function BuildingForm({
         }
       >
         {values.landmarks.length === 0 ? (
-          <p className="text-sm text-gray-400 italic">{t('noLandmarks')}</p>
+          <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">{t('noLandmarks')}</p>
         ) : (
           <ul className="space-y-3">
             {values.landmarks.map((lm, i) => (
               <li
                 key={i}
-                className="border border-gray-200 rounded-xl p-4 space-y-3 bg-gray-50/50"
+                className="border border-gray-200 dark:border-[var(--admin-border)] rounded-xl p-4 space-y-3 bg-gray-50/50 dark:bg-[var(--admin-surface-2)]/50"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wide text-gray-500">
+                  <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('landmarkN', { n: i + 1 })}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeLandmark(i)}
-                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                    className="p-1 text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-red-600 dark:text-red-400 transition-colors"
                     aria-label={t('removeLandmark')}
                   >
                     <Trash2 size={14} />
@@ -515,7 +515,7 @@ export default function BuildingForm({
                   />
                 </div>
                 {errors[`landmark-${i}`] && (
-                  <p className="flex items-center gap-1 text-sm text-red-500">
+                  <p className="flex items-center gap-1 text-sm text-red-500 dark:text-red-400">
                     <AlertCircle size={12} />
                     {errors[`landmark-${i}`]}
                   </p>
@@ -534,7 +534,7 @@ export default function BuildingForm({
             type="button"
             onClick={() => router.back()}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
           >
             {t('cancel')}
           </button>
@@ -562,9 +562,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-navy">{title}</h2>
+        <h2 className="text-sm font-semibold text-navy dark:text-[var(--admin-text)]">{title}</h2>
         {action}
       </div>
       {children}
@@ -584,16 +584,16 @@ function ToggleField({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-200 p-3 hover:border-coral/50 transition-colors">
+    <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-200 dark:border-[var(--admin-border)] p-3 hover:border-coral/50 transition-colors">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-4 w-4 rounded border-gray-300 text-coral focus:ring-coral"
+        className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-[var(--admin-border)] text-coral focus:ring-coral"
       />
       <span className="flex-1">
-        <span className="block text-sm font-medium text-navy">{label}</span>
-        <span className="block text-xs text-gray-500 mt-0.5">{description}</span>
+        <span className="block text-sm font-medium text-navy dark:text-[var(--admin-text)]">{label}</span>
+        <span className="block text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{description}</span>
       </span>
     </label>
   );

@@ -16,8 +16,8 @@ export default function ContentPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-navy">{t('sidebar.content')}</h1>
-      <div className="bg-white rounded-xl border border-gray-200">
+      <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{t('sidebar.content')}</h1>
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={FileText}
           title={t('comingSoon.title')}

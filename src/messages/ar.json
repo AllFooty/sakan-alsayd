@@ -123,7 +123,11 @@
     "backToLocations": "العودة للفروع",
     "selectRoom": "احجزي هذه الغرفة",
     "viewBuildings": "اختاري الفرع لمعرفة الأسعار",
-    "pricesVary": "الأسعار تختلف حسب الفرع. اختاري الفرع لمعرفة الأسعار الدقيقة."
+    "pricesVary": "الأسعار تختلف حسب الفرع. اختاري الفرع لمعرفة الأسعار الدقيقة.",
+    "apartmentsSummary": "{apartments, plural, zero {لا شقق} one {شقة واحدة} two {شقتان} few {# شقق} many {# شقة} other {# شقة}} موزعة على {floors, plural, zero {لا طوابق} one {طابق واحد} two {طابقين} few {# طوابق} many {# طابقاً} other {# طابق}}",
+    "allApartmentsHaveKitchen": "جميع الشقق تحتوي على مطبخ",
+    "bedroomMix": "شقق بعدد غرف {counts}",
+    "roomCardApartmentContext": "متاحة في {count, plural, zero {لا شقق} one {شقة واحدة} two {شقتين} few {# شقق} many {# شقة} other {# شقة}}"
   },
   "transportation": {
     "sectionTitle": "خدمات المواصلات المتاحة",
@@ -387,8 +391,11 @@
       "room": "الغرفة",
       "price": "السعر",
       "insurance": "التأمين",
-      "transportation": "المواصلات"
+      "transportation": "المواصلات",
+      "apartmentContext": "{apartments, plural, zero {لا شقق} one {شقة واحدة} two {شقتان} few {# شقق} many {# شقة} other {# شقة}} · {floors, plural, zero {لا طوابق} one {طابق واحد} two {طابقين} few {# طوابق} many {# طابقاً} other {# طابق}}",
+      "sharedKitchen": "مطبخ مشترك"
     },
+    "roomCardApartmentContext": "متاحة في {count, plural, zero {لا شقق} one {شقة واحدة} two {شقتين} few {# شقق} many {# شقة} other {# شقة}}",
     "success": {
       "title": "تم إرسال طلب الحجز",
       "heading": "شكراً لك!",
@@ -423,7 +430,12 @@
         "extraDetails": "تفاصيل إضافية (اختياري)",
         "extraDetailsPlaceholder": "أضيفي أي تفاصيل إضافية تساعد فريق الصيانة",
         "roomNumber": "رقم الغرفة / رقم الشقة / المبنى",
-        "roomNumberPlaceholder": "مثل: غرفة 12، شقة 3، مبنى أ"
+        "roomNumberPlaceholder": "مثل: غرفة 12، شقة 3، مبنى أ",
+        "locationLabel": "أين موقع المشكلة؟",
+        "locationRoom": "في غرفة محددة",
+        "locationShared": "في منطقة مشتركة (المطبخ، الممر، التكييف)",
+        "apartmentNumberPlaceholder": "رقم الشقة (مثل A1)",
+        "apartmentNumberHelper": "اختياري — يساعدنا في معرفة الشقة. اتركيه فارغاً إذا لم تكوني متأكدة."
       },
       "info": {
         "title": "معلوماتك الشخصية",
@@ -473,7 +485,7 @@
       "dashboard": "لوحة المعلومات",
       "bookings": "طلبات الحجز",
       "maintenance": "الصيانة",
-      "buildings": "المباني والغرف",
+      "buildings": "المباني",
       "occupancy": "خريطة الشواغر",
       "residents": "الساكنات",
       "users": "المستخدمون",
@@ -488,6 +500,12 @@
       },
       "collapse": "طيّ القائمة الجانبية",
       "expand": "توسيع القائمة الجانبية"
+    },
+    "theme": {
+      "label": "المظهر",
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
     },
     "topbar": {
       "welcome": "مرحباً",
@@ -722,7 +740,9 @@
         "dateFrom": "من تاريخ",
         "dateTo": "إلى تاريخ",
         "advancedFilters": "تصفية",
-        "clearFilters": "مسح"
+        "clearFilters": "مسح",
+        "apartmentShared": "المناطق المشتركة فقط",
+        "apartmentSharedHelper": "اعرض فقط الطلبات المتعلقة بالمطابخ والممرات والمكيفات وغيرها من المناطق المشتركة بالشقة (بدون غرفة محددة)."
       },
       "status": {
         "submitted": "مقدَّم",
@@ -780,6 +800,9 @@
         "whatsapp": "واتساب",
         "buildingInfo": "معلومات المبنى",
         "roomNumber": "الغرفة / المنطقة",
+        "apartmentLabel": "الشقة",
+        "apartmentSharedBadge": "منطقة مشتركة (بدون غرفة محددة)",
+        "floorN": "الطابق {n}",
         "createdAt": "تاريخ الإنشاء",
         "updatedAt": "آخر تحديث",
         "completedAt": "تاريخ الإكمال",
@@ -900,6 +923,7 @@
         "noMap": "لا يوجد رابط للخريطة.",
         "residents": "المقيمون الحاليون",
         "activeAssignmentsHint": "المسجّلون في غرف حالياً",
+        "activeAssignmentsHidden": "صلاحيتك لا تتيح عرض بيانات الساكنين",
         "metadata": "التفاصيل",
         "bilingualNames": "التسميات بالعربية والإنجليزية",
         "bilingual": {
@@ -915,6 +939,8 @@
         "tabsLabel": "أقسام المبنى",
         "tabs": {
           "overview": "نظرة عامة",
+          "apartments": "الشقق",
+          "layout": "التخطيط",
           "rooms": "الغرف"
         },
         "stats": {
@@ -931,26 +957,58 @@
       },
       "floorMap": {
         "tabLabel": "خريطة الطوابق",
+        "viewVisual": "خريطة",
+        "viewList": "قائمة",
+        "expandAll": "فتح الكل",
+        "collapseAll": "طيّ الكل",
+        "addApartment": "إضافة شقة",
+        "addRoom": "إضافة غرفة",
+        "hint": "اضغط على طابق لطيّه أو فتحه — اضغط على شقة لرؤية تفاصيلها.",
         "summaryTotal": "إجمالي الأسرّة",
         "summaryOccupied": "مشغولة",
         "summaryVacant": "شاغرة",
         "summaryPercent": "نسبة الشواغر",
+        "summaryPercentTooltip": "تُحتسب الغرف الخاصة كمشغولة بالكامل في نسبة الشواغر، حتى لو لم تُملأ كل الأسرّة.",
+        "noOccupantAccessTitle": "تفاصيل الإشغال غير ظاهرة",
+        "noOccupantAccessDescription": "صلاحيتك تتيح عرض حالة الغرف فقط دون معرفة الساكنين فيها. لذلك تظهر حالة الغرفة فقط، وتُخفى الإجماليات وأسماء الساكنات.",
         "floorLabel": "الطابق {floor}",
         "floorUnassigned": "بدون طابق محدد",
-        "floorSummary": "{vacant} شواغر / {total} سرير",
+        "floorSummary": "{vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}",
+        "floorSummaryRoomsOnly": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
+        "apartmentSummary": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}} · {vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}",
+        "apartmentSummaryRoomsOnly": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
+        "apartmentSummaryWithResidents": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}} · {vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}} · {residents, plural, zero {لا يوجد سكان} one {ساكن واحد} two {ساكنان} few {# سكان} many {# ساكناً} other {# ساكن}}",
+        "apartmentUnknown": "بدون شقة محددة",
+        "apartmentInactive": "غير نشطة",
+        "apartmentDefaultShort": "تلقائي",
+        "apartmentDefaultTitle": "شقة افتراضية أُنشئت تلقائياً لهذا الطابق — أعد تسميتها لرقم شقة حقيقي (مثل A1، B2) لتنظيم الغرف حسب الشقة.",
+        "noRoomsInApartment": "لا توجد غرف في هذه الشقة بعد.",
         "roomLabel": "الغرفة {number}",
         "roomUnnumbered": "غرفة بدون رقم",
-        "cardCapacityPrivate": "{count, plural, zero {لا أسرّة (خاصة)} one {سرير واحد (خاصة)} two {سريران (خاصة)} few {# أسرّة (خاصة)} many {# سريراً (خاصة)} other {# سرير (خاصة)}}",
-        "cardCapacityShared": "{occupied} من {capacity} أسرّة مشغولة",
+        "cardCapacityOccupied": "{occupied} من {capacity} أسرّة مشغولة",
+        "cardCapacityOverbooked": "تعارض في البيانات: {residents} ساكنات في غرفة سعتها {capacity}",
         "cardCapacityUnavailable": "{count, plural, zero {لا أسرّة متوقفة} one {سرير واحد متوقف} two {سريران متوقفان} few {# أسرّة متوقفة} many {# سريراً متوقفاً} other {# سرير متوقف}}",
+        "cardCapacityStatusOnly": "{capacity, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}",
         "cardAriaLabel": "{room}، {type} {mode}، {occupied} مشغولة من {capacity} أسرّة، الحالة {status}",
+        "cardAriaLabelStatusOnly": "{room}، {type} {mode}، {capacity, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}، الحالة {status}",
+        "partiallyOccupied": "مشغولة جزئياً",
+        "bedVacantLabel": "سرير شاغر",
+        "bedOccupiedLabel": "مشغول بواسطة {name}",
         "clickHint": "اضغط على أي غرفة لعرض ساكنيها الحاليين وسجلها.",
-        "emptyTitle": "لا توجد غرف في هذا المبنى بعد",
-        "emptyDescription": "أضف الغرف من تبويب «الغرف» لتظهر هنا في خريطة الطوابق.",
+        "emptyTitle": "لا توجد شقق بعد",
+        "emptyDescription": "أضف الشقة الأولى في هذا المبنى لتبدأ بتنظيم غرفه.",
+        "emptyDescriptionStaff": "لم تُضَف بعد أي شقق إلى هذا المبنى. اطلب من المسؤول الأعلى أو نائب المدير العام إعدادها.",
+        "errorTitle": "تعذّر تحميل التخطيط",
+        "errorDescription": "حاول التحديث — إذا استمرّت المشكلة تواصل مع الدعم.",
+        "defaultsBannerTitle": "أعد تنظيم الشقق الافتراضية",
+        "defaultsBannerDescription": "{count, plural, zero {لا توجد شقق افتراضية} one {لا تزال شقة افتراضية واحدة بحاجة إلى تسمية حقيقية (مثل A1، B2) لتنظيم الغرف حسب الشقة.} two {لا تزال شقتان افتراضيتان بحاجة إلى تسمية حقيقية (مثل A1، B2) لتنظيم الغرف حسب الشقة.} few {لا تزال # شقق افتراضية بحاجة إلى تسمية حقيقية (مثل A1، B2) لتنظيم الغرف حسب الشقة.} many {لا تزال # شقة افتراضية بحاجة إلى تسمية حقيقية (مثل A1، B2) لتنظيم الغرف حسب الشقة.} other {لا تزال # شقة افتراضية بحاجة إلى تسمية حقيقية (مثل A1، B2) لتنظيم الغرف حسب الشقة.}}",
+        "defaultsBannerCta": "ابدأ بإعادة تسمية الأولى",
+        "defaultsBannerDismiss": "إخفاء التنبيه",
         "legend": {
           "title": "الدليل",
           "vacant": "شاغر",
           "occupied": "مشغول",
+          "partial": "مشغولة جزئياً",
           "maintenance": "صيانة",
           "reserved": "محجوز"
         }
@@ -1070,6 +1128,7 @@
         "searchPlaceholder": "ابحث برقم الغرفة...",
         "allStatuses": "جميع الحالات",
         "allTypes": "جميع الأنواع",
+        "allApartments": "جميع الشقق",
         "clearFilters": "مسح",
         "addRoom": "إضافة غرفة",
         "rowActions": "إجراءات",
@@ -1077,6 +1136,7 @@
         "rowDelete": "حذف الغرفة",
         "table": {
           "roomNumber": "الغرفة",
+          "apartment": "الشقة",
           "floor": "الطابق",
           "type": "النوع",
           "bathroom": "الحمام",
@@ -1112,6 +1172,8 @@
         },
         "fields": {
           "roomNumber": "رقم الغرفة",
+          "apartment": "الشقة",
+          "apartmentOption": "{number} · الطابق {floor}",
           "floor": "الطابق",
           "roomType": "نوع الغرفة",
           "bathroomType": "نوع الحمام",
@@ -1124,7 +1186,9 @@
         },
         "helpers": {
           "roomNumber": "اختياري. معرّف مألوف داخل المبنى (مثل: 101 أو A-3).",
-          "floor": "اختياري. استخدم 0 للأرضي وقيمة سالبة للقبو.",
+          "apartment": "الشقة التي تنتمي إليها هذه الغرفة. الطابق يُحدَّد تلقائياً من الشقة.",
+          "apartmentEmpty": "لا توجد شقق بعد — أنشئ شقة أولاً أو استخدم زر الإضافة المباشرة.",
+          "floor": "يُضبط تلقائياً من الشقة المختارة.",
           "capacity": "عدد الأسرّة في هذه الغرفة. القيمة الافتراضية مأخوذة من نوع الغرفة، ويمكن تعديلها للحالات غير القياسية.",
           "occupancyMode": "خاص: يتم تأجير الغرفة كاملة لعقد واحد. مشترك: يُؤجَّر كل سرير بشكل مستقل.",
           "occupancyModeSingle": "الغرفة المفردة دائماً خاصة — لا يوجد ساكن آخر للمشاركة.",
@@ -1132,6 +1196,7 @@
           "statusOccupied": "استخدم خطوة إدخال الساكنة لتخصيص الغرفة. هذا الحقل يحدّث حالة العرض فقط.",
           "notes": "تظهر للموظفين فقط. حتى ٥٠٠٠ حرف."
         },
+        "newApartmentInline": "إضافة شقة جديدة",
         "discount": {
           "percentOff": "خصم {pct}٪"
         },
@@ -1143,12 +1208,17 @@
           "discountInvalid": "أدخل رقماً غير سالب.",
           "discountTooHigh": "لا يمكن أن يتجاوز السعر بعد الخصم السعر الشهري.",
           "floorInvalid": "الطابق يجب أن يكون رقماً صحيحاً.",
+          "apartmentRequired": "يرجى اختيار الشقة.",
+          "apartmentNotInBuilding": "هذه الشقة لا تنتمي إلى المبنى الحالي.",
+          "apartmentInactive": "هذه الشقة غير نشطة — أعد تفعيلها قبل ربط الغرف بها.",
           "capacityRequired": "عدد الأسرّة مطلوب.",
           "capacityInvalid": "أدخل رقماً صحيحاً بين 1 و 20.",
           "sharedRequiresMultipleBeds": "يحتاج النمط المشترك إلى سريرين على الأقل. زد عدد الأسرّة أو اجعل الغرفة خاصة.",
           "notesTooLong": "الملاحظات يجب ألا تتجاوز ٥٠٠٠ حرف.",
           "requiredMissing": "بعض الحقول المطلوبة مفقودة.",
           "buildingNotFound": "تعذّر العثور على المبنى الأصل.",
+          "buildingInactive": "هذا المبنى غير نشط — يجب تفعيله قبل تعديل الغرف.",
+          "noChanges": "لا توجد تغييرات للحفظ.",
           "roomHasAssignments": "هذه الغرفة لديها سجل إقامة سابق ولا يمكن حذفها. عيّن حالتها إلى «صيانة» لإخراجها من الخدمة بدلاً من ذلك."
         },
         "toast": {
@@ -1172,12 +1242,168 @@
           "description": "ربما تمت إزالتها أو ليس لديك صلاحية الوصول."
         }
       },
+      "apartmentsTab": {
+        "addApartment": "إضافة شقة",
+        "searchPlaceholder": "ابحث برقم الشقة...",
+        "allFloors": "كل الطوابق",
+        "floorN": "الطابق {n}",
+        "clearFilters": "مسح",
+        "table": {
+          "apartmentNumber": "الشقة",
+          "floor": "الطابق",
+          "rooms": "الغرف",
+          "residents": "السكّان",
+          "kitchen": "مطبخ",
+          "livingRoom": "غرفة معيشة",
+          "bathrooms": "دورات المياه",
+          "status": "الحالة"
+        },
+        "kitchenYes": "نعم",
+        "kitchenNo": "—",
+        "livingRoomYes": "نعم",
+        "livingRoomNo": "—",
+        "bathroomsLabel": "{shared} مشتركة، {priv} خاصة",
+        "roomsLabel": "{count, plural, zero {لا غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
+        "residentsLabel": "{count, plural, zero {لا سكان} one {ساكن واحد} two {ساكنان} few {# سكان} many {# ساكناً} other {# ساكن}}",
+        "rowEdit": "تعديل الشقة",
+        "rowDelete": "حذف الشقة",
+        "rowActions": "إجراءات",
+        "summary": "{count, plural, zero {لا شقق} one {شقة واحدة} two {شقتان} few {# شقق} many {# شقة} other {# شقة}}",
+        "clickHint": "انقر شقة لعرض غرفها.",
+        "emptyTitle": "لا توجد شقق بعد",
+        "emptyDescription": "أضف الشقة الأولى في هذا المبنى.",
+        "emptyFilteredTitle": "لا توجد نتائج",
+        "emptyFilteredDescription": "جرّب مسح الفلاتر.",
+        "errorTitle": "تعذّر تحميل الشقق",
+        "errorDescription": "حاول التحديث — إذا استمرّت المشكلة تواصل مع الدعم.",
+        "defaultTagShort": "تلقائي",
+        "defaultTagTitle": "شقة افتراضية أُنشئت تلقائياً لهذا الطابق — أعد تسميتها لرقم شقة حقيقي (مثل A1، B2) لتنظيم الغرف حسب الشقة.",
+        "active": "نشطة",
+        "inactive": "غير نشطة"
+      },
+      "apartmentForm": {
+        "createTitle": "إضافة شقة",
+        "editTitle": "تعديل شقة",
+        "createSubtitle": "أضف شقة جديدة إلى هذا المبنى.",
+        "editSubtitle": "حدّث تفاصيل الشقة أو تخطيطها أو حالتها.",
+        "create": "إنشاء",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "delete": "حذف",
+        "deleting": "جاري الحذف...",
+        "buildingLabel": "المبنى",
+        "sections": {
+          "basics": "الأساسيات",
+          "layout": "التخطيط والمرافق المشتركة",
+          "status": "الحالة والملاحظات"
+        },
+        "fields": {
+          "apartmentNumber": "رقم الشقة",
+          "floor": "الطابق",
+          "descriptionEn": "الوصف (إنجليزي)",
+          "descriptionAr": "الوصف (عربي)",
+          "hasKitchen": "يحتوي على مطبخ",
+          "hasLivingRoom": "يحتوي على غرفة معيشة",
+          "sharedBathroomCount": "دورات المياه المشتركة",
+          "privateBathroomCount": "دورات المياه الخاصة",
+          "sortOrder": "ترتيب العرض",
+          "isActive": "نشطة",
+          "notes": "ملاحظات داخلية"
+        },
+        "helpers": {
+          "apartmentNumber": "تسمية قصيرة مثل A1، 201، أو Left.",
+          "floor": "0 للطابق الأرضي؛ الأرقام السالبة للقبو.",
+          "hasKitchen": "هل لهذه الشقة مطبخ خاص بها.",
+          "hasLivingRoom": "هل تحتوي الشقة على غرفة معيشة مشتركة.",
+          "sharedBathroomCount": "عدد دورات المياه المشتركة بين جميع غرف الشقة.",
+          "privateBathroomCount": "عدد دورات المياه الخاصة (داخل الغرف).",
+          "sortOrder": "الأرقام الأقل تظهر أولاً ضمن الطابق نفسه.",
+          "notes": "تظهر للموظفين فقط."
+        },
+        "errors": {
+          "fixBelow": "يرجى تصحيح الحقول المظلّلة.",
+          "apartmentNumberRequired": "رقم الشقة مطلوب.",
+          "apartmentNumberTaken": "هناك شقة أخرى في هذا المبنى تستخدم هذا الرقم.",
+          "floorInvalid": "يجب أن يكون الطابق رقماً صحيحاً.",
+          "bathroomCountInvalid": "عدد دورات المياه يجب أن يكون رقماً صحيحاً بين 0 و 20.",
+          "sortOrderInvalid": "ترتيب العرض يجب أن يكون رقماً صحيحاً.",
+          "buildingInactive": "هذا المبنى غير نشط — يجب تفعيله قبل تعديل الشقق.",
+          "buildingNotFound": "المبنى غير موجود.",
+          "apartmentHasRooms": "هذه الشقة تحتوي على غرف. انقل الغرف أو احذفها أولاً، أو علّم الشقة كغير نشطة بدلاً من ذلك.",
+          "noChanges": "لا توجد تغييرات للحفظ.",
+          "requiredMissing": "حقول مطلوبة ناقصة."
+        },
+        "toast": {
+          "created": "تم إنشاء الشقة.",
+          "updated": "تم تحديث الشقة.",
+          "deleted": "تم حذف الشقة.",
+          "genericError": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+        },
+        "deleteConfirm": {
+          "title": "حذف الشقة؟",
+          "description": "سيؤدي ذلك إلى حذف الشقة نهائياً. يجب نقل الغرف أو حذفها أولاً.",
+          "confirm": "حذف الشقة",
+          "cancel": "إلغاء"
+        },
+        "forbidden": {
+          "title": "ليس لديك صلاحية",
+          "description": "يقتصر إنشاء أو حذف الشقق على المسؤول الأعلى ونائب المدير العام."
+        },
+        "notFound": {
+          "title": "الشقة غير موجودة",
+          "description": "ربما تمت إزالتها أو ليس لديك صلاحية الوصول."
+        }
+      },
+      "apartmentDetail": {
+        "title": "الشقة {number}",
+        "floorN": "الطابق {n}",
+        "floorChipAria": "عرض الطابق {n} في تخطيط المبنى",
+        "totalRooms": "إجمالي الغرف",
+        "totalCapacity": "إجمالي الأسرّة",
+        "activeResidents": "السكّان النشطون",
+        "active": "نشطة",
+        "inactive": "غير نشطة",
+        "backToBuilding": "العودة إلى المبنى",
+        "editApartment": "تعديل الشقة",
+        "deleteApartment": "حذف الشقة",
+        "addRoom": "إضافة غرفة",
+        "roomLabel": "غرفة {number}",
+        "roomUnnumbered": "غرفة بدون رقم",
+        "occupiedBy": "ساكن",
+        "vacantShort": "متاحة",
+        "unknownResident": "ساكنة غير معروفة",
+        "kitchenYes": "مطبخ",
+        "kitchenNo": "بدون مطبخ",
+        "livingRoomYes": "غرفة معيشة",
+        "livingRoomNo": "بدون غرفة معيشة",
+        "bathroomsLabel": "{shared} مشتركة، {priv} خاصة",
+        "defaultTagShort": "تلقائي",
+        "defaultTagTitle": "شقة افتراضية أُنشئت تلقائياً لهذا الطابق — أعد تسميتها لرقم شقة حقيقي (مثل A1، B2) لتنظيم الغرف حسب الشقة.",
+        "noRooms": "لا توجد غرف في هذه الشقة بعد.",
+        "noResidents": "لا يوجد سكّان نشطون في هذه الشقة حالياً.",
+        "noNotes": "لا توجد ملاحظات.",
+        "noDescription": "لا يوجد وصف.",
+        "createdAt": "أُنشئت",
+        "updatedAt": "آخر تحديث",
+        "notFoundTitle": "الشقة غير موجودة",
+        "notFoundDescription": "ربما تمت إزالتها أو ليس لديك صلاحية الوصول.",
+        "sections": {
+          "rooms": "الغرف",
+          "residents": "السكّان النشطون",
+          "description": "الوصف",
+          "building": "المبنى",
+          "notes": "ملاحظات داخلية",
+          "metadata": "تفاصيل"
+        }
+      },
       "roomDetail": {
         "backToRooms": "العودة إلى الغرف",
         "editRoom": "تعديل الغرفة",
         "roomTitle": "غرفة {number}",
         "unnumbered": "غرفة بدون رقم",
         "floorN": "الطابق {n}",
+        "apartmentChip": "الشقة {number} · الطابق {floor}",
+        "apartmentChipAria": "عرض الشقة {number} في الطابق {floor}",
         "active": "نشط",
         "ended": "منتهٍ",
         "present": "حتى الآن",
@@ -1279,6 +1505,10 @@
         "checkOutLabel": "تاريخ الخروج",
         "buildingLabel": "المبنى",
         "roomLabel": "الغرفة",
+        "apartmentLabel": "الشقة",
+        "apartmentMates": "سكّان الشقة",
+        "noApartmentMates": "لا يوجد سكّان آخرون في هذه الشقة بعد.",
+        "apartmentMatesContext": "جميع السكّان النشطين في الشقة {apartment}.",
         "statusLabel": "الحالة",
         "notProvided": "غير متوفر",
         "callPhone": "اتصال",
@@ -1674,6 +1904,7 @@
         "maintenance": "الصيانة",
         "buildings": "المباني",
         "rooms": "الغرف",
+        "apartments": "الشقق",
         "residents": "السكان",
         "users": "الموظفون والمستخدمون",
         "content": "محتوى الموقع",
@@ -1714,6 +1945,12 @@
           "create": "إنشاء غرف",
           "update": "تعديل الغرف",
           "delete": "حذف الغرف"
+        },
+        "apartments": {
+          "list": "عرض الشقق",
+          "create": "إنشاء شقق",
+          "update": "تعديل الشقق",
+          "delete": "حذف الشقق"
         },
         "residents": {
           "list": "عرض المقيمين",

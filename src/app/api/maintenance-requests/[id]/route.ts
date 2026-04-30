@@ -23,7 +23,7 @@ export async function GET(
     const { data, error } = await supabase
       .from('maintenance_requests')
       .select(
-        '*, building:buildings!maintenance_requests_building_id_fkey(id, slug, neighborhood_en, neighborhood_ar, city_en, city_ar), assigned_staff:staff_profiles!maintenance_requests_assigned_to_fkey(id, full_name)'
+        '*, building:buildings!maintenance_requests_building_id_fkey(id, slug, neighborhood_en, neighborhood_ar, city_en, city_ar), apartment:apartments!apartment_id(id, apartment_number, floor), assigned_staff:staff_profiles!maintenance_requests_assigned_to_fkey(id, full_name)'
       )
       .eq('id', id)
       .single();
@@ -105,7 +105,7 @@ export async function PATCH(
       .update(updates)
       .eq('id', id)
       .select(
-        '*, building:buildings!maintenance_requests_building_id_fkey(id, slug, neighborhood_en, neighborhood_ar, city_en, city_ar), assigned_staff:staff_profiles!maintenance_requests_assigned_to_fkey(id, full_name)'
+        '*, building:buildings!maintenance_requests_building_id_fkey(id, slug, neighborhood_en, neighborhood_ar, city_en, city_ar), apartment:apartments!apartment_id(id, apartment_number, floor), assigned_staff:staff_profiles!maintenance_requests_assigned_to_fkey(id, full_name)'
       )
       .single();
 

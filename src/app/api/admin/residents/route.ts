@@ -39,6 +39,11 @@ interface AssignmentJoinedRow {
   rooms: {
     room_number: string | null;
     floor: number | null;
+    apartment_id: string | null;
+    apartments: {
+      id: string;
+      apartment_number: string;
+    } | null;
   } | null;
   buildings: {
     city_en: string;
@@ -166,7 +171,7 @@ export async function GET(request: NextRequest) {
       const { data: assignmentRows, error: assignmentErr } = await supabase
         .from('room_assignments')
         .select(
-          'id, resident_id, room_id, building_id, check_in_date, check_out_date, rooms(room_number, floor), buildings(city_en, city_ar, neighborhood_en, neighborhood_ar)'
+          'id, resident_id, room_id, building_id, check_in_date, check_out_date, rooms(room_number, floor, apartment_id, apartments(id, apartment_number)), buildings(city_en, city_ar, neighborhood_en, neighborhood_ar)'
         )
         .in('resident_id', residentIds)
         .eq('status', 'active');
@@ -187,6 +192,8 @@ export async function GET(request: NextRequest) {
           check_out_date: row.check_out_date,
           room_number: row.rooms?.room_number ?? null,
           floor: row.rooms?.floor ?? null,
+          apartment_id: row.rooms?.apartment_id ?? null,
+          apartment_number: row.rooms?.apartments?.apartment_number ?? null,
           building_city_en: row.buildings?.city_en ?? '',
           building_city_ar: row.buildings?.city_ar ?? '',
           building_neighborhood_en: row.buildings?.neighborhood_en ?? '',

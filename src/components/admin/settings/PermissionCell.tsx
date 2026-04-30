@@ -28,7 +28,7 @@ export default function PermissionCell({
   if (access === 'none') {
     return (
       <span
-        className="inline-flex items-center justify-center w-7 h-7 text-gray-400"
+        className="inline-flex items-center justify-center w-7 h-7 text-gray-400 dark:text-[var(--admin-text-subtle)]"
         aria-label={ariaLabel}
         title={`${accessLabel}: ${permissionLabel}`}
       >
@@ -40,7 +40,7 @@ export default function PermissionCell({
   if (access === 'full') {
     return (
       <span
-        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-50 text-emerald-700"
+        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
         aria-label={ariaLabel}
         title={`${accessLabel}: ${permissionLabel}`}
       >
@@ -52,7 +52,7 @@ export default function PermissionCell({
   return (
     <span
       className={cn(
-        'relative inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-50 text-amber-700'
+        'relative inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300'
       )}
       aria-label={ariaLabel}
       title={scopeLabel ? `${accessLabel} — ${scopeLabel}` : accessLabel}

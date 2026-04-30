@@ -216,14 +216,14 @@ export default function UsersList() {
         <div className="relative flex-1 min-w-0">
           <Search
             size={18}
-            className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--admin-text-subtle)]"
           />
           <input
             type="text"
             placeholder={t('filters.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full ps-10 pe-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+            className="w-full ps-10 pe-4 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
           />
         </div>
       </div>
@@ -289,15 +289,15 @@ export default function UsersList() {
 
       {/* Table */}
       {loading ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-6">
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
+              <div key={i} className="h-12 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
             ))}
           </div>
         </div>
       ) : users.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
           <EmptyState
             icon={UserCog}
             title={t('empty.title')}
@@ -305,11 +305,11 @@ export default function UsersList() {
           />
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
+                <tr className="border-b border-gray-200 dark:border-[var(--admin-border)] bg-gray-50 dark:bg-[var(--admin-bg)]">
                   <SortableHeader
                     label={t('table.name')}
                     column="full_name"
@@ -317,7 +317,7 @@ export default function UsersList() {
                     sortDir={sortDir}
                     onSort={handleSort}
                   />
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden md:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden md:table-cell">
                     {t('table.email')}
                   </th>
                   <SortableHeader
@@ -327,7 +327,7 @@ export default function UsersList() {
                     sortDir={sortDir}
                     onSort={handleSort}
                   />
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden lg:table-cell">
                     {t('table.buildings')}
                   </th>
                   <SortableHeader
@@ -345,7 +345,7 @@ export default function UsersList() {
                     onSort={handleSort}
                     className="hidden xl:table-cell"
                   />
-                  <th className="text-end px-4 py-3 font-medium text-gray-500">
+                  <th className="text-end px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.actions')}
                   </th>
                 </tr>
@@ -356,21 +356,21 @@ export default function UsersList() {
                   return (
                   <tr
                     key={u.id}
-                    className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="border-b border-gray-100 dark:border-[var(--admin-border)] hover:bg-gray-50 dark:bg-[var(--admin-bg)] cursor-pointer transition-colors"
                     onClick={() => setEditing(u)}
                   >
-                    <td className="px-4 py-3 font-medium text-navy">{u.full_name}</td>
-                    <td className="px-4 py-3 text-gray-600 hidden md:table-cell" dir="ltr">
+                    <td className="px-4 py-3 font-medium text-navy dark:text-[var(--admin-text)]">{u.full_name}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-[var(--admin-text-muted)] hidden md:table-cell" dir="ltr">
                       {u.email || '—'}
                     </td>
                     <td className="px-4 py-3">
                       <UserRoleBadge role={u.role} />
                     </td>
-                    <td className="px-4 py-3 text-gray-600 hidden lg:table-cell">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[var(--admin-text-muted)] hidden lg:table-cell">
                       {u.role === 'super_admin' || u.role === 'deputy_general_manager' ? (
-                        <span className="text-gray-400">{t('table.allBuildings')}</span>
+                        <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('table.allBuildings')}</span>
                       ) : u.buildings.length === 0 ? (
-                        <span className="text-gray-400">—</span>
+                        <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">—</span>
                       ) : (
                         <span title={u.buildings.map(buildingShortLabel).join(', ')}>
                           {u.buildings.length === 1
@@ -385,7 +385,7 @@ export default function UsersList() {
                         variant={u.is_active ? 'success' : 'neutral'}
                       />
                     </td>
-                    <td className="px-4 py-3 text-gray-500 hidden xl:table-cell">
+                    <td className="px-4 py-3 text-gray-500 dark:text-[var(--admin-text-muted)] hidden xl:table-cell">
                       {formatDate(u.created_at, isArabic ? 'ar' : 'en')}
                     </td>
                     <td className="px-4 py-3">
@@ -395,7 +395,7 @@ export default function UsersList() {
                             e.stopPropagation();
                             setEditing(u);
                           }}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-navy transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors"
                           title={t('actions.edit')}
                         >
                           <Edit2 size={16} />
@@ -410,7 +410,7 @@ export default function UsersList() {
                             });
                           }}
                           disabled={isSelf}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-navy transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                           title={
                             isSelf
                               ? t('errors.selfModify')
@@ -426,7 +426,7 @@ export default function UsersList() {
                             e.stopPropagation();
                             setConfirm({ kind: 'reset', user: u });
                           }}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-navy transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors"
                           title={t('actions.resetPassword')}
                         >
                           <KeyRound size={16} />
@@ -441,25 +441,25 @@ export default function UsersList() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[var(--admin-border)]">
+              <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
                 {t('pagination.summary', { count: total })}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft size={16} />
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)]">
                   {page} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -521,14 +521,14 @@ function SortableHeader({
   const Icon = active ? (sortDir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
   return (
     <th
-      className={`text-start px-4 py-3 font-medium text-gray-500 ${className}`}
+      className={`text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] ${className}`}
       aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
     >
       <button
         type="button"
         onClick={() => onSort(column)}
-        className={`flex items-center gap-1.5 hover:text-navy transition-colors ${
-          active ? 'text-navy' : ''
+        className={`flex items-center gap-1.5 hover:text-navy dark:text-[var(--admin-text)] transition-colors ${
+          active ? 'text-navy dark:text-[var(--admin-text)]' : ''
         }`}
       >
         <span>{label}</span>

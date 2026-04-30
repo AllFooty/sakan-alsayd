@@ -18,7 +18,7 @@ export const getAuthenticatedStaff = cache(async (locale: string) => {
 
   const { data: profile } = await supabase
     .from('staff_profiles')
-    .select('id, full_name, phone, role, is_active')
+    .select('id, full_name, phone, role, is_active, theme_preference')
     .eq('id', user.id)
     .single<StaffProfile>();
 
@@ -56,4 +56,18 @@ export function isSuperAdmin(role: UserRole): boolean {
 
 export function hasAdminAccess(role: UserRole): boolean {
   return role === 'super_admin' || role === 'deputy_general_manager';
+}
+
+// Roles that can SELECT residents and room_assignments under RLS.
+// Mirrors the union of `*_admin_all` (admin tier) and `*_manager_select`
+// policies in migrations 014_rls_perf.sql + 027_residents_supervision_staff_and_capacity.sql.
+// Used by APIs that conditionally skip joins they wouldn't be allowed to read,
+// so callers without access get a clean "no occupancy data" response instead
+// of a silently-empty result that looks like an empty building.
+export function canReadOccupants(role: UserRole): boolean {
+  return (
+    hasAdminAccess(role) ||
+    role === 'branch_manager' ||
+    role === 'supervision_staff'
+  );
 }

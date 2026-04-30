@@ -335,16 +335,16 @@ export default function BookingModal({
   const inputClassName = (hasError: boolean) =>
     cn(
       'w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-      hasError ? 'border-red-400' : 'border-gray-200'
+      hasError ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
     );
 
   // Booking summary card (reused across form steps)
   const SummaryCard = () => (
-    <div className="bg-gray-50 rounded-xl p-3 mb-3">
+    <div className="bg-gray-50 dark:bg-[var(--admin-bg)] rounded-xl p-3 mb-3">
       <div className="flex items-center justify-between text-sm gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-gray-500 text-xs">{t('summary.building')}</p>
-          <p className="font-medium text-navy truncate">
+          <p className="text-gray-500 dark:text-[var(--admin-text-muted)] text-xs">{t('summary.building')}</p>
+          <p className="font-medium text-navy dark:text-[var(--admin-text)] truncate">
             {selectedLocation && (
               <>
                 {isArabic ? selectedLocation.neighborhoodAr : selectedLocation.neighborhood}
@@ -355,27 +355,48 @@ export default function BookingModal({
           </p>
         </div>
         <div className="text-end flex-shrink-0">
-          <p className="text-gray-500 text-xs">{t('summary.room')}</p>
-          <p className="font-medium text-navy">
+          <p className="text-gray-500 dark:text-[var(--admin-text-muted)] text-xs">{t('summary.room')}</p>
+          <p className="font-medium text-navy dark:text-[var(--admin-text)]">
             {selectedRoom && tRooms(`types.${selectedRoom.type}`)}
           </p>
         </div>
       </div>
       {selectedRoom && (
         <>
-          <div className="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between">
-            <span className="text-xs text-gray-500">
+          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-[var(--admin-border)] flex items-center justify-between">
+            <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
               {tRooms(`bathroom.${selectedRoom.bathroomType}`)}
             </span>
             <span className="font-bold text-coral">
               {formatPrice(selectedRoom.price)} {tRooms('pricePerMonth')}
             </span>
           </div>
+          {/* Apartment context for the selected building. Reassures the
+              student that the room sits inside a real apartment with shared
+              amenities, without adding a step. */}
+          {selectedLocation &&
+            selectedLocation.apartmentSummary.count > 0 && (
+              <div className="mt-1.5 flex items-center justify-between">
+                <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] inline-flex items-center gap-1">
+                  <Home size={10} />
+                  {t('summary.apartmentContext', {
+                    apartments: selectedLocation.apartmentSummary.count,
+                    floors: selectedLocation.apartmentSummary.floors,
+                  })}
+                </span>
+                {selectedLocation.apartmentSummary.withKitchen ===
+                  selectedLocation.apartmentSummary.count && (
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                    {t('summary.sharedKitchen')}
+                  </span>
+                )}
+              </div>
+            )}
           <div className="mt-1.5 flex items-center justify-between">
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
               {t('summary.insurance')}
             </span>
-            <span className="text-sm font-medium text-navy">
+            <span className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
               {formatPrice(500)} {t('currency')}
             </span>
           </div>
@@ -391,27 +412,27 @@ export default function BookingModal({
     >
       <div
         className={cn(
-          'relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl',
+          'relative bg-white dark:bg-[var(--admin-surface)] w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl',
           'max-h-[90dvh] sm:max-h-[85vh] flex flex-col'
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-[var(--admin-border)] flex-shrink-0">
           <div className="flex items-center gap-3">
             {stepIndex > 0 && submitStatus !== 'success' && (
               <button
                 onClick={handleBack}
-                className="p-2.5 -m-1 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2.5 -m-1 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors"
               >
-                <BackIcon size={20} className="text-gray-600" />
+                <BackIcon size={20} className="text-gray-600 dark:text-[var(--admin-text-muted)]" />
               </button>
             )}
             <div>
-              <h2 className="text-lg font-bold text-navy">
+              <h2 className="text-lg font-bold text-navy dark:text-[var(--admin-text)]">
                 {submitStatus === 'success' ? t('success.title') : t('title')}
               </h2>
               {submitStatus !== 'success' && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
                   {t(`steps.${currentStep}.title`)}
                 </p>
               )}
@@ -419,10 +440,10 @@ export default function BookingModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors"
             aria-label="Close"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
           </button>
         </div>
 
@@ -434,7 +455,7 @@ export default function BookingModal({
                 key={step}
                 className={cn(
                   'h-1 flex-1 rounded-full transition-colors duration-300',
-                  i <= stepIndex ? 'bg-coral' : 'bg-gray-200'
+                  i <= stepIndex ? 'bg-coral' : 'bg-gray-200 dark:bg-[var(--admin-border)]'
                 )}
               />
             ))}
@@ -449,10 +470,10 @@ export default function BookingModal({
               <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
                 <CheckCircle size={32} className="text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-navy mb-2">
+              <h3 className="text-xl font-bold text-navy dark:text-[var(--admin-text)] mb-2">
                 {t('success.heading')}
               </h3>
-              <p className="text-gray-600 mb-6 max-w-sm">
+              <p className="text-gray-600 dark:text-[var(--admin-text-muted)] mb-6 max-w-sm">
                 {t('success.description')}
               </p>
               <button
@@ -472,23 +493,23 @@ export default function BookingModal({
                   className={cn(
                     'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-colors',
                     selectedCity === city.name.toLowerCase()
-                      ? 'border-coral bg-coral/5'
-                      : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
+                      ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                      : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50 hover:bg-gray-50 dark:bg-[var(--admin-bg)]'
                   )}
                 >
                   <div className="w-11 h-11 rounded-xl bg-coral/10 flex items-center justify-center flex-shrink-0">
                     <MapPin size={20} className="text-coral" />
                   </div>
                   <div className="text-start flex-1">
-                    <p className="font-semibold text-navy">
+                    <p className="font-semibold text-navy dark:text-[var(--admin-text)]">
                       {isArabic ? city.nameAr : city.name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
                       {buildings.filter((l) => l.city === city.name).length}{' '}
                       {t('steps.city.buildings')}
                     </p>
                   </div>
-                  <div className="text-gray-400">
+                  <div className="text-gray-400 dark:text-[var(--admin-text-subtle)]">
                     {isArabic ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                   </div>
                 </button>
@@ -504,24 +525,24 @@ export default function BookingModal({
                   className={cn(
                     'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-colors',
                     selectedLocationId === loc.id
-                      ? 'border-coral bg-coral/5'
-                      : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
+                      ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                      : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50 hover:bg-gray-50 dark:bg-[var(--admin-bg)]'
                   )}
                 >
                   <div className="w-11 h-11 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
-                    <Building2 size={20} className="text-navy" />
+                    <Building2 size={20} className="text-navy dark:text-[var(--admin-text)]" />
                   </div>
                   <div className="text-start flex-1">
-                    <p className="font-semibold text-navy">
+                    <p className="font-semibold text-navy dark:text-[var(--admin-text)]">
                       {isArabic ? loc.neighborhoodAr : loc.neighborhood}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
                       {loc.roomPrices.length} {t('steps.building.rooms')}
                       {' · '}
                       {t('steps.building.from')} {formatPrice(Math.min(...loc.roomPrices.map((r) => r.discountedPrice || r.monthlyPrice)))} {t('currency')}
                     </p>
                   </div>
-                  <div className="text-gray-400">
+                  <div className="text-gray-400 dark:text-[var(--admin-text-subtle)]">
                     {isArabic ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                   </div>
                 </button>
@@ -544,31 +565,44 @@ export default function BookingModal({
                     className={cn(
                       'w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-colors',
                       isSelected
-                        ? 'border-coral bg-coral/5'
-                        : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
+                        ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                        : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50 hover:bg-gray-50 dark:bg-[var(--admin-bg)]'
                     )}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      <RoomIcon size={18} className="text-navy" />
+                    <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center flex-shrink-0">
+                      <RoomIcon size={18} className="text-navy dark:text-[var(--admin-text)]" />
                     </div>
                     <div className="text-start flex-1 min-w-0">
-                      <p className="font-medium text-navy text-sm">
+                      <p className="font-medium text-navy dark:text-[var(--admin-text)] text-sm">
                         {tRooms(`types.${room.type}`)}
                       </p>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
                         <Bath size={12} />
                         <span className="truncate">{tRooms(`bathroom.${room.bathroomType}`)}</span>
                       </div>
+                      {/* Apartment context — small reassurance that this tier
+                          is offered across multiple apartments. Hidden when
+                          the building hasn't been organized yet. */}
+                      {room.apartmentCount > 0 && (
+                        <div className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-[var(--admin-text-subtle)] mt-0.5">
+                          <Home size={10} />
+                          <span className="truncate">
+                            {t('roomCardApartmentContext', {
+                              count: room.apartmentCount,
+                            })}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="text-end flex-shrink-0">
                       <p className="font-bold text-coral text-sm">
                         {formatPrice(price)}
                       </p>
-                      <p className="text-[10px] text-gray-500">
+                      <p className="text-[10px] text-gray-500 dark:text-[var(--admin-text-muted)]">
                         {tRooms('pricePerMonth')}
                       </p>
                       {room.discountedPrice && (
-                        <p className="text-[10px] text-gray-400 line-through">
+                        <p className="text-[10px] text-gray-400 dark:text-[var(--admin-text-subtle)] line-through">
                           {formatPrice(room.monthlyPrice)}
                         </p>
                       )}
@@ -584,7 +618,7 @@ export default function BookingModal({
               <div className="space-y-3.5">
                 {/* Name */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.personal.name')} *
                   </label>
                   <input
@@ -598,7 +632,7 @@ export default function BookingModal({
 
                 {/* Date of birth */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.personal.dateOfBirth')} *
                   </label>
                   <div className="relative">
@@ -613,7 +647,7 @@ export default function BookingModal({
                       )}
                     />
                     {!watchDateOfBirth && (
-                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400">
+                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
                       </span>
                     )}
@@ -622,7 +656,7 @@ export default function BookingModal({
 
                 {/* Occupation */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1.5 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block">
                     {t('steps.personal.occupation')} *
                   </label>
                   <Controller
@@ -638,8 +672,8 @@ export default function BookingModal({
                             className={cn(
                               'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
                               watchOccupation === option
-                                ? 'border-coral bg-coral/5 text-coral'
-                                : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                                ? 'border-coral bg-coral/5 dark:bg-coral/10 text-coral'
+                                : 'border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-coral/50'
                             )}
                           >
                             {t(`steps.personal.occupationOptions.${option}`)}
@@ -649,7 +683,7 @@ export default function BookingModal({
                     )}
                   />
                   {errors.occupation && (
-                    <p className="text-red-500 text-xs mt-1">{errors.occupation.message}</p>
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.occupation.message}</p>
                   )}
                 </div>
               </div>
@@ -660,7 +694,7 @@ export default function BookingModal({
               <SummaryCard />
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.contact.email')} *
                   </label>
                   <input
@@ -683,9 +717,9 @@ export default function BookingModal({
                   />
                 </div>
 
-                <div className="pt-2 border-t border-gray-100">
+                <div className="pt-2 border-t border-gray-100 dark:border-[var(--admin-border)]">
                   <div>
-                    <label className="text-sm font-medium text-navy mb-1 block">
+                    <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                       {t('steps.contact.emergencyContactName')} *
                     </label>
                     <input
@@ -715,7 +749,7 @@ export default function BookingModal({
               <div className="space-y-4">
                 {/* Contract start date */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.logistics.contractStartDate')} *
                   </label>
                   <div className="relative">
@@ -730,7 +764,7 @@ export default function BookingModal({
                       )}
                     />
                     {!watchContractStartDate && (
-                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400">
+                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
                       </span>
                     )}
@@ -739,7 +773,7 @@ export default function BookingModal({
 
                 {/* Transportation */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1.5 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block">
                     {t('steps.logistics.transportation')} *
                   </label>
                   <Controller
@@ -753,14 +787,14 @@ export default function BookingModal({
                           className={cn(
                             'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors',
                             watchTransportation === true
-                              ? 'border-coral bg-coral/5'
-                              : 'border-gray-200 hover:border-coral/50'
+                              ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                              : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50'
                           )}
                         >
-                          <Bus size={24} className={watchTransportation === true ? 'text-coral' : 'text-gray-400'} />
+                          <Bus size={24} className={watchTransportation === true ? 'text-coral' : 'text-gray-400 dark:text-[var(--admin-text-subtle)]'} />
                           <span className={cn(
                             'text-sm font-medium',
-                            watchTransportation === true ? 'text-coral' : 'text-gray-600'
+                            watchTransportation === true ? 'text-coral' : 'text-gray-600 dark:text-[var(--admin-text-muted)]'
                           )}>
                             {t('steps.logistics.withTransportation')}
                           </span>
@@ -771,14 +805,14 @@ export default function BookingModal({
                           className={cn(
                             'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors',
                             watchTransportation === false
-                              ? 'border-coral bg-coral/5'
-                              : 'border-gray-200 hover:border-coral/50'
+                              ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                              : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50'
                           )}
                         >
-                          <BusFront size={24} className={watchTransportation === false ? 'text-coral' : 'text-gray-400'} />
+                          <BusFront size={24} className={watchTransportation === false ? 'text-coral' : 'text-gray-400 dark:text-[var(--admin-text-subtle)]'} />
                           <span className={cn(
                             'text-sm font-medium',
-                            watchTransportation === false ? 'text-coral' : 'text-gray-600'
+                            watchTransportation === false ? 'text-coral' : 'text-gray-600 dark:text-[var(--admin-text-muted)]'
                           )}>
                             {t('steps.logistics.withoutTransportation')}
                           </span>
@@ -795,7 +829,7 @@ export default function BookingModal({
               <div className="space-y-4">
                 {/* Medical issues */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1.5 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block">
                     {t('steps.additional.medicalIssues')}
                   </label>
                   <Controller
@@ -809,8 +843,8 @@ export default function BookingModal({
                           className={cn(
                             'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
                             !watchHasMedicalIssues
-                              ? 'border-coral bg-coral/5 text-coral'
-                              : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                              ? 'border-coral bg-coral/5 dark:bg-coral/10 text-coral'
+                              : 'border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-coral/50'
                           )}
                         >
                           {t('steps.additional.no')}
@@ -821,8 +855,8 @@ export default function BookingModal({
                           className={cn(
                             'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
                             watchHasMedicalIssues
-                              ? 'border-coral bg-coral/5 text-coral'
-                              : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                              ? 'border-coral bg-coral/5 dark:bg-coral/10 text-coral'
+                              : 'border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-coral/50'
                           )}
                         >
                           {t('steps.additional.yes')}
@@ -832,14 +866,14 @@ export default function BookingModal({
                   />
                   {watchHasMedicalIssues && (
                     <div className="mt-2">
-                      <label className="text-xs text-gray-500 mb-1 block">
+                      <label className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1 block">
                         {t('steps.additional.medicalDescription')}
                       </label>
                       <textarea
                         {...register('medicalIssuesDescription')}
                         rows={3}
                         placeholder={t('placeholders.medicalDescription')}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                       />
                     </div>
                   )}
@@ -847,14 +881,14 @@ export default function BookingModal({
 
                 {/* How did you hear */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.additional.referralSource')} *
                   </label>
                   <select
                     {...register('referralSource')}
                     className={cn(
                       inputClassName(!!errors.referralSource),
-                      'appearance-none bg-white'
+                      'appearance-none bg-white dark:bg-[var(--admin-surface)]'
                     )}
                     defaultValue=""
                   >
@@ -871,19 +905,19 @@ export default function BookingModal({
 
                 {/* Notes */}
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.additional.notes')}
                   </label>
                   <textarea
                     {...register('notes')}
                     rows={2}
                     placeholder={t('placeholders.notes')}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                   />
                 </div>
 
                 {submitStatus === 'error' && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl text-sm">
+                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-sm">
                     <AlertCircle size={16} className="flex-shrink-0" />
                     <span>{t('error')}</span>
                   </div>
@@ -895,7 +929,7 @@ export default function BookingModal({
 
         {/* Footer - Next button on form steps, Submit on last step */}
         {isFormStep && submitStatus !== 'success' && (
-          <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0">
+          <div className="px-5 py-4 border-t border-gray-100 dark:border-[var(--admin-border)] flex-shrink-0">
             {isLastStep ? (
               <button
                 type="button"

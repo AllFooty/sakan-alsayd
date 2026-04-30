@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Tailwind v4 dark variant — scoped to the .dark class on <html> (admin only). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Brand Colors */
 :root {
   /* Primary Colors */
@@ -29,6 +32,32 @@
   --accent: var(--color-coral-light);
   --border: #E5E7EB;
   --ring: var(--color-coral);
+
+  /* Admin surface tokens (used by admin shell + shared components). */
+  --admin-bg: #F9FAFB;          /* page background  */
+  --admin-surface: #FFFFFF;     /* cards, topbar    */
+  --admin-surface-2: #F3F4F6;   /* subtle fill      */
+  --admin-border: #E5E7EB;
+  --admin-text: var(--color-navy);
+  --admin-text-muted: #6B7280;
+  --admin-text-subtle: #9CA3AF;
+}
+
+/* Dark mode token overrides — only active when an ancestor has the .dark class. */
+.dark {
+  --background: #0F1A2A;
+  --foreground: #F5F0EB;
+  --muted: #1F2D40;
+  --muted-foreground: #9CA3AF;
+  --border: #2A3D55;
+
+  --admin-bg: #0F1A2A;
+  --admin-surface: #17263B;
+  --admin-surface-2: #1F2D40;
+  --admin-border: #2A3D55;
+  --admin-text: #F5F0EB;
+  --admin-text-muted: #B8C2D1;
+  --admin-text-subtle: #8593A6;
 }
 
 @theme inline {

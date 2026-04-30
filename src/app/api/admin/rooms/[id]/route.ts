@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 import { getAssignedBuildingIds, hasAdminAccess } from '@/lib/auth/guards';
 import { revalidatePublicBuildings } from '@/lib/buildings/public';
+import { resolveDefaultApartmentForFloor } from '@/lib/apartments/resolve';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface RoomRow {
   id: string;
   building_id: string;
+  apartment_id: string;
+  apartment: { id: string; apartment_number: string; floor: number } | null;
   room_number: string | null;
   floor: number | null;
   room_type: string;
@@ -78,7 +81,7 @@ export async function GET(
     const { data: room, error: roomErr } = await supabase
       .from('rooms')
       .select(
-        'id, building_id, room_number, floor, room_type, bathroom_type, capacity, occupancy_mode, monthly_price, discounted_price, status, images, notes, created_at, updated_at'
+        'id, building_id, apartment_id, apartment:apartments!apartment_id(id, apartment_number, floor), room_number, floor, room_type, bathroom_type, capacity, occupancy_mode, monthly_price, discounted_price, status, images, notes, created_at, updated_at'
       )
       .eq('id', id)
       .maybeSingle<RoomRow>();
@@ -217,12 +220,14 @@ export async function PATCH(
     const { data: existing, error: fetchErr } = await supabase
       .from('rooms')
       .select(
-        'id, building_id, monthly_price, discounted_price, capacity, occupancy_mode, building:buildings!building_id(is_active)'
+        'id, building_id, apartment_id, floor, monthly_price, discounted_price, capacity, occupancy_mode, building:buildings!building_id(is_active)'
       )
       .eq('id', id)
       .maybeSingle<{
         id: string;
         building_id: string;
+        apartment_id: string;
+        floor: number | null;
         monthly_price: number;
         discounted_price: number | null;
         capacity: number;
@@ -268,15 +273,72 @@ export async function PATCH(
       }
     }
 
+    // Floor is now derived from apartment.floor — see migration 028 (the
+    // sync trigger keeps rooms.floor in step with apartment.floor whenever
+    // apartment_id changes). Direct floor edits are still accepted for
+    // back-compat with the existing RoomForm: we transparently move the
+    // room into the matching `F{n}-DEFAULT` apartment for the new floor.
+    let nextFloor: number | null = existing.floor;
+    let floorChangedExplicitly = false;
     if (Object.prototype.hasOwnProperty.call(b, 'floor')) {
       const v = b.floor;
       if (v === null || v === '') {
-        updates.floor = null;
+        nextFloor = null;
       } else if (typeof v !== 'number' || !Number.isFinite(v)) {
         return NextResponse.json({ error: 'invalidFloor' }, { status: 400 });
       } else {
-        updates.floor = Math.trunc(v);
+        nextFloor = Math.trunc(v);
       }
+      if (nextFloor !== existing.floor) {
+        floorChangedExplicitly = true;
+      }
+    }
+
+    // Allow explicit apartment_id override (forward-compat with Slice 2).
+    let nextApartmentId: string | null = null;
+    if (Object.prototype.hasOwnProperty.call(b, 'apartment_id')) {
+      const v = b.apartment_id;
+      if (typeof v !== 'string' || !UUID_RE.test(v)) {
+        return NextResponse.json({ error: 'invalidApartmentId' }, { status: 400 });
+      }
+      const { data: apt, error: aptErr } = await supabase
+        .from('apartments')
+        .select('id, building_id, is_active')
+        .eq('id', v)
+        .maybeSingle<{ id: string; building_id: string; is_active: boolean }>();
+      if (aptErr) {
+        console.error('Apartment lookup failed:', aptErr);
+        return NextResponse.json({ error: 'updateFailed' }, { status: 500 });
+      }
+      if (!apt || apt.building_id !== existing.building_id) {
+        return NextResponse.json({ error: 'apartmentNotInBuilding' }, { status: 400 });
+      }
+      if (!apt.is_active && apt.id !== existing.apartment_id) {
+        return NextResponse.json({ error: 'apartmentInactive' }, { status: 409 });
+      }
+      nextApartmentId = apt.id;
+    } else if (floorChangedExplicitly && nextFloor !== null) {
+      const resolved = await resolveDefaultApartmentForFloor(
+        supabase,
+        existing.building_id,
+        nextFloor
+      );
+      if ('error' in resolved) {
+        return NextResponse.json({ error: resolved.error }, { status: 500 });
+      }
+      nextApartmentId = resolved.apartmentId;
+    }
+
+    if (nextApartmentId && nextApartmentId !== existing.apartment_id) {
+      // The BEFORE-UPDATE trigger on rooms.apartment_id will sync floor from
+      // the new apartment, so passing apartment_id alone is enough. Skip
+      // sending updates.floor — it would be overwritten by the trigger.
+      updates.apartment_id = nextApartmentId;
+    } else if (floorChangedExplicitly && nextFloor === null) {
+      // Floor cleared without apartment change — preserve previous behavior
+      // by writing the null floor through. (Rare path: existing data already
+      // had null floor for outliers.)
+      updates.floor = null;
     }
 
     if (Object.prototype.hasOwnProperty.call(b, 'room_type')) {

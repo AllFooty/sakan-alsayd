@@ -271,7 +271,7 @@ export default function ResidentForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+          className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors w-fit"
         >
           <BackIcon size={16} />
           {t('form.actions.cancel')}
@@ -281,7 +281,7 @@ export default function ResidentForm({
             type="button"
             onClick={() => router.push(cancelHref)}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
           >
             {t('form.actions.cancel')}
           </button>
@@ -303,7 +303,7 @@ export default function ResidentForm({
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-navy">{heading}</h1>
+        <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{heading}</h1>
       </div>
 
       {/* Section: Personal info */}
@@ -345,7 +345,7 @@ export default function ResidentForm({
           />
           {/* Date of birth — overlay pattern (see project memory) */}
           <div className="w-full">
-            <label className="block text-sm font-medium text-navy mb-2">
+            <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
               {t('form.fields.date_of_birth')}
             </label>
             <div className="relative">
@@ -354,19 +354,19 @@ export default function ResidentForm({
                 lang="en"
                 {...register('date_of_birth')}
                 className={cn(
-                  'block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-navy shadow-sm transition-colors focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral disabled:cursor-not-allowed disabled:opacity-50',
+                  'block w-full rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] px-3 py-2 text-sm text-navy dark:text-[var(--admin-text)] shadow-sm transition-colors focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral disabled:cursor-not-allowed disabled:opacity-50',
                   errors.date_of_birth && 'border-red-500 focus:border-red-500 focus:ring-red-500',
                   !watchDob && 'text-transparent'
                 )}
               />
               {!watchDob && (
-                <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400">
+                <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
                   {isArabic ? 'يوم/شهر/سنة' : 'DD/MM/YYYY'}
                 </span>
               )}
             </div>
             {errors.date_of_birth?.message && (
-              <p className="mt-1.5 text-sm text-red-500">
+              <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">
                 {errors.date_of_birth.message}
               </p>
             )}
@@ -416,13 +416,13 @@ export default function ResidentForm({
         <div className="space-y-4">
           {mode === 'edit' && (
             <div className="w-full max-w-xs">
-              <label className="block text-sm font-medium text-navy mb-2">
+              <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
                 {t('form.fields.status')}
               </label>
               <select
                 {...register('status')}
                 className={cn(
-                  'block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-navy shadow-sm transition-colors focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
+                  'block w-full rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] px-3 py-2 text-sm text-navy dark:text-[var(--admin-text)] shadow-sm transition-colors focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
                   errors.status &&
                     'border-red-500 focus:border-red-500 focus:ring-red-500'
                 )}
@@ -434,7 +434,7 @@ export default function ResidentForm({
                 ))}
               </select>
               {errors.status?.message && (
-                <p className="mt-1.5 text-sm text-red-500">
+                <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">
                   {errors.status.message}
                 </p>
               )}
@@ -456,7 +456,7 @@ export default function ResidentForm({
           type="button"
           onClick={() => router.push(cancelHref)}
           disabled={submitting}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
         >
           {t('form.actions.cancel')}
         </button>
@@ -487,10 +487,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
       <div className="flex items-center gap-2 mb-4">
         {icon && <span className="text-coral">{icon}</span>}
-        <h2 className="text-sm font-semibold text-navy">{title}</h2>
+        <h2 className="text-sm font-semibold text-navy dark:text-[var(--admin-text)]">{title}</h2>
       </div>
       {children}
     </section>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import {
@@ -10,12 +10,20 @@ import {
   Loader2,
   Trash2,
   Info,
+  Plus,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
+
+interface ApartmentOption {
+  id: string;
+  apartment_number: string;
+  floor: number;
+}
 
 const ROOM_TYPES = ['single', 'double', 'triple', 'suite'] as const;
 const BATHROOM_TYPES = [
@@ -58,6 +66,7 @@ function defaultCapacityForType(rt: RoomType): number {
 
 export interface RoomFormValues {
   room_number: string;
+  apartment_id: string;
   floor: string; // kept as string for the input; parsed on submit
   room_type: RoomType;
   bathroom_type: BathroomType;
@@ -76,10 +85,15 @@ interface RoomFormProps {
   roomId?: string;
   initial?: Partial<RoomFormValues>;
   canDelete?: boolean;
+  // 'list' → after submit/delete, return to BuildingFloorMap's List sub-mode
+  // (`#floorMap=list`) so admins editing from the table land back in the table.
+  // Undefined defaults to `#layout`, which routes to Visual.
+  returnTo?: 'list';
 }
 
 const EMPTY_VALUES: RoomFormValues = {
   room_number: '',
+  apartment_id: '',
   floor: '',
   room_type: 'single',
   bathroom_type: 'shared',
@@ -98,6 +112,7 @@ export default function RoomForm({
   roomId,
   initial,
   canDelete = false,
+  returnTo,
 }: RoomFormProps) {
   const t = useTranslations('admin.buildings.roomForm');
   const tType = useTranslations('rooms.types');
@@ -108,14 +123,136 @@ export default function RoomForm({
   const isArabic = locale === 'ar';
   const router = useRouter();
 
-  const [values, setValues] = useState<RoomFormValues>({
-    ...EMPTY_VALUES,
-    ...initial,
+  // Persist draft state across navigations to /apartments/new (the inline
+  // "create new apartment" link in this form is a full nav and would
+  // otherwise nuke any in-progress fields). sessionStorage is per-tab so
+  // it dies when the tab closes; restricted to create mode so opening an
+  // edit form never resurrects stale draft data on top of the loaded room.
+  const draftKey =
+    mode === 'create' ? `roomForm:create:${buildingId}` : null;
+
+  const [values, setValues] = useState<RoomFormValues>(() => {
+    const seeded = { ...EMPTY_VALUES, ...initial };
+    if (!draftKey || typeof window === 'undefined') return seeded;
+    try {
+      const raw = window.sessionStorage.getItem(draftKey);
+      if (!raw) return seeded;
+      const parsed = JSON.parse(raw) as Partial<RoomFormValues>;
+      const merged = { ...seeded, ...parsed };
+      // A URL-provided apartment_id wins over any draft value — entering via
+      // the apartment-scoped "Add room" CTA is an explicit context signal.
+      if (initial?.apartment_id) {
+        merged.apartment_id = initial.apartment_id;
+      }
+      return merged;
+    } catch {
+      return seeded;
+    }
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  useEffect(() => {
+    if (!draftKey || typeof window === 'undefined') return;
+    try {
+      const isEmpty =
+        JSON.stringify(values) === JSON.stringify(EMPTY_VALUES);
+      if (isEmpty) {
+        window.sessionStorage.removeItem(draftKey);
+      } else {
+        window.sessionStorage.setItem(draftKey, JSON.stringify(values));
+      }
+    } catch {
+      // sessionStorage may be unavailable (private mode, quota); fail soft.
+    }
+  }, [draftKey, values]);
+
+  // Apartments list for the selector. Scoped to this building. Fetched once
+  // on mount; admins can refresh via the "create new apartment" link which
+  // navigates away.
+  const [apartments, setApartments] = useState<ApartmentOption[]>([]);
+  const [apartmentsLoading, setApartmentsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadApartments() {
+      setApartmentsLoading(true);
+      try {
+        const res = await fetch(
+          `/api/admin/buildings/${buildingId}/apartments`
+        );
+        if (cancelled) return;
+        if (!res.ok) return;
+        const json = await res.json();
+        const list: ApartmentOption[] = (json.data ?? []).map(
+          (a: { id: string; apartment_number: string; floor: number }) => ({
+            id: a.id,
+            apartment_number: a.apartment_number,
+            floor: a.floor,
+          })
+        );
+        // Stable order: by floor, then apartment_number.
+        list.sort(
+          (a, b) =>
+            a.floor - b.floor || a.apartment_number.localeCompare(b.apartment_number)
+        );
+        setApartments(list);
+        // If no apartment selected yet on create mode and there's exactly one,
+        // pre-select it for ergonomics.
+        if (
+          mode === 'create' &&
+          !values.apartment_id &&
+          list.length === 1
+        ) {
+          setValues((v) => ({
+            ...v,
+            apartment_id: list[0].id,
+            floor: String(list[0].floor),
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to load apartments:', err);
+      } finally {
+        if (!cancelled) setApartmentsLoading(false);
+      }
+    }
+    loadApartments();
+    return () => {
+      cancelled = true;
+    };
+    // We deliberately don't include `values.apartment_id` — fetching is one-shot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buildingId, mode]);
+
+  // Floor displayed on the form is derived from the selected apartment.
+  const selectedApartment = useMemo(
+    () => apartments.find((a) => a.id === values.apartment_id) ?? null,
+    [apartments, values.apartment_id]
+  );
+
+  // Keep values.floor in sync with the selected apartment so the submit
+  // payload matches what the API will compute server-side anyway.
+  useEffect(() => {
+    if (!selectedApartment) return;
+    if (values.floor !== String(selectedApartment.floor)) {
+      setValues((v) => ({ ...v, floor: String(selectedApartment.floor) }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedApartment]);
+
+  const apartmentOptions = useMemo(
+    () =>
+      apartments.map((a) => ({
+        value: a.id,
+        label: t('fields.apartmentOption', {
+          number: a.apartment_number,
+          floor: a.floor,
+        }),
+      })),
+    [apartments, t]
+  );
 
   const BackIcon = isArabic ? ArrowRight : ArrowLeft;
 
@@ -213,13 +350,12 @@ export default function RoomForm({
       }
     }
 
-    // floor: optional integer
-    if (values.floor.trim()) {
-      const f = parseFloat(values.floor);
-      if (!Number.isFinite(f) || !Number.isInteger(f)) {
-        errs.floor = t('errors.floorInvalid');
-      }
+    // apartment_id: required (the API enforces it via the FK NOT NULL).
+    if (!values.apartment_id) {
+      errs.apartment_id = t('errors.apartmentRequired');
     }
+
+    // floor is now derived from the selected apartment — no direct edit.
 
     // capacity: required integer in [MIN_CAPACITY, MAX_CAPACITY]
     const c = parseInt(values.capacity, 10);
@@ -266,7 +402,11 @@ export default function RoomForm({
         room_number: values.room_number.trim()
           ? values.room_number.trim().slice(0, MAX_ROOM_NUMBER)
           : null,
+        // floor is derived server-side from apartment.floor, but we still
+        // send it so the API can use it for legacy callers without
+        // apartment_id. Both ways arrive at the same answer.
         floor: values.floor.trim() ? Math.trunc(parseFloat(values.floor)) : null,
+        apartment_id: values.apartment_id || undefined,
         discounted_price: values.discounted_price.trim()
           ? parseFloat(values.discounted_price)
           : null,
@@ -302,6 +442,18 @@ export default function RoomForm({
         } else if (code === 'invalidFloor') {
           setErrors((e) => ({ ...e, floor: t('errors.floorInvalid') }));
           toast.error(t('errors.floorInvalid'));
+        } else if (code === 'invalidApartmentId' || code === 'apartmentNotInBuilding') {
+          setErrors((e) => ({
+            ...e,
+            apartment_id: t('errors.apartmentNotInBuilding'),
+          }));
+          toast.error(t('errors.apartmentNotInBuilding'));
+        } else if (code === 'apartmentInactive') {
+          setErrors((e) => ({
+            ...e,
+            apartment_id: t('errors.apartmentInactive'),
+          }));
+          toast.error(t('errors.apartmentInactive'));
         } else if (code === 'invalidRoomType' || code === 'invalidBathroomType') {
           toast.error(t('errors.requiredMissing'));
         } else if (code === 'invalidStatus') {
@@ -319,6 +471,10 @@ export default function RoomForm({
           toast.error(t('errors.sharedRequiresMultipleBeds'));
         } else if (code === 'buildingNotFound' || code === 'invalidBuildingId') {
           toast.error(t('errors.buildingNotFound'));
+        } else if (code === 'buildingInactive') {
+          toast.error(t('errors.buildingInactive'));
+        } else if (code === 'noChanges') {
+          toast.error(t('errors.noChanges'));
         } else {
           toast.error(t('toast.genericError'));
         }
@@ -326,7 +482,15 @@ export default function RoomForm({
       }
 
       toast.success(mode === 'create' ? t('toast.created') : t('toast.updated'));
-      router.push(`/${locale}/admin/buildings/${buildingId}`);
+      if (draftKey && typeof window !== 'undefined') {
+        try {
+          window.sessionStorage.removeItem(draftKey);
+        } catch {
+          // ignore
+        }
+      }
+      const returnHash = returnTo === 'list' ? '#floorMap=list' : '#layout';
+      router.push(`/${locale}/admin/buildings/${buildingId}${returnHash}`);
       router.refresh();
     } catch (err) {
       console.error('Room form submit failed:', err);
@@ -353,7 +517,8 @@ export default function RoomForm({
         return;
       }
       toast.success(t('toast.deleted'));
-      router.push(`/${locale}/admin/buildings/${buildingId}`);
+      const returnHash = returnTo === 'list' ? '#floorMap=list' : '#layout';
+      router.push(`/${locale}/admin/buildings/${buildingId}${returnHash}`);
       router.refresh();
     } catch (err) {
       console.error('Room delete failed:', err);
@@ -373,7 +538,7 @@ export default function RoomForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+          className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors w-fit"
         >
           <BackIcon size={16} />
           {t('cancel')}
@@ -384,7 +549,7 @@ export default function RoomForm({
               type="button"
               onClick={() => setConfirmDelete(true)}
               disabled={submitting || deleting}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-[var(--admin-surface)] border border-red-200 dark:border-red-500/30 rounded-lg hover:bg-red-50 dark:bg-red-500/10 disabled:opacity-50 transition-colors"
             >
               <Trash2 size={14} />
               {t('delete')}
@@ -394,7 +559,7 @@ export default function RoomForm({
             type="button"
             onClick={() => router.back()}
             disabled={submitting || deleting}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
           >
             {t('cancel')}
           </button>
@@ -410,14 +575,14 @@ export default function RoomForm({
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-navy">{heading}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{heading}</h1>
+        <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
           {mode === 'edit' ? t('editSubtitle') : t('createSubtitle')}
         </p>
         {buildingLabel && (
-          <p className="text-xs text-gray-500 mt-1">
-            <span className="text-gray-400">{t('buildingLabel')}: </span>
-            <span className="text-navy font-medium">{buildingLabel}</span>
+          <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">
+            <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('buildingLabel')}: </span>
+            <span className="text-navy dark:text-[var(--admin-text)] font-medium">{buildingLabel}</span>
           </p>
         )}
       </div>
@@ -436,19 +601,56 @@ export default function RoomForm({
             maxLength={MAX_ROOM_NUMBER}
             helperText={t('helpers.roomNumber')}
           />
-          <Input
-            label={t('fields.floor')}
-            type="number"
-            value={values.floor}
-            onChange={(e) => update('floor', e.target.value)}
-            placeholder="0"
-            dir="ltr"
-            lang="en"
-            inputMode="numeric"
-            step={1}
-            error={errors.floor}
-            helperText={t('helpers.floor')}
-          />
+          <div>
+            <Select
+              label={t('fields.apartment')}
+              value={values.apartment_id}
+              onChange={(e) => {
+                const id = e.target.value;
+                const apt = apartments.find((a) => a.id === id) ?? null;
+                setValues((v) => ({
+                  ...v,
+                  apartment_id: id,
+                  floor: apt ? String(apt.floor) : v.floor,
+                }));
+              }}
+              options={apartmentOptions}
+              placeholder={
+                apartmentsLoading
+                  ? '...'
+                  : apartments.length === 0
+                    ? '—'
+                    : undefined
+              }
+              error={errors.apartment_id}
+              disabled={apartmentsLoading}
+            />
+            <p className="mt-1.5 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
+              {apartments.length === 0 && !apartmentsLoading
+                ? t('helpers.apartmentEmpty')
+                : t('helpers.apartment')}
+            </p>
+            <Link
+              href={`/${locale}/admin/buildings/${buildingId}/apartments/new`}
+              className="mt-1.5 inline-flex items-center gap-1 text-xs text-coral hover:text-coral/80 font-medium"
+            >
+              <Plus size={12} />
+              {t('newApartmentInline')}
+            </Link>
+          </div>
+          {/* Floor is derived from the apartment — show read-only for clarity. */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] mb-1.5">
+              {t('fields.floor')}
+            </label>
+            <div
+              className="px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm bg-gray-50 dark:bg-[var(--admin-bg)] text-gray-700 dark:text-[var(--admin-text-muted)] tabular-nums min-h-[42px] flex items-center"
+              dir="ltr"
+            >
+              {selectedApartment ? selectedApartment.floor : '—'}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('helpers.floor')}</p>
+          </div>
           <Select
             label={t('fields.roomType')}
             value={values.room_type}
@@ -494,7 +696,7 @@ export default function RoomForm({
               disabled={sharedDisabled}
             />
             {!errors.occupancy_mode && (
-              <p className="mt-1.5 text-xs text-gray-500">
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
                 {sharedDisabled
                   ? t('helpers.occupancyModeSingle')
                   : t('helpers.occupancyMode')}
@@ -556,7 +758,7 @@ export default function RoomForm({
             options={statusOptions}
           />
           {showStatusHelper && (
-            <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
+            <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 p-3 text-xs text-amber-800">
               <Info size={14} className="flex-shrink-0 mt-0.5" />
               <span>{t('helpers.statusOccupied')}</span>
             </div>
@@ -580,7 +782,7 @@ export default function RoomForm({
             type="button"
             onClick={() => setConfirmDelete(true)}
             disabled={submitting || deleting}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors me-auto"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-[var(--admin-surface)] border border-red-200 dark:border-red-500/30 rounded-lg hover:bg-red-50 dark:bg-red-500/10 disabled:opacity-50 transition-colors me-auto"
           >
             <Trash2 size={14} />
             {t('delete')}
@@ -590,7 +792,7 @@ export default function RoomForm({
           type="button"
           onClick={() => router.back()}
           disabled={submitting || deleting}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
         >
           {t('cancel')}
         </button>
@@ -627,8 +829,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="text-sm font-semibold text-navy mb-4">{title}</h2>
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+      <h2 className="text-sm font-semibold text-navy dark:text-[var(--admin-text)] mb-4">{title}</h2>
       {children}
     </section>
   );

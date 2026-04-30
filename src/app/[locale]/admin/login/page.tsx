@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 type Step = 'email' | 'otp';
 
@@ -16,17 +17,17 @@ const isDev = process.env.NODE_ENV === 'development';
 
 function LoginSkeleton() {
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center p-4">
+    <div className="min-h-screen bg-cream dark:bg-[var(--admin-bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="h-12 w-48 bg-gray-200 rounded animate-pulse mx-auto" />
-          <div className="h-6 w-40 bg-gray-200 rounded animate-pulse mx-auto mt-4" />
+          <div className="h-12 w-48 bg-gray-200 dark:bg-[var(--admin-surface-2)] rounded animate-pulse mx-auto" />
+          <div className="h-6 w-40 bg-gray-200 dark:bg-[var(--admin-surface-2)] rounded animate-pulse mx-auto mt-4" />
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-2xl shadow-lg p-8">
           <div className="space-y-5">
-            <div className="h-5 w-24 bg-gray-200 rounded animate-pulse" />
-            <div className="h-12 bg-gray-200 rounded-xl animate-pulse" />
-            <div className="h-12 bg-gray-200 rounded-xl animate-pulse" />
+            <div className="h-5 w-24 bg-gray-200 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+            <div className="h-12 bg-gray-200 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
+            <div className="h-12 bg-gray-200 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -36,9 +37,11 @@ function LoginSkeleton() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={<LoginSkeleton />}>
-      <LoginForm />
-    </Suspense>
+    <ThemeProvider>
+      <Suspense fallback={<LoginSkeleton />}>
+        <LoginForm />
+      </Suspense>
+    </ThemeProvider>
   );
 }
 
@@ -131,7 +134,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center p-4">
+    <div className="min-h-screen bg-cream dark:bg-[var(--admin-bg)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -140,16 +143,23 @@ function LoginForm() {
             alt="Sakan Alsayd"
             width={200}
             height={60}
-            className="mx-auto h-12 w-auto"
+            className="mx-auto h-12 w-auto dark:hidden"
           />
-          <h1 className="text-xl font-bold text-navy mt-4">
+          <Image
+            src="/logo-white.png"
+            alt="Sakan Alsayd"
+            width={200}
+            height={60}
+            className="mx-auto h-12 w-auto hidden dark:block"
+          />
+          <h1 className="text-xl font-bold text-navy dark:text-[var(--admin-text)] mt-4">
             {t('title')}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
+          <p className="text-gray-500 dark:text-[var(--admin-text-muted)] text-sm mt-1">{t('subtitle')}</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-2xl shadow-lg p-6 md:p-8">
           {step === 'email' ? (
             <form
               onSubmit={usePassword ? handlePasswordLogin : handleSendOtp}
@@ -158,14 +168,14 @@ function LoginForm() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-navy mb-1.5"
+                  className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5"
                 >
                   {t('emailLabel')}
                 </label>
                 <div className="relative">
                   <Mail
                     size={18}
-                    className="absolute top-1/2 -translate-y-1/2 text-gray-400"
+                    className="absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--admin-text-subtle)]"
                     style={locale === 'ar' ? { right: 12 } : { left: 12 }}
                   />
                   <input
@@ -175,7 +185,7 @@ function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="test@sakanalsayd.com"
-                    className="w-full rounded-xl border border-gray-300 py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors placeholder:text-gray-300 placeholder:italic"
+                    className="w-full rounded-xl border border-gray-300 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface-2)] text-navy dark:text-[var(--admin-text)] py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors placeholder:text-gray-300 dark:placeholder:text-[var(--admin-text-subtle)] placeholder:italic"
                     style={
                       locale === 'ar'
                         ? { paddingRight: 40, paddingLeft: 16 }
@@ -190,14 +200,14 @@ function LoginForm() {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-navy mb-1.5"
+                    className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5"
                   >
                     {t('passwordLabel')}
                   </label>
                   <div className="relative">
                     <Lock
                       size={18}
-                      className="absolute top-1/2 -translate-y-1/2 text-gray-400"
+                      className="absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--admin-text-subtle)]"
                       style={locale === 'ar' ? { right: 12 } : { left: 12 }}
                     />
                     <input
@@ -208,7 +218,7 @@ function LoginForm() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       autoComplete="current-password"
-                      className="w-full rounded-xl border border-gray-300 py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors"
+                      className="w-full rounded-xl border border-gray-300 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface-2)] text-navy dark:text-[var(--admin-text)] py-3 text-base focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors"
                       style={
                         locale === 'ar'
                           ? { paddingRight: 40, paddingLeft: 40 }
@@ -219,7 +229,7 @@ function LoginForm() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-gray-600 dark:hover:text-[var(--admin-text)] transition-colors"
                       style={locale === 'ar' ? { left: 12 } : { right: 12 }}
                       tabIndex={-1}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
@@ -231,7 +241,7 @@ function LoginForm() {
               )}
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3">
+                <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg p-3">
                   {error}
                 </p>
               )}
@@ -257,7 +267,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => setUsePassword(!usePassword)}
-                className="w-full text-xs text-gray-400 hover:text-coral transition-colors"
+                className="w-full text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-coral transition-colors"
               >
                 {usePassword ? t('switchToOtp') : t('switchToPassword')}
               </button>
@@ -271,20 +281,20 @@ function LoginForm() {
                   setOtp('');
                   setError('');
                 }}
-                className="flex items-center gap-1 text-sm text-gray-500 hover:text-navy transition-colors"
+                className="flex items-center gap-1 text-sm text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:hover:text-[var(--admin-text)] transition-colors"
               >
                 <ArrowLeft size={16} />
                 {t('backToEmail')}
               </button>
 
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)]">
                 {t('otpSent', { email })}
               </p>
 
               <div>
                 <label
                   htmlFor="otp"
-                  className="block text-sm font-medium text-navy mb-1.5"
+                  className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5"
                 >
                   {t('otpLabel')}
                 </label>
@@ -298,14 +308,14 @@ function LoginForm() {
                     setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))
                   }
                   placeholder="000000"
-                  className="w-full rounded-xl border border-gray-300 py-3 px-4 text-center text-2xl tracking-[0.5em] font-mono focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors"
+                  className="w-full rounded-xl border border-gray-300 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface-2)] text-navy dark:text-[var(--admin-text)] py-3 px-4 text-center text-2xl tracking-[0.5em] font-mono focus:ring-2 focus:ring-coral focus:border-coral outline-none transition-colors"
                   maxLength={6}
                   required
                 />
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 rounded-lg p-3">
+                <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg p-3">
                   {error}
                 </p>
               )}
@@ -326,7 +336,7 @@ function LoginForm() {
                 type="button"
                 onClick={handleSendOtp}
                 disabled={loading}
-                className="w-full text-sm text-gray-500 hover:text-coral transition-colors"
+                className="w-full text-sm text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-coral transition-colors"
               >
                 {t('resendOtp')}
               </button>
@@ -338,7 +348,7 @@ function LoginForm() {
         <p className="text-center mt-6">
           <a
             href={`/${locale}`}
-            className="text-sm text-gray-500 hover:text-coral transition-colors"
+            className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-coral transition-colors"
           >
             {t('backToWebsite')}
           </a>

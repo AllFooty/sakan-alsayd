@@ -123,7 +123,11 @@
     "backToLocations": "Back to Locations",
     "selectRoom": "Book This Room",
     "viewBuildings": "View Buildings for Prices",
-    "pricesVary": "Prices vary by location. Select a building to see accurate pricing."
+    "pricesVary": "Prices vary by location. Select a building to see accurate pricing.",
+    "apartmentsSummary": "{apartments, plural, one {# apartment} other {# apartments}} across {floors, plural, one {# floor} other {# floors}}",
+    "allApartmentsHaveKitchen": "All apartments have a kitchen",
+    "bedroomMix": "{counts}-bedroom apartments",
+    "roomCardApartmentContext": "Available across {count, plural, one {# apartment} other {# apartments}}"
   },
   "transportation": {
     "sectionTitle": "Transportation Service",
@@ -387,8 +391,11 @@
       "room": "Room",
       "price": "Price",
       "insurance": "Insurance",
-      "transportation": "Transportation"
+      "transportation": "Transportation",
+      "apartmentContext": "{apartments, plural, one {# apartment} other {# apartments}} · {floors, plural, one {# floor} other {# floors}}",
+      "sharedKitchen": "Shared kitchen"
     },
+    "roomCardApartmentContext": "Available across {count, plural, one {# apartment} other {# apartments}}",
     "success": {
       "title": "Booking Request Sent",
       "heading": "Thank you!",
@@ -423,7 +430,12 @@
         "extraDetails": "Extra details (optional)",
         "extraDetailsPlaceholder": "Add any extra details that would help the maintenance team",
         "roomNumber": "Room No. / Apartment No. / Building",
-        "roomNumberPlaceholder": "e.g. Room 12, Apt 3, Building A"
+        "roomNumberPlaceholder": "e.g. Room 12, Apt 3, Building A",
+        "locationLabel": "Where is the issue?",
+        "locationRoom": "In a specific room",
+        "locationShared": "In a shared area (kitchen, hallway, AC)",
+        "apartmentNumberPlaceholder": "Apartment number (e.g. A1)",
+        "apartmentNumberHelper": "Optional — helps us know which apartment. Leave blank if you're not sure."
       },
       "info": {
         "title": "Your information",
@@ -473,7 +485,7 @@
       "dashboard": "Dashboard",
       "bookings": "Booking Requests",
       "maintenance": "Maintenance",
-      "buildings": "Buildings & Rooms",
+      "buildings": "Buildings",
       "occupancy": "Vacancy Map",
       "residents": "Residents",
       "users": "Users",
@@ -488,6 +500,12 @@
       },
       "collapse": "Collapse sidebar",
       "expand": "Expand sidebar"
+    },
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
     },
     "topbar": {
       "welcome": "Welcome",
@@ -722,7 +740,9 @@
         "dateFrom": "From Date",
         "dateTo": "To Date",
         "advancedFilters": "Filters",
-        "clearFilters": "Clear"
+        "clearFilters": "Clear",
+        "apartmentShared": "Shared-area only",
+        "apartmentSharedHelper": "Show only requests for kitchens, hallways, AC, and other apartment-shared areas (no specific room)."
       },
       "status": {
         "submitted": "Submitted",
@@ -780,6 +800,9 @@
         "whatsapp": "WhatsApp",
         "buildingInfo": "Building Information",
         "roomNumber": "Room / Area",
+        "apartmentLabel": "Apartment",
+        "apartmentSharedBadge": "Shared area (no specific room)",
+        "floorN": "Floor {n}",
         "createdAt": "Created",
         "updatedAt": "Last Updated",
         "completedAt": "Completed At",
@@ -900,6 +923,7 @@
         "noMap": "No map link.",
         "residents": "Active residents",
         "activeAssignmentsHint": "Currently checked-in to a room",
+        "activeAssignmentsHidden": "Your role can't see resident details",
         "metadata": "Details",
         "bilingualNames": "Bilingual labels",
         "bilingual": {
@@ -922,6 +946,8 @@
         "tabsLabel": "Building sections",
         "tabs": {
           "overview": "Overview",
+          "apartments": "Apartments",
+          "layout": "Layout",
           "rooms": "Rooms"
         },
         "notFound": {
@@ -931,26 +957,58 @@
       },
       "floorMap": {
         "tabLabel": "Floor Map",
+        "viewVisual": "Visual",
+        "viewList": "List",
+        "expandAll": "Expand all",
+        "collapseAll": "Collapse all",
+        "addApartment": "Add apartment",
+        "addRoom": "Add room",
+        "hint": "Click a floor to collapse or expand it — click an apartment to view its details.",
         "summaryTotal": "Total beds",
         "summaryOccupied": "Occupied",
         "summaryVacant": "Vacant",
         "summaryPercent": "Vacancy",
+        "summaryPercentTooltip": "Private rooms count as fully occupied for vacancy %, even when not all beds are filled.",
+        "noOccupantAccessTitle": "Occupancy details hidden",
+        "noOccupantAccessDescription": "Your role can see room status, but not who is living in each room. Vacancy totals and resident names are hidden for these rooms.",
         "floorLabel": "Floor {floor}",
         "floorUnassigned": "Unassigned floor",
-        "floorSummary": "{vacant} vacant / {total} beds",
+        "floorSummary": "{vacant} vacant / {total, plural, =0 {0 beds} one {1 bed} other {# beds}}",
+        "floorSummaryRoomsOnly": "{rooms, plural, =0 {0 rooms} one {1 room} other {# rooms}}",
+        "apartmentSummary": "{rooms, plural, =0 {0 rooms} one {1 room} other {# rooms}} · {vacant} vacant / {total, plural, =0 {0 beds} one {1 bed} other {# beds}}",
+        "apartmentSummaryRoomsOnly": "{rooms, plural, =0 {0 rooms} one {1 room} other {# rooms}}",
+        "apartmentSummaryWithResidents": "{rooms, plural, =0 {0 rooms} one {1 room} other {# rooms}} · {vacant} vacant / {total, plural, =0 {0 beds} one {1 bed} other {# beds}} · {residents, plural, =0 {0 residents} one {1 resident} other {# residents}}",
+        "apartmentUnknown": "Unassigned apartment",
+        "apartmentInactive": "Inactive",
+        "apartmentDefaultShort": "Default",
+        "apartmentDefaultTitle": "Auto-generated default apartment for this floor — rename it to a real apartment number (e.g. A1, B2) to organize rooms by apartment.",
+        "noRoomsInApartment": "No rooms in this apartment yet.",
         "roomLabel": "Room {number}",
         "roomUnnumbered": "Unnumbered room",
-        "cardCapacityPrivate": "{count, plural, one {1 bed (private)} other {# beds (private)}}",
-        "cardCapacityShared": "{occupied} of {capacity} beds occupied",
+        "cardCapacityOccupied": "{occupied} of {capacity} beds occupied",
+        "cardCapacityOverbooked": "Data inconsistency: {residents} residents in a {capacity}-bed room",
         "cardCapacityUnavailable": "{count, plural, one {1 bed offline} other {# beds offline}}",
+        "cardCapacityStatusOnly": "{capacity, plural, one {1 bed} other {# beds}}",
         "cardAriaLabel": "{room}, {type} {mode}, {occupied} occupied of {capacity} beds, status {status}",
+        "cardAriaLabelStatusOnly": "{room}, {type} {mode}, {capacity, plural, one {1 bed} other {# beds}}, status {status}",
+        "partiallyOccupied": "Partially occupied",
+        "bedVacantLabel": "Vacant bed",
+        "bedOccupiedLabel": "Occupied by {name}",
         "clickHint": "Click any room to see its current occupant and history.",
-        "emptyTitle": "No rooms in this building yet",
-        "emptyDescription": "Add rooms from the Rooms tab to populate the floor map.",
+        "emptyTitle": "No apartments yet",
+        "emptyDescription": "Add the first apartment to this building to start organizing its rooms.",
+        "emptyDescriptionStaff": "No apartments have been added to this building yet. Ask a super admin or deputy general manager to set them up.",
+        "errorTitle": "Couldn't load layout",
+        "errorDescription": "Try refreshing — if the issue persists contact support.",
+        "defaultsBannerTitle": "Reorganize default apartments",
+        "defaultsBannerDescription": "{count, plural, =0 {No default apartments left} one {1 default apartment still needs a real name (e.g. A1, B2) to organize rooms by apartment.} other {# default apartments still need real names (e.g. A1, B2) to organize rooms by apartment.}}",
+        "defaultsBannerCta": "Start renaming the first one",
+        "defaultsBannerDismiss": "Dismiss notice",
         "legend": {
           "title": "Legend",
           "vacant": "Vacant",
           "occupied": "Occupied",
+          "partial": "Partially occupied",
           "maintenance": "Maintenance",
           "reserved": "Reserved"
         }
@@ -1070,6 +1128,7 @@
         "searchPlaceholder": "Search by room number...",
         "allStatuses": "All statuses",
         "allTypes": "All types",
+        "allApartments": "All apartments",
         "clearFilters": "Clear",
         "addRoom": "Add room",
         "rowActions": "Actions",
@@ -1077,6 +1136,7 @@
         "rowDelete": "Delete room",
         "table": {
           "roomNumber": "Room",
+          "apartment": "Apartment",
           "floor": "Floor",
           "type": "Type",
           "bathroom": "Bathroom",
@@ -1112,6 +1172,8 @@
         },
         "fields": {
           "roomNumber": "Room number",
+          "apartment": "Apartment",
+          "apartmentOption": "{number} · Floor {floor}",
           "floor": "Floor",
           "roomType": "Room type",
           "bathroomType": "Bathroom type",
@@ -1124,7 +1186,9 @@
         },
         "helpers": {
           "roomNumber": "Optional. Building-friendly identifier (e.g. 101, A-3).",
-          "floor": "Optional. Use 0 for ground floor; negative for basement.",
+          "apartment": "Which apartment this room is part of. Floor is set by the apartment.",
+          "apartmentEmpty": "No apartments yet — create one first or use the inline button.",
+          "floor": "Set automatically from the selected apartment.",
           "capacity": "Number of beds in this room. Defaults from room type; override for non-standard layouts.",
           "occupancyMode": "Private = the room rents as one unit on one contract. Shared = each bed rents independently.",
           "occupancyModeSingle": "A 1-bed room is always private — there's no second tenant to share with.",
@@ -1132,6 +1196,7 @@
           "statusOccupied": "Use the residents move-in flow to assign a tenant. This only updates display status.",
           "notes": "Visible to staff only. Up to 5000 characters."
         },
+        "newApartmentInline": "Add new apartment",
         "discount": {
           "percentOff": "{pct}% off"
         },
@@ -1143,12 +1208,17 @@
           "discountInvalid": "Enter a non-negative number.",
           "discountTooHigh": "Discounted price can't exceed the monthly price.",
           "floorInvalid": "Floor must be a whole number.",
+          "apartmentRequired": "Please pick an apartment.",
+          "apartmentNotInBuilding": "That apartment doesn't belong to this building.",
+          "apartmentInactive": "That apartment is inactive — reactivate it before assigning rooms to it.",
           "capacityRequired": "Bed count is required.",
           "capacityInvalid": "Enter a whole number between 1 and 20.",
           "sharedRequiresMultipleBeds": "Shared mode needs at least 2 beds. Increase the bed count or keep this room private.",
           "notesTooLong": "Notes must be 5000 characters or fewer.",
           "requiredMissing": "Some required fields are missing.",
           "buildingNotFound": "Couldn't find the parent building.",
+          "buildingInactive": "This building is inactive — reactivate it before editing rooms.",
+          "noChanges": "No changes to save.",
           "roomHasAssignments": "This room has assignment history and can't be deleted. Set its status to maintenance to take it offline instead."
         },
         "toast": {
@@ -1172,12 +1242,168 @@
           "description": "It may have been removed, or you may not have access."
         }
       },
+      "apartmentsTab": {
+        "addApartment": "Add Apartment",
+        "searchPlaceholder": "Search by apartment number...",
+        "allFloors": "All floors",
+        "floorN": "Floor {n}",
+        "clearFilters": "Clear",
+        "table": {
+          "apartmentNumber": "Apartment",
+          "floor": "Floor",
+          "rooms": "Rooms",
+          "residents": "Residents",
+          "kitchen": "Kitchen",
+          "livingRoom": "Living room",
+          "bathrooms": "Bathrooms",
+          "status": "Status"
+        },
+        "kitchenYes": "Yes",
+        "kitchenNo": "—",
+        "livingRoomYes": "Yes",
+        "livingRoomNo": "—",
+        "bathroomsLabel": "{shared} shared, {priv} private",
+        "roomsLabel": "{count, plural, one {# room} other {# rooms}}",
+        "residentsLabel": "{count, plural, one {# resident} other {# residents}}",
+        "rowEdit": "Edit apartment",
+        "rowDelete": "Delete apartment",
+        "rowActions": "Row actions",
+        "summary": "{count, plural, one {# apartment} other {# apartments}}",
+        "clickHint": "Click an apartment to see its rooms.",
+        "emptyTitle": "No apartments yet",
+        "emptyDescription": "Add the first apartment for this building.",
+        "emptyFilteredTitle": "No matches",
+        "emptyFilteredDescription": "Try clearing the filters.",
+        "errorTitle": "Couldn't load apartments",
+        "errorDescription": "Try refreshing — if it persists, contact support.",
+        "defaultTagShort": "Auto",
+        "defaultTagTitle": "Auto-generated default for this floor — rename to a real apartment number (e.g. A1, B2) to organize rooms by apartment.",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "apartmentForm": {
+        "createTitle": "Add apartment",
+        "editTitle": "Edit apartment",
+        "createSubtitle": "Add a new apartment to this building.",
+        "editSubtitle": "Update the apartment's details, layout, or status.",
+        "create": "Create",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleting": "Deleting...",
+        "buildingLabel": "Building",
+        "sections": {
+          "basics": "Basics",
+          "layout": "Layout & shared facilities",
+          "status": "Status & notes"
+        },
+        "fields": {
+          "apartmentNumber": "Apartment number",
+          "floor": "Floor",
+          "descriptionEn": "Description (English)",
+          "descriptionAr": "Description (Arabic)",
+          "hasKitchen": "Has kitchen",
+          "hasLivingRoom": "Has living room",
+          "sharedBathroomCount": "Shared bathrooms",
+          "privateBathroomCount": "Private bathrooms",
+          "sortOrder": "Sort order",
+          "isActive": "Active",
+          "notes": "Internal notes"
+        },
+        "helpers": {
+          "apartmentNumber": "A short label like A1, 201, or Left.",
+          "floor": "0 for ground floor; negatives for basement levels.",
+          "hasKitchen": "Whether this apartment has its own kitchen.",
+          "hasLivingRoom": "Whether the apartment has a shared living room.",
+          "sharedBathroomCount": "Number of bathrooms shared by all rooms in the apartment.",
+          "privateBathroomCount": "Number of private (en-suite) bathrooms inside specific rooms.",
+          "sortOrder": "Lower numbers appear first within the same floor.",
+          "notes": "Visible only to staff."
+        },
+        "errors": {
+          "fixBelow": "Please fix the highlighted fields.",
+          "apartmentNumberRequired": "Apartment number is required.",
+          "apartmentNumberTaken": "Another apartment in this building already uses that number.",
+          "floorInvalid": "Floor must be a whole number.",
+          "bathroomCountInvalid": "Bathroom count must be a whole number between 0 and 20.",
+          "sortOrderInvalid": "Sort order must be a whole number.",
+          "buildingInactive": "This building is inactive — reactivate it before editing apartments.",
+          "buildingNotFound": "Building not found.",
+          "apartmentHasRooms": "This apartment has rooms in it. Move or delete the rooms first, or mark the apartment inactive instead.",
+          "noChanges": "No changes to save.",
+          "requiredMissing": "Required fields are missing."
+        },
+        "toast": {
+          "created": "Apartment created.",
+          "updated": "Apartment updated.",
+          "deleted": "Apartment deleted.",
+          "genericError": "Something went wrong. Please try again."
+        },
+        "deleteConfirm": {
+          "title": "Delete apartment?",
+          "description": "This permanently removes the apartment. Rooms must be moved or deleted first.",
+          "confirm": "Delete apartment",
+          "cancel": "Cancel"
+        },
+        "forbidden": {
+          "title": "You don't have access",
+          "description": "Only super admins and deputy general managers can create or delete apartments."
+        },
+        "notFound": {
+          "title": "Apartment not found",
+          "description": "It may have been removed, or you may not have access."
+        }
+      },
+      "apartmentDetail": {
+        "title": "Apartment {number}",
+        "floorN": "Floor {n}",
+        "floorChipAria": "View Floor {n} in the building layout",
+        "totalRooms": "Total rooms",
+        "totalCapacity": "Total beds",
+        "activeResidents": "Active residents",
+        "active": "Active",
+        "inactive": "Inactive",
+        "backToBuilding": "Back to building",
+        "editApartment": "Edit apartment",
+        "deleteApartment": "Delete apartment",
+        "addRoom": "Add room",
+        "roomLabel": "Room {number}",
+        "roomUnnumbered": "Unnumbered room",
+        "occupiedBy": "Occupied by",
+        "vacantShort": "Vacant",
+        "unknownResident": "Unknown resident",
+        "kitchenYes": "Kitchen",
+        "kitchenNo": "No kitchen",
+        "livingRoomYes": "Living room",
+        "livingRoomNo": "No living room",
+        "bathroomsLabel": "{shared} shared, {priv} private",
+        "defaultTagShort": "Default",
+        "defaultTagTitle": "Auto-generated default apartment for this floor — rename it to a real apartment number (e.g. A1, B2) to organize rooms by apartment.",
+        "noRooms": "No rooms in this apartment yet.",
+        "noResidents": "No active residents in this apartment yet.",
+        "noNotes": "No notes added.",
+        "noDescription": "No description.",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "notFoundTitle": "Apartment not found",
+        "notFoundDescription": "It may have been removed, or you may not have access.",
+        "sections": {
+          "rooms": "Rooms",
+          "residents": "Active residents",
+          "description": "Description",
+          "building": "Building",
+          "notes": "Internal notes",
+          "metadata": "Details"
+        }
+      },
       "roomDetail": {
         "backToRooms": "Back to rooms",
         "editRoom": "Edit room",
         "roomTitle": "Room {number}",
         "unnumbered": "Unnumbered room",
         "floorN": "Floor {n}",
+        "apartmentChip": "Apartment {number} · Floor {floor}",
+        "apartmentChipAria": "View apartment {number} on floor {floor}",
         "active": "Active",
         "ended": "Ended",
         "present": "Present",
@@ -1279,6 +1505,10 @@
         "checkOutLabel": "Check-out",
         "buildingLabel": "Building",
         "roomLabel": "Room",
+        "apartmentLabel": "Apartment",
+        "apartmentMates": "Apartment-mates",
+        "noApartmentMates": "No other residents in this apartment yet.",
+        "apartmentMatesContext": "All active residents in apartment {apartment}.",
         "statusLabel": "Status",
         "notProvided": "Not provided",
         "callPhone": "Call",
@@ -1674,6 +1904,7 @@
         "maintenance": "Maintenance",
         "buildings": "Buildings",
         "rooms": "Rooms",
+        "apartments": "Apartments",
         "residents": "Residents",
         "users": "Users & Staff",
         "content": "Website Content",
@@ -1714,6 +1945,12 @@
           "create": "Create rooms",
           "update": "Edit rooms",
           "delete": "Delete rooms"
+        },
+        "apartments": {
+          "list": "View apartments",
+          "create": "Create apartments",
+          "update": "Edit apartments",
+          "delete": "Delete apartments"
         },
         "residents": {
           "list": "View residents",

@@ -16,8 +16,8 @@ export default function MaintenancePage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
-        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{t('title')}</h1>
+        <p className="text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">{t('subtitle')}</p>
       </div>
 
       <MaintenanceList />

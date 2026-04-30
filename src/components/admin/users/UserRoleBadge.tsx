@@ -22,7 +22,7 @@ export type UserRole =
 const roleStyles: Record<UserRole, string> = {
   super_admin: 'bg-coral/10 text-coral',
   deputy_general_manager: 'bg-coral/10 text-coral',
-  branch_manager: 'bg-navy/10 text-navy',
+  branch_manager: 'bg-navy/10 text-navy dark:text-[var(--admin-text)]',
   maintenance_manager: 'bg-amber-300 text-amber-900',
   transportation_manager: 'bg-purple-300 text-purple-900',
   finance_manager: 'bg-emerald-300 text-emerald-900',

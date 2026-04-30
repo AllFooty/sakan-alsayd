@@ -27,6 +27,11 @@ interface JoinedAssignmentRow {
   rooms: {
     room_number: string | null;
     floor: number | null;
+    apartment_id: string | null;
+    apartments: {
+      id: string;
+      apartment_number: string;
+    } | null;
   } | null;
   buildings: {
     city_en: string;
@@ -85,7 +90,7 @@ export async function GET(
       supabase
         .from('room_assignments')
         .select(
-          'id, room_id, building_id, check_in_date, check_out_date, status, created_at, rooms(room_number, floor), buildings(city_en, city_ar, neighborhood_en, neighborhood_ar)'
+          'id, room_id, building_id, check_in_date, check_out_date, status, created_at, rooms(room_number, floor, apartment_id, apartments(id, apartment_number)), buildings(city_en, city_ar, neighborhood_en, neighborhood_ar)'
         )
         .eq('resident_id', id)
         .order('created_at', { ascending: false })
@@ -137,6 +142,8 @@ export async function GET(
         created_at: a.created_at,
         room_number: a.rooms?.room_number ?? null,
         floor: a.rooms?.floor ?? null,
+        apartment_id: a.rooms?.apartment_id ?? null,
+        apartment_number: a.rooms?.apartments?.apartment_number ?? null,
         building_city_en: a.buildings?.city_en ?? '',
         building_city_ar: a.buildings?.city_ar ?? '',
         building_neighborhood_en: a.buildings?.neighborhood_en ?? '',
@@ -154,6 +161,8 @@ export async function GET(
           check_out_date: activeRow.check_out_date,
           room_number: activeRow.rooms?.room_number ?? null,
           floor: activeRow.rooms?.floor ?? null,
+          apartment_id: activeRow.rooms?.apartment_id ?? null,
+          apartment_number: activeRow.rooms?.apartments?.apartment_number ?? null,
           building_city_en: activeRow.buildings?.city_en ?? '',
           building_city_ar: activeRow.buildings?.city_ar ?? '',
           building_neighborhood_en: activeRow.buildings?.neighborhood_en ?? '',

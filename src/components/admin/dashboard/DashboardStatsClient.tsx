@@ -32,7 +32,7 @@ function StatCard({
   loading?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
       <div className="flex items-center gap-4">
         <div
           className={`w-12 h-12 rounded-lg flex items-center justify-center ${color}`}
@@ -41,11 +41,11 @@ function StatCard({
         </div>
         <div>
           {loading ? (
-            <div className="h-7 w-12 bg-gray-200 rounded animate-pulse" />
+            <div className="h-7 w-12 bg-gray-200 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
           ) : (
-            <p className="text-2xl font-bold text-navy">{value}</p>
+            <p className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{value}</p>
           )}
-          <p className="text-sm text-gray-500">{label}</p>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">{label}</p>
         </div>
       </div>
     </div>

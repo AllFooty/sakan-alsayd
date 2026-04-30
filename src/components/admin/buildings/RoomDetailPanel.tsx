@@ -17,6 +17,9 @@ import {
   ExternalLink,
   Hash,
   Pencil,
+  Home as HomeIcon,
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-react';
 import StatusBadge, {
   getRoomStatusVariant,
@@ -60,6 +63,8 @@ interface MaintenanceRow {
 interface RoomDetail {
   id: string;
   building_id: string;
+  apartment_id: string;
+  apartment: { id: string; apartment_number: string; floor: number } | null;
   room_number: string | null;
   floor: number | null;
   room_type: string;
@@ -87,9 +92,18 @@ interface RoomDetail {
 interface RoomDetailPanelProps {
   roomId: string;
   onBack: () => void;
+  // 'list' → propagate `?returnTo=list` to the Edit link so the form bounces
+  // back to the merged Floor Map's List sub-mode after submit. Set by
+  // BuildingRoomsTab; left undefined when opened from BuildingFloorMap visual
+  // mode (default → Visual).
+  returnTo?: 'list';
 }
 
-export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps) {
+export default function RoomDetailPanel({
+  roomId,
+  onBack,
+  returnTo,
+}: RoomDetailPanelProps) {
   const t = useTranslations('admin.buildings.roomDetail');
   const tType = useTranslations('rooms.types');
   const tBath = useTranslations('rooms.bathroom');
@@ -98,6 +112,7 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const BackIcon = isArabic ? ArrowRight : ArrowLeft;
+  const ForwardChevron = isArabic ? ChevronLeft : ChevronRight;
   const { profile } = useAuth();
   const canEdit =
     !!profile &&
@@ -145,16 +160,16 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-9 w-40 bg-gray-100 rounded animate-pulse" />
-        <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+        <div className="h-9 w-40 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+        <div className="h-32 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
-            <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />
-            <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-48 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
+            <div className="h-48 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
           </div>
           <div className="space-y-4">
-            <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
-            <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-32 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
+            <div className="h-32 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -163,12 +178,12 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
 
   if (notFound || !room) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <DoorOpen size={40} className="mx-auto text-gray-300" />
-        <h2 className="mt-4 text-lg font-semibold text-navy">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-12 text-center">
+        <DoorOpen size={40} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)]" />
+        <h2 className="mt-4 text-lg font-semibold text-navy dark:text-[var(--admin-text)]">
           {t('notFoundTitle')}
         </h2>
-        <p className="mt-1 text-sm text-gray-500">{t('notFoundDescription')}</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">{t('notFoundDescription')}</p>
         <button
           type="button"
           onClick={onBack}
@@ -192,14 +207,16 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+          className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors w-fit"
         >
           <BackIcon size={16} />
           {t('backToRooms')}
         </button>
         {canEdit && room.building_id && (
           <Link
-            href={`/${locale}/admin/buildings/${room.building_id}/rooms/${room.id}/edit`}
+            href={`/${locale}/admin/buildings/${room.building_id}/rooms/${room.id}/edit${
+              returnTo === 'list' ? '?returnTo=list' : ''
+            }`}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-coral text-white text-sm font-medium rounded-lg hover:bg-coral/90 transition-colors shadow-sm"
           >
             <Pencil size={14} />
@@ -209,24 +226,43 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
       </div>
 
       {/* Header card */}
-      <section className="bg-white rounded-xl border border-gray-200 p-5">
+      <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-lg bg-coral/10 text-coral flex items-center justify-center flex-shrink-0">
               <DoorOpen size={20} />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-navy">
+              <h1 className="text-xl font-semibold text-navy dark:text-[var(--admin-text)]">
                 {room.room_number ? (
                   t('roomTitle', { number: room.room_number })
                 ) : (
-                  <span className="text-gray-400">{t('unnumbered')}</span>
+                  <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('unnumbered')}</span>
                 )}
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
                 {tType(room.room_type)} &middot; {tBath(room.bathroom_type)}
                 {room.floor !== null && ` · ${t('floorN', { n: room.floor })}`}
               </p>
+              {room.apartment && room.building_id && (
+                <Link
+                  href={`/${locale}/admin/buildings/${room.building_id}/apartments/${room.apartment.id}`}
+                  className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-coral/10 text-coral text-xs font-medium hover:bg-coral/15 transition-colors"
+                  aria-label={t('apartmentChipAria', {
+                    number: room.apartment.apartment_number,
+                    floor: room.apartment.floor,
+                  })}
+                >
+                  <HomeIcon size={12} />
+                  <span>
+                    {t('apartmentChip', {
+                      number: room.apartment.apartment_number,
+                      floor: room.apartment.floor,
+                    })}
+                  </span>
+                  <ForwardChevron size={12} />
+                </Link>
+              )}
             </div>
           </div>
           <StatusBadge
@@ -267,13 +303,13 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
             {occupant && room.current_assignment ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-navy/10 text-navy flex items-center justify-center font-medium">
+                  <div className="w-10 h-10 rounded-full bg-navy/10 text-navy dark:text-[var(--admin-text)] flex items-center justify-center font-medium">
                     {initials(occupant.full_name)}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-navy">{occupant.full_name}</p>
+                    <p className="font-medium text-navy dark:text-[var(--admin-text)]">{occupant.full_name}</p>
                     {occupant.nationality && (
-                      <p className="text-xs text-gray-500">{occupant.nationality}</p>
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{occupant.nationality}</p>
                     )}
                   </div>
                   <StatusBadge label={t('active')} variant="success" />
@@ -302,13 +338,13 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
                     <ContactRow icon={Mail} value={occupant.email} dir="ltr" />
                   )}
                   <ContactRow icon={Calendar} value={t('checkInDate')} subtle>
-                    <span className="text-navy">
+                    <span className="text-navy dark:text-[var(--admin-text)]">
                       {formatDate(room.current_assignment.check_in_date, locale)}
                     </span>
                   </ContactRow>
                   {room.current_assignment.check_out_date && (
                     <ContactRow icon={Calendar} value={t('checkOutDate')} subtle>
-                      <span className="text-navy">
+                      <span className="text-navy dark:text-[var(--admin-text)]">
                         {formatDate(
                           room.current_assignment.check_out_date,
                           locale
@@ -319,7 +355,7 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('noCurrentOccupant')}
               </p>
             )}
@@ -328,21 +364,21 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
           {/* Assignment history */}
           <Section title={t('sections.assignmentHistory')} icon={Calendar}>
             {room.assignment_history.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('noAssignments')}
               </p>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-gray-100 dark:divide-[var(--admin-border)]">
                 {room.assignment_history.map((a) => (
                   <li
                     key={a.id}
                     className="flex items-start justify-between py-3 gap-3"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-navy truncate">
+                      <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)] truncate">
                         {a.resident?.full_name ?? t('unknownResident')}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
                         {formatDate(a.check_in_date, locale)}
                         {' — '}
                         {a.check_out_date
@@ -365,11 +401,11 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
           {/* Maintenance history */}
           <Section title={t('sections.maintenanceHistory')} icon={Wrench}>
             {room.maintenance_history.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('noMaintenance')}
               </p>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-gray-100 dark:divide-[var(--admin-border)]">
                 {room.maintenance_history.map((m) => (
                   <li
                     key={m.id}
@@ -379,10 +415,10 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
                       href={`/${locale}/admin/maintenance/${m.id}`}
                       className="min-w-0 flex-1 group"
                     >
-                      <p className="text-sm font-medium text-navy truncate group-hover:text-coral transition-colors">
+                      <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)] truncate group-hover:text-coral transition-colors">
                         {m.title || tMaint(`category.${m.category}`)}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
                         {tMaint(`category.${m.category}`)}
                         {' · '}
                         {formatDate(m.created_at, locale)}
@@ -438,7 +474,7 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
                     href={src}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative aspect-square overflow-hidden rounded-lg border border-gray-200 hover:border-coral transition-colors"
+                    className="relative aspect-square overflow-hidden rounded-lg border border-gray-200 dark:border-[var(--admin-border)] hover:border-coral transition-colors"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="w-full h-full object-cover" />
@@ -447,8 +483,8 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
               </div>
             ) : (
               <div className="text-center py-6">
-                <ImageOff size={24} className="mx-auto text-gray-300 mb-2" />
-                <p className="text-sm text-gray-400">{t('noPhotos')}</p>
+                <ImageOff size={24} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)] mb-2" />
+                <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('noPhotos')}</p>
               </div>
             )}
           </Section>
@@ -456,11 +492,11 @@ export default function RoomDetailPanel({ roomId, onBack }: RoomDetailPanelProps
           {/* Notes */}
           <Section title={t('sections.notes')} icon={StickyNote}>
             {room.notes ? (
-              <p className="text-sm text-gray-700 whitespace-pre-line">
+              <p className="text-sm text-gray-700 dark:text-[var(--admin-text-muted)] whitespace-pre-line">
                 {room.notes}
               </p>
             ) : (
-              <p className="text-sm text-gray-400 italic">{t('noNotes')}</p>
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">{t('noNotes')}</p>
             )}
           </Section>
 
@@ -491,9 +527,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="flex items-center gap-2 text-sm font-semibold text-navy mb-3">
-        {Icon && <Icon size={16} className="text-gray-400" />}
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+      <h2 className="flex items-center gap-2 text-sm font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
+        {Icon && <Icon size={16} className="text-gray-400 dark:text-[var(--admin-text-subtle)]" />}
         {title}
       </h2>
       {children}
@@ -517,22 +553,22 @@ function PriceCell({
   hint?: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
-      <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
+    <div className="rounded-lg border border-gray-100 dark:border-[var(--admin-border)] bg-gray-50/60 dark:bg-[var(--admin-surface-2)]/60 p-3">
+      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] uppercase tracking-wide">{label}</p>
       <div className="mt-1 flex items-baseline gap-2 tabular-nums">
         {accent ? (
           <>
             <span className="text-xl font-bold text-coral">{accent}</span>
-            <span className="text-xs text-gray-400 line-through">
+            <span className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] line-through">
               {striked}
             </span>
           </>
         ) : (
-          <span className="text-xl font-semibold text-navy">{primary}</span>
+          <span className="text-xl font-semibold text-navy dark:text-[var(--admin-text)]">{primary}</span>
         )}
-        <span className="text-xs text-gray-500">{currency}</span>
+        <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{currency}</span>
       </div>
-      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+      {hint && <p className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] mt-1">{hint}</p>}
     </div>
   );
 }
@@ -552,9 +588,9 @@ function ContactRow({
 }) {
   return (
     <div className="flex items-center gap-2 min-w-0">
-      <Icon size={14} className="text-gray-400 flex-shrink-0" />
+      <Icon size={14} className="text-gray-400 dark:text-[var(--admin-text-subtle)] flex-shrink-0" />
       <span
-        className={`truncate ${subtle ? 'text-xs text-gray-500' : 'text-gray-700'}`}
+        className={`truncate ${subtle ? 'text-xs text-gray-500 dark:text-[var(--admin-text-muted)]' : 'text-gray-700 dark:text-[var(--admin-text-muted)]'}`}
         dir={dir}
       >
         {value}
@@ -577,8 +613,8 @@ function Meta({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-xs text-gray-500 uppercase tracking-wide">{label}</dt>
-      <dd className="text-gray-700">{children}</dd>
+      <dt className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] uppercase tracking-wide">{label}</dt>
+      <dd className="text-gray-700 dark:text-[var(--admin-text-muted)]">{children}</dd>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import RoomForm, {
 interface RoomApi {
   id: string;
   building_id: string;
+  apartment_id: string;
   room_number: string | null;
   floor: number | null;
   room_type: string;
@@ -63,10 +64,14 @@ function asBathroomType(v: string): BathroomType {
 
 export default function EditRoomPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; roomId: string; locale: string }>;
+  searchParams: Promise<{ returnTo?: string }>;
 }) {
   const { id: buildingId, roomId } = use(params);
+  const { returnTo } = use(searchParams);
+  const returnToList = returnTo === 'list' ? 'list' : undefined;
   const { profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const locale = useLocale();
@@ -126,6 +131,7 @@ export default function EditRoomPage({
 
         setInitial({
           room_number: r.room_number ?? '',
+          apartment_id: r.apartment_id,
           floor: r.floor !== null ? String(r.floor) : '',
           room_type: asRoomType(r.room_type),
           bathroom_type: asBathroomType(r.bathroom_type),
@@ -163,7 +169,7 @@ export default function EditRoomPage({
 
   if (!canEdit) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={DoorOpen}
           title={t('forbidden.title')}
@@ -175,7 +181,7 @@ export default function EditRoomPage({
 
   if (notFound || !initial) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={DoorOpen}
           title={t('notFound.title')}
@@ -193,6 +199,7 @@ export default function EditRoomPage({
       roomId={roomId}
       initial={initial}
       canDelete={canDelete}
+      returnTo={returnToList}
     />
   );
 }

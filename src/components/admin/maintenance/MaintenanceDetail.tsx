@@ -30,6 +30,7 @@ import StatusBadge, {
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import MaintenancePipelineStepper from './MaintenancePipelineStepper';
 import { toWhatsAppUrl, formatDate } from '@/lib/utils';
+import { isAutoApartmentNumber } from '@/lib/apartments/auto-name';
 
 interface StaffMember {
   id: string;
@@ -53,6 +54,9 @@ interface MaintenanceRequest {
   requester_name: string | null;
   requester_phone: string | null;
   room_number: string | null;
+  room_id: string | null;
+  apartment_id: string | null;
+  apartment: { id: string; apartment_number: string; floor: number } | null;
   photos: string[] | null;
   resolution_notes: string | null;
   assigned_to: string | null;
@@ -304,14 +308,14 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="h-24 bg-gray-200 rounded-xl animate-pulse" />
+        <div className="h-8 w-48 bg-gray-200 dark:bg-[var(--admin-border)] rounded animate-pulse" />
+        <div className="h-24 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
-            <div className="h-64 bg-gray-200 rounded-xl animate-pulse" />
-            <div className="h-48 bg-gray-200 rounded-xl animate-pulse" />
+            <div className="h-64 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
+            <div className="h-48 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
           </div>
-          <div className="h-96 bg-gray-200 rounded-xl animate-pulse" />
+          <div className="h-96 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
         </div>
       </div>
     );
@@ -320,7 +324,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
   if (!request) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-[var(--admin-text-muted)]">
           {isArabic ? 'طلب الصيانة غير موجود' : 'Maintenance request not found'}
         </p>
       </div>
@@ -335,13 +339,13 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.push('/admin/maintenance')}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors"
         >
-          <ArrowLeft size={20} className="text-gray-600" />
+          <ArrowLeft size={20} className="text-gray-600 dark:text-[var(--admin-text-muted)]" />
         </button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-navy">{t('detail.title')}</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl font-bold text-navy dark:text-[var(--admin-text)]">{t('detail.title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
             {t('detail.createdAt')}: {formatDateTime(request.created_at)}
           </p>
         </div>
@@ -361,51 +365,87 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
         {/* Main content */}
         <div className="lg:col-span-2 space-y-4">
           {/* Requester info */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
               {t('detail.requesterInfo')}
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <User size={16} className="text-gray-500" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <User size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">{t('table.requester')}</p>
-                  <p className="font-medium text-navy">
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('table.requester')}</p>
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                     {request.requester_name || (isArabic ? 'غير محدد' : 'Not specified')}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <Phone size={16} className="text-gray-500" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <Phone size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">{isArabic ? 'الجوال' : 'Phone'}</p>
-                  <p className="font-medium text-navy" dir="ltr">
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{isArabic ? 'الجوال' : 'Phone'}</p>
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)]" dir="ltr">
                     {request.requester_phone || (isArabic ? 'غير محدد' : 'Not specified')}
                   </p>
                 </div>
               </div>
+              {request.apartment && (() => {
+                const isAuto = isAutoApartmentNumber(request.apartment.apartment_number);
+                const floorLabel = t('detail.floorN', { n: request.apartment.floor });
+                return (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
+                      <Building2 size={16} className="text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
+                        {t('detail.apartmentLabel')}
+                      </p>
+                      <p
+                        className="font-medium text-navy dark:text-[var(--admin-text)] tabular-nums"
+                        dir={isAuto ? undefined : 'ltr'}
+                      >
+                        {isAuto ? (
+                          floorLabel
+                        ) : (
+                          <>
+                            {request.apartment.apartment_number}
+                            <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] ms-1">
+                              · {floorLabel}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                      {!request.room_id && (
+                        <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium mt-0.5">
+                          {t('detail.apartmentSharedBadge')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               {request.room_number && (
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                    <DoorOpen size={16} className="text-gray-500" />
+                  <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                    <DoorOpen size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{t('detail.roomNumber')}</p>
-                    <p className="font-medium text-navy">{request.room_number}</p>
+                    <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.roomNumber')}</p>
+                    <p className="font-medium text-navy dark:text-[var(--admin-text)]">{request.room_number}</p>
                   </div>
                 </div>
               )}
             </div>
 
             {request.requester_phone && (
-              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-[var(--admin-border)]">
                 <a
                   href={`tel:${request.requester_phone}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors"
                 >
                   <Phone size={14} />
                   {t('detail.callPhone')}
@@ -424,8 +464,8 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
           </div>
 
           {/* Issue Details */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-3">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
               {t('detail.issueDetails')}
             </h2>
             <div className="space-y-3">
@@ -433,15 +473,15 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                 <StatusBadge label={t(`category.${request.category}`)} variant="info" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">{t('table.summary')}</p>
-                <p className="font-medium text-navy whitespace-pre-wrap leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1">{t('table.summary')}</p>
+                <p className="font-medium text-navy dark:text-[var(--admin-text)] whitespace-pre-wrap leading-relaxed">
                   {request.description || t('detail.noSummary')}
                 </p>
               </div>
               {request.extra_details && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">{t('detail.extraDetails')}</p>
-                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1">{t('detail.extraDetails')}</p>
+                  <p className="text-gray-700 dark:text-[var(--admin-text-muted)] whitespace-pre-wrap leading-relaxed">
                     {request.extra_details}
                   </p>
                 </div>
@@ -450,9 +490,9 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
           </div>
 
           {/* Photos */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold text-navy">
+              <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)]">
                 {t('detail.photos')}
               </h2>
               <div>
@@ -466,7 +506,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                 <button
                   onClick={() => photoInputRef.current?.click()}
                   disabled={uploadingPhoto}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 text-navy font-medium rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 dark:bg-[var(--admin-surface-2)] text-navy dark:text-[var(--admin-text)] font-medium rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50 transition-colors"
                 >
                   {uploadingPhoto ? (
                     <>
@@ -491,7 +531,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                     href={photo.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:border-coral transition-colors group"
+                    className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-[var(--admin-border)] hover:border-coral transition-colors group"
                   >
                     <img
                       src={photo.url}
@@ -503,15 +543,15 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
               </div>
             ) : (
               <div className="text-center py-6">
-                <ImageIcon size={24} className="mx-auto text-gray-300 mb-2" />
-                <p className="text-sm text-gray-400">{t('detail.noPhotos')}</p>
+                <ImageIcon size={24} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)] mb-2" />
+                <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('detail.noPhotos')}</p>
               </div>
             )}
           </div>
 
           {/* Resolution Notes */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-3">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
               {t('detail.resolutionNotes')}
             </h2>
             <textarea
@@ -519,20 +559,20 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
               onChange={(e) => setEditResolutionNotes(e.target.value)}
               placeholder={t('detail.resolutionPlaceholder')}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none"
             />
             <button
               onClick={handleSaveResolutionNotes}
               disabled={savingNotes}
-              className="mt-2 px-4 py-1.5 bg-gray-100 text-navy text-sm font-medium rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+              className="mt-2 px-4 py-1.5 bg-gray-100 dark:bg-[var(--admin-surface-2)] text-navy dark:text-[var(--admin-text)] text-sm font-medium rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50 transition-colors"
             >
               {savingNotes ? t('detail.saving') : t('detail.save')}
             </button>
           </div>
 
           {/* Notes section */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
               {t('notes.title')}
             </h2>
 
@@ -542,7 +582,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                 onChange={(e) => setNewNote(e.target.value)}
                 placeholder={t('notes.placeholder')}
                 rows={2}
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none"
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none"
               />
               <button
                 onClick={handleAddNote}
@@ -564,21 +604,21 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
               const userNotes = notes.filter(n => !n.note.startsWith('[system]'));
               return userNotes.length === 0 ? (
                 <div className="text-center py-6">
-                  <StickyNote size={24} className="mx-auto text-gray-300 mb-2" />
-                  <p className="text-sm text-gray-400">{t('notes.empty')}</p>
-                  <p className="text-xs text-gray-300 mt-1">{t('notes.emptyDescription')}</p>
+                  <StickyNote size={24} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)] mb-2" />
+                  <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('notes.empty')}</p>
+                  <p className="text-xs text-gray-300 dark:text-[var(--admin-text-subtle)] mt-1">{t('notes.emptyDescription')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {userNotes.map((note) => (
                     <div
                       key={note.id}
-                      className="rounded-lg p-3 border bg-gray-50 border-gray-100"
+                      className="rounded-lg p-3 border bg-gray-50 dark:bg-[var(--admin-bg)] border-gray-100 dark:border-[var(--admin-border)]"
                     >
-                      <p className="text-sm whitespace-pre-wrap text-gray-700">
+                      <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-[var(--admin-text-muted)]">
                         {note.note}
                       </p>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         <span className="font-medium">{note.author?.full_name}</span>
                         <span>&middot;</span>
                         <span>{formatDateTime(note.created_at)}</span>
@@ -591,8 +631,8 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
           </div>
 
           {/* Activity Log section */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4 flex items-center gap-2">
               <History size={18} />
               {t('activityLog.title')}
             </h2>
@@ -603,12 +643,12 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                 <div className="space-y-3">
                   {/* Completion event */}
                   {request.completed_at && (
-                    <div className="rounded-lg p-3 border bg-green-50/50 border-green-100">
-                      <p className="text-sm text-green-700 italic flex items-center gap-1.5">
-                        <CheckCircle size={14} className="text-green-500" />
+                    <div className="rounded-lg p-3 border bg-green-50/50 dark:bg-green-500/10 border-green-100 dark:border-green-500/20">
+                      <p className="text-sm text-green-700 dark:text-green-400 italic flex items-center gap-1.5">
+                        <CheckCircle size={14} className="text-green-500 dark:text-green-400" />
                         {t('activityLog.completed')}
                       </p>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         <span>{formatDateTime(request.completed_at)}</span>
                       </div>
                     </div>
@@ -627,12 +667,12 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                     return (
                       <div
                         key={note.id}
-                        className="rounded-lg p-3 border bg-blue-50/50 border-blue-100"
+                        className="rounded-lg p-3 border bg-blue-50/50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20"
                       >
-                        <p className="text-sm whitespace-pre-wrap text-blue-700 italic">
+                        <p className="text-sm whitespace-pre-wrap text-blue-700 dark:text-blue-400 italic">
                           {displayText}
                         </p>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                           <span className="font-medium">{note.author?.full_name || t('notes.system')}</span>
                           <span>&middot;</span>
                           <span>{formatDateTime(note.created_at)}</span>
@@ -642,12 +682,12 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                   })}
 
                   {/* Creation event — always shown at the bottom (oldest) */}
-                  <div className="rounded-lg p-3 border bg-gray-50 border-gray-200">
-                    <p className="text-sm text-gray-600 italic flex items-center gap-1.5">
-                      <Clock size={14} className="text-gray-400" />
+                  <div className="rounded-lg p-3 border bg-gray-50 dark:bg-[var(--admin-bg)] border-gray-200 dark:border-[var(--admin-border)]">
+                    <p className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)] italic flex items-center gap-1.5">
+                      <Clock size={14} className="text-gray-400 dark:text-[var(--admin-text-subtle)]" />
                       {t('activityLog.created')}
                     </p>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                       <span>{formatDateTime(request.created_at)}</span>
                     </div>
                   </div>
@@ -660,8 +700,8 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Status & Actions */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
               {t('detail.assignment')}
             </h2>
 
@@ -669,14 +709,14 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
               {/* Status + Priority badges */}
               <div className="flex gap-3">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1.5">{t('table.status')}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5">{t('table.status')}</p>
                   <StatusBadge
                     label={t(`status.${request.status}`)}
                     variant={getMaintenanceStatusVariant(request.status)}
                   />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1.5">{t('table.priority')}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5">{t('table.priority')}</p>
                   <StatusBadge
                     label={t(`priority.${request.priority}`)}
                     variant={getMaintenancePriorityVariant(request.priority)}
@@ -686,20 +726,20 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
               {/* Assigned to */}
               <div>
-                <p className="text-xs text-gray-500 mb-1.5">{t('detail.assignedTo')}</p>
-                <p className="text-sm font-medium text-navy">
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5">{t('detail.assignedTo')}</p>
+                <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                   {request.assigned_staff?.full_name || (
-                    <span className="text-gray-400">{t('table.unassigned')}</span>
+                    <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('table.unassigned')}</span>
                   )}
                 </p>
               </div>
 
               {/* Assign & Review form (for submitted status) */}
               {showAssignForm && (
-                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-3">
+                <div className="bg-gray-50 dark:bg-[var(--admin-bg)] rounded-lg p-3 border border-gray-200 dark:border-[var(--admin-border)] space-y-3">
                   {/* Priority */}
                   <div>
-                    <p className="text-xs text-gray-500 mb-1.5 font-medium">{t('pipeline.setPriority')}</p>
+                    <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5 font-medium">{t('pipeline.setPriority')}</p>
                     <div className="grid grid-cols-2 gap-1.5">
                       {MAINTENANCE_PRIORITIES.map((p) => (
                         <button
@@ -708,7 +748,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                           className={`px-2 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                             selectedPriority === p
                               ? 'border-coral bg-coral text-white'
-                              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                              : 'border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-gray-300 dark:border-[var(--admin-border)]'
                           }`}
                         >
                           {t(`priority.${p}`)}
@@ -719,11 +759,11 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
                   {/* Staff */}
                   <div>
-                    <p className="text-xs text-gray-500 mb-1.5 font-medium">{t('pipeline.selectTechnician')}</p>
+                    <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5 font-medium">{t('pipeline.selectTechnician')}</p>
                     <select
                       value={selectedStaff}
                       onChange={(e) => setSelectedStaff(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral bg-white"
+                      className="w-full px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral bg-white dark:bg-[var(--admin-surface)]"
                     >
                       <option value="">{t('detail.selectStaff')}</option>
                       {assignStaff.map((s) => (
@@ -742,7 +782,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                     </button>
                     <button
                       onClick={() => setShowAssignForm(false)}
-                      className="px-3 py-2 text-sm text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                      className="px-3 py-2 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] bg-gray-200 dark:bg-[var(--admin-border)] rounded-lg hover:bg-gray-300 dark:hover:bg-[var(--admin-border)] transition-colors"
                     >
                       {t('deleteConfirm.cancel')}
                     </button>
@@ -791,7 +831,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                     <button
                       onClick={() => setShowRejectConfirm(true)}
                       disabled={actionLoading}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 disabled:opacity-50 transition-colors"
                     >
                       <XCircle size={14} />
                       {t('pipeline.actions.reject')}
@@ -799,7 +839,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                     <button
                       onClick={() => setShowCancelConfirm(true)}
                       disabled={actionLoading}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 dark:text-[var(--admin-text-muted)] bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50 transition-colors"
                     >
                       <XCircle size={14} />
                       {t('pipeline.actions.cancel')}
@@ -813,7 +853,7 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
                 <button
                   onClick={handleReopen}
                   disabled={actionLoading}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-navy bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-navy dark:text-[var(--admin-text)] bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50 transition-colors"
                 >
                   <RotateCcw size={14} />
                   {t('pipeline.actions.reopen')}
@@ -824,19 +864,19 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
 
           {/* Building Info */}
           {request.building && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-base font-semibold text-navy mb-3">
+            <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+              <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
                 {t('detail.buildingInfo')}
               </h2>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-navy/10 flex items-center justify-center">
-                  <Building2 size={16} className="text-navy" />
+                  <Building2 size={16} className="text-navy dark:text-[var(--admin-text)]" />
                 </div>
                 <div>
-                  <p className="font-medium text-navy">
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                     {isArabic ? request.building.neighborhood_ar : request.building.neighborhood_en}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {isArabic ? request.building.city_ar : request.building.city_en}
                   </p>
                 </div>

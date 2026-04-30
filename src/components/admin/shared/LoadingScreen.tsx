@@ -9,7 +9,7 @@ export default function LoadingScreen() {
   return (
     <div className="flex flex-col items-center justify-center py-32 gap-3">
       <Loader2 size={32} className="animate-spin text-coral" />
-      <p className="text-sm text-gray-500">{t('loading')}</p>
+      <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">{t('loading')}</p>
     </div>
   );
 }

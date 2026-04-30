@@ -161,12 +161,12 @@ export default function OccupancyDashboard() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{t('title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {refreshedLabel && (
-            <span className="text-xs text-gray-400 tabular-nums">
+            <span className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] tabular-nums">
               {t('refresh.lastUpdated', { time: refreshedLabel })}
             </span>
           )}
@@ -175,18 +175,18 @@ export default function OccupancyDashboard() {
             onClick={() => fetchData()}
             disabled={loading}
             aria-label={t('refresh.button')}
-            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 text-gray-600 bg-white hover:text-coral hover:border-coral/40 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] hover:text-coral hover:border-coral/40 disabled:opacity-50 transition-colors"
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : undefined} />
           </button>
-          <label className="text-sm text-gray-600" htmlFor="occupancy-sort">
+          <label className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)]" htmlFor="occupancy-sort">
             {t('sortLabel')}
           </label>
           <select
             id="occupancy-sort"
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+            className="px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm bg-white dark:bg-[var(--admin-surface)] focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
           >
             <option value="most_empty">{t('sort.mostEmpty')}</option>
             <option value="name">{t('sort.name')}</option>
@@ -210,7 +210,7 @@ export default function OccupancyDashboard() {
           ))}
         </div>
       ) : error ? (
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
           <EmptyState
             icon={Activity}
             title={t('error.title')}
@@ -227,7 +227,7 @@ export default function OccupancyDashboard() {
           />
         </div>
       ) : sortedBuildings.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
           <EmptyState
             icon={Activity}
             title={t('empty.title')}
@@ -262,7 +262,7 @@ function SummaryRow({
   t: ReturnType<typeof useTranslations>;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 sm:p-5">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <SummaryStat label={t('summary.totalBeds')} value={intFmt.format(totals.total_beds)} />
         <SummaryStat
@@ -273,7 +273,7 @@ function SummaryRow({
         <SummaryStat
           label={t('summary.vacant')}
           value={intFmt.format(totals.vacant_beds)}
-          accent="text-emerald-600"
+          accent="text-emerald-600 dark:text-emerald-400"
         />
         <SummaryStat
           label={t('summary.vacancyPct')}
@@ -295,8 +295,8 @@ function SummaryStat({
 }) {
   return (
     <div>
-      <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold ${accent ?? 'text-navy'}`}>{value}</p>
+      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] uppercase tracking-wide">{label}</p>
+      <p className={`mt-1 text-2xl font-semibold ${accent ?? 'text-navy dark:text-[var(--admin-text)]'}`}>{value}</p>
     </div>
   );
 }
@@ -309,8 +309,8 @@ function Legend({ t }: { t: ReturnType<typeof useTranslations> }) {
     { status: 'reserved', label: t('legend.reserved') },
   ];
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-600">
-      <span className="font-medium text-gray-500">{t('legend.title')}</span>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-600 dark:text-[var(--admin-text-muted)]">
+      <span className="font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">{t('legend.title')}</span>
       {items.map(({ status, label }) => {
         const Icon = STATUS_ICONS[status];
         return (
@@ -350,17 +350,17 @@ function BuildingCard({
   return (
     <Link
       href={`/${locale}/admin/buildings/${building.id}#floorMap`}
-      className="group bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-coral/30 transition-all flex flex-col gap-3"
+      className="group bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 hover:shadow-md hover:border-coral/30 transition-all flex flex-col gap-3"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="font-semibold text-navy group-hover:text-coral transition-colors truncate">
+          <h3 className="font-semibold text-navy dark:text-[var(--admin-text)] group-hover:text-coral transition-colors truncate">
             {name}
           </h3>
-          <p className="text-sm text-gray-500 mt-0.5">{city}</p>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{city}</p>
         </div>
         {building.building_number != null && (
-          <span className="shrink-0 text-xs font-medium text-gray-400 tabular-nums">
+          <span className="shrink-0 text-xs font-medium text-gray-400 dark:text-[var(--admin-text-subtle)] tabular-nums">
             #{intFmt.format(building.building_number)}
           </span>
         )}
@@ -371,19 +371,19 @@ function BuildingCard({
           <span className="text-xl font-semibold text-coral tabular-nums">
             {intFmt.format(building.occupied_beds)}
           </span>
-          <span className="text-gray-500">
+          <span className="text-gray-500 dark:text-[var(--admin-text-muted)]">
             {t('card.residents', { count: building.occupied_beds })}
           </span>
         </span>
         <span className="inline-flex items-baseline gap-1.5">
-          <span className="text-xl font-semibold text-emerald-600 tabular-nums">
+          <span className="text-xl font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
             {intFmt.format(building.vacant_beds)}
           </span>
-          <span className="text-gray-500">
+          <span className="text-gray-500 dark:text-[var(--admin-text-muted)]">
             {t('card.vacantBeds', { count: building.vacant_beds })}
           </span>
         </span>
-        <span className="ms-auto text-xs font-medium text-gray-500 tabular-nums">
+        <span className="ms-auto text-xs font-medium text-gray-500 dark:text-[var(--admin-text-muted)] tabular-nums">
           {t('card.percentEmpty', { pct: pctFmt.format(pct) })}
         </span>
       </div>
@@ -427,7 +427,7 @@ function SeatMap({
   if (rooms.length === 0) {
     return (
       <div
-        className="border border-dashed border-gray-200 rounded-md py-4 text-center text-xs text-gray-400"
+        className="border border-dashed border-gray-200 dark:border-[var(--admin-border)] rounded-md py-4 text-center text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]"
         role="img"
         aria-label={ariaLabel}
       >
@@ -438,7 +438,7 @@ function SeatMap({
 
   return (
     <div
-      className="space-y-1.5 rounded-md bg-gray-50/60 p-2 border border-gray-100"
+      className="space-y-1.5 rounded-md bg-gray-50/60 dark:bg-[var(--admin-surface-2)]/60 p-2 border border-gray-100 dark:border-[var(--admin-border)]"
       role="img"
       aria-label={ariaLabel}
     >
@@ -447,7 +447,7 @@ function SeatMap({
           <span
             className={cn(
               'w-5 shrink-0 text-center text-[10px] font-semibold tabular-nums',
-              'rounded-sm bg-white border border-gray-200 text-gray-500 py-0.5'
+              'rounded-sm bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] text-gray-500 dark:text-[var(--admin-text-muted)] py-0.5'
             )}
             aria-hidden
           >
@@ -495,12 +495,12 @@ function SeatMap({
 
 function SummarySkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 sm:p-5">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="space-y-2">
-            <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
-            <div className="h-7 w-16 bg-gray-100 rounded animate-pulse" />
+            <div className="h-3 w-24 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+            <div className="h-7 w-16 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
           </div>
         ))}
       </div>
@@ -510,16 +510,16 @@ function SummarySkeleton() {
 
 function CardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 space-y-3">
       <div className="space-y-2">
-        <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
-        <div className="h-3 w-1/2 bg-gray-100 rounded animate-pulse" />
+        <div className="h-4 w-2/3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+        <div className="h-3 w-1/2 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
       </div>
       <div className="flex gap-4">
-        <div className="h-6 w-20 bg-gray-100 rounded animate-pulse" />
-        <div className="h-6 w-20 bg-gray-100 rounded animate-pulse" />
+        <div className="h-6 w-20 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+        <div className="h-6 w-20 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
       </div>
-      <div className="h-24 w-full bg-gray-100 rounded animate-pulse" />
+      <div className="h-24 w-full bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
     </div>
   );
 }

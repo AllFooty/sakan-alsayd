@@ -243,16 +243,16 @@ export default function UserModal({
         className="fixed inset-0 bg-black/50"
         onClick={() => !submitting && onClose()}
       />
-      <div className="relative bg-white rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
-          <h2 className="text-lg font-semibold text-navy">{title}</h2>
+      <div className="relative bg-white dark:bg-[var(--admin-surface)] rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[var(--admin-border)] sticky top-0 bg-white dark:bg-[var(--admin-surface)]">
+          <h2 className="text-lg font-semibold text-navy dark:text-[var(--admin-text)]">{title}</h2>
           <button
             type="button"
             onClick={() => !submitting && onClose()}
-            className="p-1 rounded-lg hover:bg-gray-100"
+            className="p-1 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)]"
             aria-label="Close"
           >
-            <X size={18} className="text-gray-500" />
+            <X size={18} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
           </button>
         </div>
 
@@ -313,30 +313,30 @@ export default function UserModal({
 
           {role !== 'super_admin' && role !== 'deputy_general_manager' && (
             <div>
-              <label className="block text-sm font-medium text-navy mb-2">
+              <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
                 {t('modal.assignBuildings')}
               </label>
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-2">
                 {t('modal.assignBuildingsHint')}
               </p>
-              <div className="border border-border rounded-xl divide-y divide-gray-100 max-h-56 overflow-y-auto">
+              <div className="border border-border dark:border-[var(--admin-border)] rounded-xl divide-y divide-gray-100 dark:divide-[var(--admin-border)] max-h-56 overflow-y-auto">
                 {buildings.length === 0 ? (
-                  <p className="text-sm text-gray-500 px-3 py-3">
+                  <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] px-3 py-3">
                     {t('modal.noBuildingsSelected')}
                   </p>
                 ) : (
                   buildings.map((b) => (
                     <label
                       key={b.id}
-                      className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-gray-50"
+                      className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-gray-50 dark:bg-[var(--admin-bg)]"
                     >
                       <input
                         type="checkbox"
                         checked={buildingIds.has(b.id)}
                         onChange={() => toggleBuilding(b.id)}
-                        className="rounded border-gray-300 text-coral focus:ring-coral/50"
+                        className="rounded border-gray-300 dark:border-[var(--admin-border)] text-coral focus:ring-coral/50"
                       />
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-gray-700 dark:text-[var(--admin-text-muted)]">
                         {buildingLabel(b)}
                       </span>
                     </label>
@@ -354,13 +354,13 @@ export default function UserModal({
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
                   disabled={!!isSelf}
-                  className="mt-1 rounded border-gray-300 text-coral focus:ring-coral/50 disabled:opacity-50"
+                  className="mt-1 rounded border-gray-300 dark:border-[var(--admin-border)] text-coral focus:ring-coral/50 disabled:opacity-50"
                 />
                 <span>
-                  <span className="block text-sm font-medium text-navy">
+                  <span className="block text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                     {t('modal.isActive')}
                   </span>
-                  <span className="block text-xs text-gray-500 mt-0.5">
+                  <span className="block text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
                     {t('modal.isActiveHint')}
                   </span>
                 </span>
@@ -380,12 +380,12 @@ export default function UserModal({
             </button>
           )}
 
-          <div className="flex justify-end gap-3 pt-2 border-t border-gray-200 -mx-6 px-6">
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-[var(--admin-border)] -mx-6 px-6">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[var(--admin-text-muted)] bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50"
             >
               {t('modal.cancel')}
             </button>

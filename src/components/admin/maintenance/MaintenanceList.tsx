@@ -89,6 +89,7 @@ export default function MaintenanceList() {
   const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
+  const [apartmentSharedFilter, setApartmentSharedFilter] = useState<boolean>(false);
   const [staffList, setStaffList] = useState<{ id: string; full_name: string }[]>(cachedStaffList || []);
   const [buildingsList, setBuildingsList] = useState<{ id: string; slug: string; neighborhood_en: string; neighborhood_ar: string; city_en: string; city_ar: string }[]>(cachedBuildingsList || []);
 
@@ -139,6 +140,7 @@ export default function MaintenanceList() {
       if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
       if (dateFrom) params.set('date_from', dateFrom);
       if (dateTo) params.set('date_to', dateTo);
+      if (apartmentSharedFilter) params.set('apartment_shared', '1');
 
       const res = await fetch(`/api/maintenance-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -150,7 +152,7 @@ export default function MaintenanceList() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, priorityFilter, categoryFilter, searchDebounce, buildingFilter, assignedToFilter, dateFrom, dateTo]);
+  }, [page, statusFilter, priorityFilter, categoryFilter, searchDebounce, buildingFilter, assignedToFilter, dateFrom, dateTo, apartmentSharedFilter]);
 
   useEffect(() => {
     fetchRequests();
@@ -160,7 +162,7 @@ export default function MaintenanceList() {
   useEffect(() => {
     setPage(1);
     setSelectedIds(new Set());
-  }, [statusFilter, priorityFilter, categoryFilter, searchDebounce, buildingFilter, assignedToFilter, dateFrom, dateTo]);
+  }, [statusFilter, priorityFilter, categoryFilter, searchDebounce, buildingFilter, assignedToFilter, dateFrom, dateTo, apartmentSharedFilter]);
 
   // Clear selection when page changes
   useEffect(() => {
@@ -229,6 +231,7 @@ export default function MaintenanceList() {
       if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
       if (dateFrom) params.set('date_from', dateFrom);
       if (dateTo) params.set('date_to', dateTo);
+      if (apartmentSharedFilter) params.set('apartment_shared', '1');
 
       const res = await fetch(`/api/maintenance-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -282,7 +285,7 @@ export default function MaintenanceList() {
         <button
           onClick={handleExport}
           disabled={exporting}
-          className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 dark:border-[var(--admin-border)] text-gray-700 dark:text-[var(--admin-text-muted)] text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-[var(--admin-surface-2)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Download size={16} />
           {exporting ? t('exporting') : t('export')}
@@ -297,15 +300,15 @@ export default function MaintenanceList() {
       </div>
 
       {/* Status filter tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg p-1 overflow-x-auto">
         {STATUSES.map((s) => (
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
               statusFilter === s
-                ? 'bg-white text-navy shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] shadow-sm'
+                : 'text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-gray-700 dark:hover:text-[var(--admin-text)]'
             }`}
           >
             {t(`filters.${s}`)}
@@ -313,19 +316,33 @@ export default function MaintenanceList() {
         ))}
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size={18}
-          className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-        <input
-          type="text"
-          placeholder={t('filters.search')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full ps-10 pe-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
-        />
+      {/* Search + apartment-shared toggle */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1">
+          <Search
+            size={18}
+            className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--admin-text-subtle)]"
+          />
+          <input
+            type="text"
+            placeholder={t('filters.search')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full ps-10 pe-4 py-2 border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] placeholder:text-gray-400 dark:placeholder:text-[var(--admin-text-subtle)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setApartmentSharedFilter((v) => !v)}
+          className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors whitespace-nowrap ${
+            apartmentSharedFilter
+              ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300'
+              : 'border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-amber-300 dark:hover:border-amber-500/40 hover:text-amber-700 dark:hover:text-amber-300'
+          }`}
+          title={t('filters.apartmentSharedHelper')}
+        >
+          {t('filters.apartmentShared')}
+        </button>
       </div>
 
       {/* Advanced Filters */}
@@ -398,6 +415,7 @@ export default function MaintenanceList() {
           setAssignedToFilter('all');
           setDateFrom('');
           setDateTo('');
+          setApartmentSharedFilter(false);
         }}
         activeCount={
           [
@@ -407,6 +425,7 @@ export default function MaintenanceList() {
             assignedToFilter !== 'all',
             !!dateFrom,
             !!dateTo,
+            apartmentSharedFilter,
           ].filter(Boolean).length
         }
         filterLabel={t('filters.advancedFilters')}
@@ -415,15 +434,15 @@ export default function MaintenanceList() {
 
       {/* Table */}
       {loading ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-6">
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
+              <div key={i} className="h-12 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
             ))}
           </div>
         </div>
       ) : requests.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
           <EmptyState
             icon={Wrench}
             title={t('empty.title')}
@@ -431,41 +450,41 @@ export default function MaintenanceList() {
           />
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
+                <tr className="border-b border-gray-200 dark:border-[var(--admin-border)] bg-gray-50 dark:bg-[var(--admin-surface-2)]">
                   <th className="px-4 py-3 w-10">
                     <input
                       type="checkbox"
                       checked={requests.length > 0 && selectedIds.size === requests.length}
                       onChange={toggleSelectAll}
-                      className="rounded border-gray-300 text-coral focus:ring-coral/50"
+                      className="rounded border-gray-300 dark:border-[var(--admin-border)] text-coral focus:ring-coral/50"
                     />
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.summary')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden md:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden md:table-cell">
                     {t('table.building')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden lg:table-cell">
                     {t('table.category')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.priority')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.status')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden xl:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden xl:table-cell">
                     {t('table.assignedTo')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden sm:table-cell">
                     {t('table.date')}
                   </th>
-                  <th className="text-end px-4 py-3 font-medium text-gray-500">
+                  <th className="text-end px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.actions')}
                   </th>
                 </tr>
@@ -474,7 +493,7 @@ export default function MaintenanceList() {
                 {requests.map((req) => (
                   <tr
                     key={req.id}
-                    className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${selectedIds.has(req.id) ? 'bg-coral/5' : ''}`}
+                    className={`border-b border-gray-100 dark:border-[var(--admin-border)] hover:bg-gray-50 dark:hover:bg-[var(--admin-surface-2)] cursor-pointer transition-colors ${selectedIds.has(req.id) ? 'bg-coral/5 dark:bg-coral/10' : ''}`}
                     onClick={() => router.push(`maintenance/${req.id}`)}
                   >
                     <td className="px-4 py-3">
@@ -483,24 +502,24 @@ export default function MaintenanceList() {
                         checked={selectedIds.has(req.id)}
                         onChange={() => toggleSelect(req.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="rounded border-gray-300 text-coral focus:ring-coral/50"
+                        className="rounded border-gray-300 dark:border-[var(--admin-border)] text-coral focus:ring-coral/50"
                       />
                     </td>
                     <td className="px-4 py-3">
                       <div className="max-w-xs">
-                        <p className="font-medium text-navy line-clamp-2">
-                          {req.description || <span className="text-gray-400 font-normal">—</span>}
+                        <p className="font-medium text-navy dark:text-[var(--admin-text)] line-clamp-2">
+                          {req.description || <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] font-normal">—</span>}
                         </p>
                         {req.requester_name && (
-                          <p className="text-xs text-gray-500">{req.requester_name}</p>
+                          <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{req.requester_name}</p>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600 hidden md:table-cell">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[var(--admin-text-muted)] hidden md:table-cell">
                       {getBuildingName(req)}
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className="text-gray-600">{t(`category.${req.category}`)}</span>
+                      <span className="text-gray-600 dark:text-[var(--admin-text-muted)]">{t(`category.${req.category}`)}</span>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge
@@ -514,12 +533,12 @@ export default function MaintenanceList() {
                         variant={getMaintenanceStatusVariant(req.status)}
                       />
                     </td>
-                    <td className="px-4 py-3 text-gray-600 hidden xl:table-cell">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[var(--admin-text-muted)] hidden xl:table-cell">
                       {req.assigned_staff?.full_name || (
-                        <span className="text-gray-400">{t('table.unassigned')}</span>
+                        <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('table.unassigned')}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">
+                    <td className="px-4 py-3 text-gray-500 dark:text-[var(--admin-text-muted)] hidden sm:table-cell">
                       {formatDateLocal(req.created_at)}
                     </td>
                     <td className="px-4 py-3">
@@ -529,7 +548,7 @@ export default function MaintenanceList() {
                             e.stopPropagation();
                             router.push(`maintenance/${req.id}`);
                           }}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-navy transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:hover:text-[var(--admin-text)] transition-colors"
                           title="View"
                         >
                           <Eye size={16} />
@@ -544,26 +563,26 @@ export default function MaintenanceList() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[var(--admin-border)]">
+              <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
                 {total} {t('title').toLowerCase()}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] text-gray-600 dark:text-[var(--admin-text-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label={tCommon('pagination.previous')}
                 >
                   <PrevIcon size={16} />
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)]">
                   {page} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] text-gray-600 dark:text-[var(--admin-text-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label={tCommon('pagination.next')}
                 >
                   <NextIcon size={16} />

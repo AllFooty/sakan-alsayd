@@ -33,10 +33,10 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
   const cancelledIndex = cancelledAtStep ? (STATUS_TO_STEP_INDEX[cancelledAtStep] ?? -1) : -1;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 sm:p-5">
       {/* Cancelled / Rejected banner */}
       {isTerminalNegative && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4 text-sm font-medium bg-red-50 text-red-700">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4 text-sm font-medium bg-red-50 dark:bg-red-500/10 text-red-700">
           <X size={16} />
           {t(`filters.${status}`)}
         </div>
@@ -77,7 +77,7 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
                     isPast && 'bg-green-500 border-green-500 text-white',
                     isCurrent && 'bg-coral border-coral text-white',
                     isCancelledStep && 'bg-red-500 border-red-500 text-white',
-                    isFuture && !isCancelledStep && 'bg-white border-gray-300 text-gray-400'
+                    isFuture && !isCancelledStep && 'bg-white dark:bg-[var(--admin-surface)] border-gray-300 dark:border-[var(--admin-border)] text-gray-400 dark:text-[var(--admin-text-subtle)]'
                   )}
                 >
                   {isPast ? <Check size={16} /> : isCancelledStep ? <X size={16} /> : i + 1}
@@ -86,8 +86,8 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
                   'mt-1.5 text-[10px] sm:text-xs font-medium leading-tight text-center',
                   isPast && 'text-green-600',
                   isCurrent && 'text-coral',
-                  isCancelledStep && 'text-red-600',
-                  isFuture && !isCancelledStep && 'text-gray-400'
+                  isCancelledStep && 'text-red-600 dark:text-red-400',
+                  isFuture && !isCancelledStep && 'text-gray-400 dark:text-[var(--admin-text-subtle)]'
                 )}>
                   {t(`filters.${step.status}`)}
                 </p>
@@ -98,7 +98,7 @@ export default function MaintenancePipelineStepper({ status, cancelledAtStep }: 
                 <div
                   className={cn(
                     'flex-1 h-0.5 mx-1 sm:mx-2 mt-[-20px] sm:mt-[-22px]',
-                    (isPast || (isTerminalNegative && cancelledIndex > i)) ? 'bg-green-500' : 'bg-gray-200'
+                    (isPast || (isTerminalNegative && cancelledIndex > i)) ? 'bg-green-500' : 'bg-gray-200 dark:bg-[var(--admin-border)]'
                   )}
                 />
               )}

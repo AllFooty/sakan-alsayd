@@ -40,6 +40,12 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('date_from');
     const dateTo = searchParams.get('date_to');
     const isExport = searchParams.get('export') === 'true';
+    // `apartment_shared=1` returns only requests with no specific room
+    // (shared-area issues — kitchen/hallway/AC). The apartment_id is optional
+    // because the public modal lets the requester leave the apartment hint
+    // blank when they can't identify it; we still need to surface those for
+    // triage instead of dropping them into an unfilterable bucket.
+    const apartmentShared = searchParams.get('apartment_shared') === '1';
     const limit = Math.min(Math.max(safeInt(searchParams.get('limit'), 20), 1), 100);
     const page = Math.max(safeInt(searchParams.get('page'), 1), 1);
     const offset = (page - 1) * limit;
@@ -56,7 +62,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('maintenance_requests')
       .select(
-        '*, building:buildings!maintenance_requests_building_id_fkey(id, slug, neighborhood_en, neighborhood_ar, city_en, city_ar), assigned_staff:staff_profiles!maintenance_requests_assigned_to_fkey(id, full_name)',
+        '*, building:buildings!maintenance_requests_building_id_fkey(id, slug, neighborhood_en, neighborhood_ar, city_en, city_ar), apartment:apartments!apartment_id(id, apartment_number, floor), assigned_staff:staff_profiles!maintenance_requests_assigned_to_fkey(id, full_name)',
         { count: 'exact' }
       );
 
@@ -82,6 +88,10 @@ export async function GET(request: NextRequest) {
 
     if (assignedTo) {
       query = query.eq('assigned_to', assignedTo);
+    }
+
+    if (apartmentShared) {
+      query = query.is('room_id', null);
     }
 
     if (dateFrom && isValidDate(dateFrom)) {

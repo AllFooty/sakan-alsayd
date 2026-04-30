@@ -9,12 +9,12 @@ type BadgeVariant =
   | 'neutral';
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: 'bg-gray-100 text-gray-800',
-  success: 'bg-green-100 text-green-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  error: 'bg-red-100 text-red-800',
-  info: 'bg-blue-100 text-blue-800',
-  neutral: 'bg-gray-100 text-gray-600',
+  default: 'bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-gray-200',
+  success: 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300',
+  warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300',
+  error: 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300',
+  info: 'bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300',
+  neutral: 'bg-gray-100 text-gray-600 dark:bg-gray-500/15 dark:text-gray-300',
 };
 
 interface StatusBadgeProps {

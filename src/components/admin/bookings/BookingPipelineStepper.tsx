@@ -31,12 +31,12 @@ export default function BookingPipelineStepper({ status }: BookingPipelineSteppe
   const currentIndex = STATUS_TO_STEP_INDEX[status] ?? -1;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 sm:p-5">
       {/* Terminal status banner */}
       {isTerminal && (
         <div className={cn(
           'flex items-center gap-2 px-3 py-2 rounded-lg mb-4 text-sm font-medium',
-          status === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'
+          status === 'rejected' ? 'bg-red-50 dark:bg-red-500/10 text-red-700' : 'bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-600 dark:text-[var(--admin-text-muted)]'
         )}>
           <X size={16} />
           {t(`status.${status}`)}
@@ -59,7 +59,7 @@ export default function BookingPipelineStepper({ status }: BookingPipelineSteppe
                     'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-bold transition-colors border-2',
                     isPast && 'bg-green-500 border-green-500 text-white',
                     isCurrent && 'bg-coral border-coral text-white',
-                    isFuture && 'bg-white border-gray-300 text-gray-400'
+                    isFuture && 'bg-white dark:bg-[var(--admin-surface)] border-gray-300 dark:border-[var(--admin-border)] text-gray-400 dark:text-[var(--admin-text-subtle)]'
                   )}
                 >
                   {isPast ? <Check size={16} /> : i + 1}
@@ -69,12 +69,12 @@ export default function BookingPipelineStepper({ status }: BookingPipelineSteppe
                     'text-[10px] sm:text-xs font-medium leading-tight',
                     isPast && 'text-green-600',
                     isCurrent && 'text-coral',
-                    isFuture && 'text-gray-400'
+                    isFuture && 'text-gray-400 dark:text-[var(--admin-text-subtle)]'
                   )}>
                     {t(`status.${step.status}`)}
                   </p>
                   {step.department && (
-                    <p className="text-[9px] sm:text-[10px] text-gray-400 leading-tight mt-0.5">
+                    <p className="text-[9px] sm:text-[10px] text-gray-400 dark:text-[var(--admin-text-subtle)] leading-tight mt-0.5">
                       {t(`pipeline.department.${step.department}`)}
                     </p>
                   )}
@@ -86,7 +86,7 @@ export default function BookingPipelineStepper({ status }: BookingPipelineSteppe
                 <div
                   className={cn(
                     'flex-1 h-0.5 mx-1 sm:mx-2 mt-[-20px] sm:mt-[-22px]',
-                    !isTerminal && currentIndex > i ? 'bg-green-500' : 'bg-gray-200'
+                    !isTerminal && currentIndex > i ? 'bg-green-500' : 'bg-gray-200 dark:bg-[var(--admin-border)]'
                   )}
                 />
               )}

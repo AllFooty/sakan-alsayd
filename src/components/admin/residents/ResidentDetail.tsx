@@ -26,6 +26,7 @@ import {
   Archive,
   LogIn,
   LogOut,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import StatusBadge from '@/components/admin/shared/StatusBadge';
@@ -39,6 +40,7 @@ import CheckOutDialog from '@/components/admin/residents/CheckOutDialog';
 import ResidentDocumentsManager from '@/components/admin/residents/ResidentDocumentsManager';
 import { useAuth } from '@/lib/auth/hooks';
 import { cn, formatDate } from '@/lib/utils';
+import { isAutoApartmentNumber } from '@/lib/apartments/auto-name';
 import type {
   ResidentDetailPayload,
   ResidentStatus,
@@ -47,6 +49,21 @@ import type {
 } from '@/lib/residents/types';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info' | 'neutral';
+
+interface ApartmentMate {
+  id: string;
+  room_id: string;
+  resident_id: string;
+  rooms: { room_number: string | null } | null;
+  resident: {
+    id: string;
+    full_name: string;
+    phone: string;
+    email: string | null;
+    profile_image: string | null;
+    status: string;
+  } | null;
+}
 
 function residentStatusVariant(status: ResidentStatus): BadgeVariant {
   switch (status) {
@@ -87,6 +104,7 @@ export default function ResidentDetail({ id }: Props) {
   const [moveInOpen, setMoveInOpen] = useState(false);
   const [checkOutOpen, setCheckOutOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [apartmentMates, setApartmentMates] = useState<ApartmentMate[]>([]);
 
   async function handleArchive() {
     setArchiving(true);
@@ -151,15 +169,47 @@ export default function ResidentDetail({ id }: Props) {
     router.replace(`/${locale}/admin/residents/${id}`);
   }, [resident, searchParams, router, locale, id]);
 
+  // Fetch apartment-mates whenever the resident's current assignment
+  // resolves to an apartment. Filtered to active assignments by the API,
+  // and we strip out the resident themselves on the client.
+  useEffect(() => {
+    const aptId = resident?.current_assignment?.apartment_id ?? null;
+    if (!aptId) {
+      setApartmentMates([]);
+      return;
+    }
+    let cancelled = false;
+    async function loadMates(apartmentId: string) {
+      try {
+        const res = await fetch(`/api/admin/apartments/${apartmentId}/residents`);
+        if (cancelled) return;
+        if (!res.ok) return;
+        const json = (await res.json()) as { data: ApartmentMate[] };
+        const mates = (json.data ?? []).filter(
+          (m) => m.resident && m.resident.id !== id
+        );
+        setApartmentMates(mates);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to fetch apartment-mates:', err);
+        }
+      }
+    }
+    loadMates(aptId);
+    return () => {
+      cancelled = true;
+    };
+  }, [resident?.current_assignment?.apartment_id, id, refreshKey]);
+
   const BackIcon = isArabic ? ArrowRight : ArrowLeft;
 
   if (loading) return <DetailSkeleton />;
 
   if (notFound || !resident) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <UserX size={40} className="mx-auto text-gray-300" />
-        <h2 className="mt-4 text-lg font-semibold text-navy">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-12 text-center">
+        <UserX size={40} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)]" />
+        <h2 className="mt-4 text-lg font-semibold text-navy dark:text-[var(--admin-text)]">
           {t('toast.notFound')}
         </h2>
         <Link
@@ -204,19 +254,19 @@ export default function ResidentDetail({ id }: Props) {
         <div className="space-y-2">
           <Link
             href={`/${locale}/admin/residents`}
-            className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors w-fit"
           >
             <BackIcon size={16} />
             {t('detail.backToList')}
           </Link>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold text-navy">{resident.full_name}</h1>
+            <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{resident.full_name}</h1>
             <StatusBadge
               label={t(`status.${resident.status}`)}
               variant={residentStatusVariant(resident.status)}
             />
           </div>
-          <p className="text-sm text-gray-500">{subline}</p>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">{subline}</p>
         </div>
         {canEdit && (
           <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
@@ -234,7 +284,7 @@ export default function ResidentDetail({ id }: Props) {
               <button
                 type="button"
                 onClick={() => setCheckOutOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-amber-300 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-50 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[var(--admin-surface)] border border-amber-300 dark:border-amber-500/40 text-amber-700 dark:text-amber-300 text-sm font-medium rounded-lg hover:bg-amber-50 dark:bg-amber-500/10 transition-colors"
               >
                 <LogOut size={14} />
                 {t('detail.checkOutButton')}
@@ -242,7 +292,7 @@ export default function ResidentDetail({ id }: Props) {
             )}
             <Link
               href={`/${locale}/admin/residents/${id}/edit`}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 text-navy text-sm font-medium rounded-lg hover:border-coral hover:text-coral transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] text-navy dark:text-[var(--admin-text)] text-sm font-medium rounded-lg hover:border-coral hover:text-coral transition-colors"
             >
               <Pencil size={14} />
               {t('detail.editButton')}
@@ -251,7 +301,7 @@ export default function ResidentDetail({ id }: Props) {
               <button
                 type="button"
                 onClick={() => setArchiveOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:border-amber-400 hover:text-amber-600 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] text-sm font-medium rounded-lg hover:border-amber-400 dark:hover:border-amber-500/50 hover:text-amber-600 dark:text-amber-400 transition-colors"
               >
                 <Archive size={14} />
                 {t('detail.archiveButton')}
@@ -319,10 +369,10 @@ export default function ResidentDetail({ id }: Props) {
                     alt={resident.full_name}
                     width={96}
                     height={96}
-                    className="h-24 w-24 rounded-full object-cover bg-gray-100 border border-gray-200"
+                    className="h-24 w-24 rounded-full object-cover bg-gray-100 dark:bg-[var(--admin-surface-2)] border border-gray-200 dark:border-[var(--admin-border)]"
                   />
                 ) : (
-                  <div className="h-24 w-24 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400">
+                  <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-[var(--admin-surface-2)] border border-gray-200 dark:border-[var(--admin-border)] flex items-center justify-center text-gray-400 dark:text-[var(--admin-text-subtle)]">
                     <UsersIcon size={36} />
                   </div>
                 )}
@@ -330,7 +380,7 @@ export default function ResidentDetail({ id }: Props) {
               <dl className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <DefRow label={t('detail.phoneLabel')} icon={Phone}>
                   {resident.phone ? (
-                    <span dir="ltr" className="tabular-nums text-gray-700">
+                    <span dir="ltr" className="tabular-nums text-gray-700 dark:text-[var(--admin-text-muted)]">
                       {resident.phone}
                     </span>
                   ) : (
@@ -339,14 +389,14 @@ export default function ResidentDetail({ id }: Props) {
                 </DefRow>
                 <DefRow label={t('detail.emailLabel')} icon={Mail}>
                   {resident.email ? (
-                    <span className="text-gray-700 break-all">{resident.email}</span>
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)] break-all">{resident.email}</span>
                   ) : (
                     <NotProvided label={t('detail.notProvided')} />
                   )}
                 </DefRow>
                 <DefRow label={t('detail.nationalityLabel')} icon={Globe}>
                   {resident.nationality ? (
-                    <span className="text-gray-700">{resident.nationality}</span>
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">{resident.nationality}</span>
                   ) : (
                     <NotProvided label={t('detail.notProvided')} />
                   )}
@@ -356,7 +406,7 @@ export default function ResidentDetail({ id }: Props) {
                   icon={Briefcase}
                 >
                   {resident.university_or_workplace ? (
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">
                       {resident.university_or_workplace}
                     </span>
                   ) : (
@@ -369,7 +419,7 @@ export default function ResidentDetail({ id }: Props) {
                   className="sm:col-span-2"
                 >
                   {resident.national_id_or_iqama ? (
-                    <span dir="ltr" className="tabular-nums text-gray-700">
+                    <span dir="ltr" className="tabular-nums text-gray-700 dark:text-[var(--admin-text-muted)]">
                       {resident.national_id_or_iqama}
                     </span>
                   ) : (
@@ -386,7 +436,7 @@ export default function ResidentDetail({ id }: Props) {
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <DefRow label={t('detail.emergencyNameLabel')}>
                   {resident.emergency_contact_name ? (
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">
                       {resident.emergency_contact_name}
                     </span>
                   ) : (
@@ -408,7 +458,7 @@ export default function ResidentDetail({ id }: Props) {
                 </DefRow>
               </dl>
             ) : (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('detail.notProvided')}
               </p>
             )}
@@ -417,18 +467,18 @@ export default function ResidentDetail({ id }: Props) {
           {/* Notes */}
           <Section title={t('detail.notes')}>
             {resident.notes ? (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-gray-700 dark:text-[var(--admin-text-muted)] leading-relaxed whitespace-pre-wrap">
                 {resident.notes}
               </p>
             ) : (
-              <p className="text-sm text-gray-400 italic">{t('detail.noNotes')}</p>
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">{t('detail.noNotes')}</p>
             )}
           </Section>
 
           {/* Assignment history */}
           <Section title={t('detail.assignmentHistory')} icon={Calendar}>
             {resident.assignment_history.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('detail.noAssignmentHistory')}
               </p>
             ) : (
@@ -449,11 +499,11 @@ export default function ResidentDetail({ id }: Props) {
           {/* Maintenance history */}
           <Section title={t('detail.maintenanceHistory')} icon={Wrench}>
             {resident.maintenance_history.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('detail.noMaintenance')}
               </p>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-gray-100 dark:divide-[var(--admin-border)]">
                 {resident.maintenance_history.map((m) => (
                   <MaintenanceHistoryItem
                     key={m.id}
@@ -474,32 +524,39 @@ export default function ResidentDetail({ id }: Props) {
             {current ? (
               <div className="space-y-3 text-sm">
                 <div>
-                  <p className="text-base font-semibold text-navy">
+                  <p className="text-base font-semibold text-navy dark:text-[var(--admin-text)]">
                     {currentNeighborhood}
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">{currentCity}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{currentCity}</p>
                 </div>
-                <dl className="space-y-2.5 pt-2 border-t border-gray-100">
+                <dl className="space-y-2.5 pt-2 border-t border-gray-100 dark:border-[var(--admin-border)]">
                   <SidebarRow
                     icon={DoorOpen}
                     label={t('detail.roomLabel')}
                   >
-                    <span className="text-gray-700 tabular-nums">
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)] tabular-nums">
                       {current.room_number ?? '—'}
                       {current.floor !== null && (
-                        <span className="text-gray-400 ms-2 text-xs">
+                        <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] ms-2 text-xs">
                           {t('card.floorLabel', { floor: current.floor })}
                         </span>
                       )}
                     </span>
                   </SidebarRow>
+                  {current.apartment_number && !isAutoApartmentNumber(current.apartment_number) && (
+                    <SidebarRow icon={HomeIcon} label={t('detail.apartmentLabel')}>
+                      <span dir="ltr" className="text-gray-700 dark:text-[var(--admin-text-muted)] tabular-nums">
+                        {current.apartment_number}
+                      </span>
+                    </SidebarRow>
+                  )}
                   <SidebarRow icon={Calendar} label={t('detail.checkInLabel')}>
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">
                       {formatDate(current.check_in_date, isArabic ? 'ar' : 'en')}
                     </span>
                   </SidebarRow>
                   <SidebarRow icon={Calendar} label={t('detail.checkOutLabel')}>
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">
                       {current.check_out_date
                         ? formatDate(
                             current.check_out_date,
@@ -518,12 +575,42 @@ export default function ResidentDetail({ id }: Props) {
                 </Link>
               </div>
             ) : (
-              <div className="flex flex-col items-center text-center py-3 text-gray-400">
+              <div className="flex flex-col items-center text-center py-3 text-gray-400 dark:text-[var(--admin-text-subtle)]">
                 <UsersIcon size={28} className="mb-2" />
                 <p className="text-sm italic">{t('detail.noAssignment')}</p>
               </div>
             )}
           </Section>
+
+          {/* Apartment-mates — visible only when the resident is in an apartment
+              that we know about. Filtered to active residents excluding self. */}
+          {current?.apartment_id && (
+            <Section title={t('detail.apartmentMates')} icon={HomeIcon}>
+              {apartmentMates.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
+                  {t('detail.noApartmentMates')}
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {apartmentMates.map((m) => (
+                    <ApartmentMateRow
+                      key={m.id}
+                      mate={m}
+                      locale={locale}
+                      t={t}
+                    />
+                  ))}
+                </ul>
+              )}
+              {current.apartment_number && !isAutoApartmentNumber(current.apartment_number) && (
+                <p className="mt-3 pt-3 border-t border-gray-100 dark:border-[var(--admin-border)] text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
+                  {t('detail.apartmentMatesContext', {
+                    apartment: current.apartment_number,
+                  })}
+                </p>
+              )}
+            </Section>
+          )}
 
           {/* Quick actions */}
           <Section title={t('detail.contactInfo')}>
@@ -574,7 +661,7 @@ export default function ResidentDetail({ id }: Props) {
       <div className="pt-2">
         <Link
           href={`/${locale}/admin/residents`}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors"
         >
           <BackIcon size={14} />
           {t('detail.backToList')}
@@ -596,9 +683,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="flex items-center gap-2 text-sm font-semibold text-navy mb-3">
-        {Icon && <Icon size={16} className="text-gray-400" />}
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+      <h2 className="flex items-center gap-2 text-sm font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
+        {Icon && <Icon size={16} className="text-gray-400 dark:text-[var(--admin-text-subtle)]" />}
         {title}
       </h2>
       {children}
@@ -619,7 +706,7 @@ function DefRow({
 }) {
   return (
     <div className={cn('space-y-1', className)}>
-      <dt className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-gray-500">
+      <dt className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-gray-500 dark:text-[var(--admin-text-muted)]">
         {Icon && <Icon size={12} />}
         {label}
       </dt>
@@ -639,7 +726,7 @@ function SidebarRow({
 }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <dt className="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wide flex-shrink-0">
+      <dt className="flex items-center gap-1.5 text-gray-500 dark:text-[var(--admin-text-muted)] text-xs uppercase tracking-wide flex-shrink-0">
         <Icon size={12} />
         {label}
       </dt>
@@ -649,7 +736,7 @@ function SidebarRow({
 }
 
 function NotProvided({ label }: { label: string }) {
-  return <span className="text-gray-400 italic">{label}</span>;
+  return <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] italic">{label}</span>;
 }
 
 function ContactAction({
@@ -674,7 +761,7 @@ function ContactAction({
         aria-disabled="true"
         className={cn(
           baseClasses,
-          'border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
+          'border-gray-200 dark:border-[var(--admin-border)] text-gray-300 dark:text-[var(--admin-text-subtle)] bg-gray-50 dark:bg-[var(--admin-bg)] cursor-not-allowed'
         )}
       >
         <Icon size={14} />
@@ -691,7 +778,7 @@ function ContactAction({
         : {})}
       className={cn(
         baseClasses,
-        'border-gray-200 text-navy bg-white hover:border-coral hover:text-coral'
+        'border-gray-200 dark:border-[var(--admin-border)] text-navy dark:text-[var(--admin-text)] bg-white dark:bg-[var(--admin-surface)] hover:border-coral hover:text-coral'
       )}
     >
       <Icon size={14} />
@@ -721,8 +808,8 @@ function AssignmentHistoryItem({
       className={cn(
         'rounded-lg border p-3 transition-colors',
         isCurrent
-          ? 'border-coral bg-coral/5'
-          : 'border-gray-200 bg-white'
+          ? 'border-coral bg-coral/5 dark:bg-coral/10'
+          : 'border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)]'
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -730,7 +817,7 @@ function AssignmentHistoryItem({
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/${locale}/admin/buildings/${item.building_id}`}
-              className="text-sm font-semibold text-navy hover:text-coral transition-colors"
+              className="text-sm font-semibold text-navy dark:text-[var(--admin-text)] hover:text-coral transition-colors"
             >
               {neighborhood}
             </Link>
@@ -744,7 +831,7 @@ function AssignmentHistoryItem({
               <StatusBadge label={t('status.checked_out')} variant="neutral" />
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
             {item.room_number
               ? t('card.roomLabel', { number: item.room_number })
               : t('card.notAssigned')}
@@ -755,19 +842,75 @@ function AssignmentHistoryItem({
             )}
           </p>
         </div>
-        <div className="text-xs text-gray-500 text-end">
+        <div className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] text-end">
           <div className="tabular-nums">
-            <span className="text-gray-400 me-1">{t('detail.checkInLabel')}:</span>
+            <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] me-1">{t('detail.checkInLabel')}:</span>
             {formatDate(item.check_in_date, isArabic ? 'ar' : 'en')}
           </div>
           <div className="tabular-nums mt-0.5">
-            <span className="text-gray-400 me-1">{t('detail.checkOutLabel')}:</span>
+            <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] me-1">{t('detail.checkOutLabel')}:</span>
             {item.check_out_date
               ? formatDate(item.check_out_date, isArabic ? 'ar' : 'en')
               : '—'}
           </div>
         </div>
       </div>
+    </li>
+  );
+}
+
+function ApartmentMateRow({
+  mate,
+  locale,
+  t,
+}: {
+  mate: ApartmentMate;
+  locale: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const r = mate.resident;
+  if (!r) return null;
+  const room = mate.rooms?.room_number ?? null;
+  return (
+    <li>
+      <Link
+        href={`/${locale}/admin/residents/${r.id}`}
+        className="flex items-center gap-3 -mx-2 px-2 py-2 rounded-md hover:bg-gray-50 dark:bg-[var(--admin-bg)] transition-colors"
+      >
+        <div className="flex-shrink-0">
+          {r.profile_image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={r.profile_image}
+              alt={r.full_name}
+              className="h-9 w-9 rounded-full object-cover bg-gray-100 dark:bg-[var(--admin-surface-2)] border border-gray-200 dark:border-[var(--admin-border)]"
+            />
+          ) : (
+            <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-[var(--admin-surface-2)] border border-gray-200 dark:border-[var(--admin-border)] flex items-center justify-center text-gray-400 dark:text-[var(--admin-text-subtle)]">
+              <UsersIcon size={16} />
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)] truncate">{r.full_name}</p>
+          <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] tabular-nums">
+            {room
+              ? t('card.roomLabel', { number: room })
+              : t('card.notAssigned')}
+          </p>
+        </div>
+        {r.phone && (
+          <a
+            href={`tel:${r.phone}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex-shrink-0 p-1.5 rounded-md text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-coral hover:bg-coral/5 dark:bg-coral/10 transition-colors"
+            aria-label={t('detail.callPhone')}
+            title={t('detail.callPhone')}
+          >
+            <Phone size={14} />
+          </a>
+        )}
+      </Link>
     </li>
   );
 }
@@ -790,16 +933,16 @@ function MaintenanceHistoryItem({
     <li>
       <Link
         href={`/${locale}/admin/maintenance/${item.id}`}
-        className="flex items-center justify-between gap-3 py-3 hover:bg-gray-50 -mx-2 px-2 rounded-md transition-colors"
+        className="flex items-center justify-between gap-3 py-3 hover:bg-gray-50 dark:bg-[var(--admin-bg)] -mx-2 px-2 rounded-md transition-colors"
       >
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-navy truncate">
+          <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)] truncate">
             {item.title || '—'}
           </p>
           <div className="flex flex-wrap items-center gap-2 mt-1">
-            <span className="text-xs text-gray-500">{categoryLabel}</span>
-            <span className="text-gray-300">·</span>
-            <span className="text-xs text-gray-500 tabular-nums">
+            <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{categoryLabel}</span>
+            <span className="text-gray-300 dark:text-[var(--admin-text-subtle)]">·</span>
+            <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] tabular-nums">
               {formatDate(item.created_at, isArabic ? 'ar' : 'en')}
             </span>
           </div>
@@ -822,21 +965,21 @@ function MaintenanceHistoryItem({
 function DetailSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
+      <div className="h-5 w-32 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
       <div className="space-y-2">
-        <div className="h-7 w-64 bg-gray-100 rounded animate-pulse" />
-        <div className="h-3 w-48 bg-gray-100 rounded animate-pulse" />
+        <div className="h-7 w-64 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+        <div className="h-3 w-48 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl border border-gray-200 p-5 space-y-3"
+              className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5 space-y-3"
             >
-              <div className="h-4 bg-gray-100 rounded animate-pulse w-32" />
-              <div className="h-3 bg-gray-100 rounded animate-pulse w-full" />
-              <div className="h-3 bg-gray-100 rounded animate-pulse w-3/4" />
+              <div className="h-4 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-32" />
+              <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-full" />
+              <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-3/4" />
             </div>
           ))}
         </div>
@@ -844,10 +987,10 @@ function DetailSkeleton() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl border border-gray-200 p-5 space-y-3"
+              className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5 space-y-3"
             >
-              <div className="h-4 bg-gray-100 rounded animate-pulse w-24" />
-              <div className="h-3 bg-gray-100 rounded animate-pulse w-full" />
+              <div className="h-4 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-24" />
+              <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-full" />
             </div>
           ))}
         </div>

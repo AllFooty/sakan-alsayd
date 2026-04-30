@@ -11,7 +11,7 @@ const fetchStaffProfile = cache(
   async (supabase: SupabaseServerClient, userId: string) => {
     const { data } = await supabase
       .from('staff_profiles')
-      .select('id, full_name, phone, role, is_active')
+      .select('id, full_name, phone, role, is_active, theme_preference')
       .eq('id', userId)
       .single<StaffProfile>();
     return data;

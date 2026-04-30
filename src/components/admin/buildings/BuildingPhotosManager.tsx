@@ -191,12 +191,12 @@ export default function BuildingPhotosManager({
   }
 
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold text-navy">
-          <ImageIcon size={16} className="text-gray-400" />
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-navy dark:text-[var(--admin-text)]">
+          <ImageIcon size={16} className="text-gray-400 dark:text-[var(--admin-text-subtle)]" />
           {t('title')}
-          <span className="text-xs text-gray-400 font-normal tabular-nums">
+          <span className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] font-normal tabular-nums">
             ({images.length}/{MAX_IMAGES})
           </span>
         </h2>
@@ -235,10 +235,10 @@ export default function BuildingPhotosManager({
       {/* Drag-drop empty state */}
       {sortedImages.length === 0 ? (
         disabled ? (
-          <div className="flex flex-col items-center justify-center text-center rounded-xl border-2 border-dashed border-gray-200 py-10">
-            <ImageIcon size={28} className="text-gray-300" />
-            <p className="mt-3 text-sm font-medium text-navy">{t('emptyTitle')}</p>
-            <p className="mt-1 text-xs text-gray-500">{t('disabledEmptyHint')}</p>
+          <div className="flex flex-col items-center justify-center text-center rounded-xl border-2 border-dashed border-gray-200 dark:border-[var(--admin-border)] py-10">
+            <ImageIcon size={28} className="text-gray-300 dark:text-[var(--admin-text-subtle)]" />
+            <p className="mt-3 text-sm font-medium text-navy dark:text-[var(--admin-text)]">{t('emptyTitle')}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('disabledEmptyHint')}</p>
           </div>
         ) : (
           <div
@@ -251,13 +251,13 @@ export default function BuildingPhotosManager({
             onClick={() => fileInputRef.current?.click()}
             className={`flex flex-col items-center justify-center text-center rounded-xl border-2 border-dashed py-10 cursor-pointer transition-colors ${
               dragOver
-                ? 'border-coral bg-coral/5'
-                : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
+                ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50 hover:bg-gray-50 dark:bg-[var(--admin-bg)]'
             }`}
           >
-            <Upload size={28} className="text-gray-300" />
-            <p className="mt-3 text-sm font-medium text-navy">{t('emptyTitle')}</p>
-            <p className="mt-1 text-xs text-gray-500">{t('emptyHint')}</p>
+            <Upload size={28} className="text-gray-300 dark:text-[var(--admin-text-subtle)]" />
+            <p className="mt-3 text-sm font-medium text-navy dark:text-[var(--admin-text)]">{t('emptyTitle')}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('emptyHint')}</p>
           </div>
         )
       ) : (
@@ -283,7 +283,7 @@ export default function BuildingPhotosManager({
                 className={`relative group aspect-square rounded-lg overflow-hidden border ${
                   isCover
                     ? 'border-coral ring-2 ring-coral/30'
-                    : 'border-gray-200 hover:border-coral/50'
+                    : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50'
                 } transition-all`}
               >
                 <Image
@@ -346,7 +346,7 @@ export default function BuildingPhotosManager({
       )}
 
       {sortedImages.length > 0 && (
-        <p className="mt-3 text-xs text-gray-500">
+        <p className="mt-3 text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
           {disabled ? t('disabledHelpText') : t('helpText')}
         </p>
       )}
@@ -378,8 +378,8 @@ function ActionButton({
       aria-label={label}
       className={`p-1.5 rounded-md backdrop-blur-sm shadow ${
         variant === 'danger'
-          ? 'bg-white/90 text-red-600 hover:bg-red-600 hover:text-white'
-          : 'bg-white/90 text-navy hover:bg-white'
+          ? 'bg-white/90 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white'
+          : 'bg-white/90 text-navy dark:text-[var(--admin-text)] hover:bg-white dark:bg-[var(--admin-surface)]'
       } disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
     >
       {busy ? <Loader2 size={14} className="animate-spin" /> : children}

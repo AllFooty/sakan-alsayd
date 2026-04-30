@@ -43,6 +43,8 @@ export interface ResidentListItem extends ResidentRow {
     check_out_date: string | null;
     room_number: string | null;
     floor: number | null;
+    apartment_id: string | null;
+    apartment_number: string | null;
     building_city_en: string;
     building_city_ar: string;
     building_neighborhood_en: string;
@@ -69,6 +71,8 @@ export interface ResidentAssignmentHistoryItem {
   created_at: string;
   room_number: string | null;
   floor: number | null;
+  apartment_id: string | null;
+  apartment_number: string | null;
   building_city_en: string;
   building_city_ar: string;
   building_neighborhood_en: string;

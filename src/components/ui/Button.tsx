@@ -17,7 +17,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 'bg-coral text-white hover:bg-coral-dark focus:ring-coral shadow-lg shadow-coral/25 hover:shadow-xl hover:shadow-coral/30',
       secondary: 'bg-navy text-white hover:bg-navy-dark focus:ring-navy shadow-lg shadow-navy/25',
       outline: 'border-2 border-coral text-coral hover:bg-coral hover:text-white focus:ring-coral',
-      ghost: 'text-navy hover:bg-cream-dark focus:ring-navy',
+      ghost: 'text-navy dark:text-[var(--admin-text)] hover:bg-cream-dark dark:hover:bg-[var(--admin-surface-2)] focus:ring-navy',
       whatsapp: 'bg-[#25D366] text-white hover:bg-[#128C7E] focus:ring-[#25D366] shadow-lg shadow-[#25D366]/25',
     };
 

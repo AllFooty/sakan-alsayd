@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 import { getAssignedBuildingIds, hasAdminAccess } from '@/lib/auth/guards';
 import { revalidatePublicBuildings } from '@/lib/buildings/public';
+import { resolveDefaultApartmentForFloor } from '@/lib/apartments/resolve';
 
 const SORTABLE_COLUMNS = [
   'room_number',
@@ -57,6 +58,8 @@ function sanitizeSearch(raw: string | null): string | null {
 interface RoomRow {
   id: string;
   building_id: string;
+  apartment_id: string;
+  apartment: { id: string; apartment_number: string; floor: number } | null;
   room_number: string | null;
   floor: number | null;
   room_type: string;
@@ -116,7 +119,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('rooms')
       .select(
-        'id, building_id, room_number, floor, room_type, bathroom_type, capacity, occupancy_mode, monthly_price, discounted_price, status, images, notes, created_at, updated_at',
+        'id, building_id, apartment_id, apartment:apartments!apartment_id(id, apartment_number, floor), room_number, floor, room_type, bathroom_type, capacity, occupancy_mode, monthly_price, discounted_price, status, images, notes, created_at, updated_at',
         { count: 'exact' }
       )
       .eq('building_id', buildingId)
@@ -145,7 +148,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      data: (data || []) as RoomRow[],
+      data: (data || []) as unknown as RoomRow[],
       total: count ?? 0,
       page,
       limit,
@@ -175,6 +178,7 @@ function isNonNegFinite(n: unknown): n is number {
 
 interface RoomInsert {
   building_id: string;
+  apartment_id: string;
   room_number: string | null;
   floor: number | null;
   room_type: (typeof ROOM_TYPES)[number];
@@ -318,8 +322,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'buildingInactive' }, { status: 409 });
     }
 
+    // Resolve apartment_id. Slice 1 keeps the existing RoomForm working
+    // (no apartment selector yet) by routing every new room into the
+    // matching `F{floor}-DEFAULT` apartment. Slice 2 will add an explicit
+    // selector and accept apartment_id directly.
+    const explicitApartmentId = trimStr(b.apartment_id, 100);
+    let apartment_id: string;
+    if (explicitApartmentId) {
+      if (!UUID_RE.test(explicitApartmentId)) {
+        return NextResponse.json({ error: 'invalidApartmentId' }, { status: 400 });
+      }
+      const { data: apt, error: aptErr } = await supabase
+        .from('apartments')
+        .select('id, building_id, is_active')
+        .eq('id', explicitApartmentId)
+        .maybeSingle<{ id: string; building_id: string; is_active: boolean }>();
+      if (aptErr) {
+        console.error('Apartment lookup failed:', aptErr);
+        return NextResponse.json({ error: 'createFailed' }, { status: 500 });
+      }
+      if (!apt || apt.building_id !== building_id) {
+        return NextResponse.json({ error: 'apartmentNotInBuilding' }, { status: 400 });
+      }
+      if (!apt.is_active) {
+        return NextResponse.json({ error: 'apartmentInactive' }, { status: 409 });
+      }
+      apartment_id = apt.id;
+    } else {
+      const resolved = await resolveDefaultApartmentForFloor(
+        supabase,
+        building_id,
+        floor ?? 0
+      );
+      if ('error' in resolved) {
+        return NextResponse.json({ error: resolved.error }, { status: 500 });
+      }
+      apartment_id = resolved.apartmentId;
+    }
+
     const insert: RoomInsert = {
       building_id,
+      apartment_id,
       room_number,
       floor,
       room_type: room_type as (typeof ROOM_TYPES)[number],

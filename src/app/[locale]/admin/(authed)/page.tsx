@@ -30,19 +30,19 @@ export default async function AdminDashboard({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-navy">
+        <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">
           {t('welcome', { name: profile?.full_name || '' })}
         </h1>
-        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+        <p className="text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">{t('subtitle')}</p>
       </div>
 
       <DashboardStatsClient initialStats={initialStats} />
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-navy mb-4">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-6">
+        <h2 className="text-lg font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
           {t('recentActivity')}
         </h2>
-        <p className="text-gray-400 text-sm">{t('noActivity')}</p>
+        <p className="text-gray-400 dark:text-[var(--admin-text-subtle)] text-sm">{t('noActivity')}</p>
       </div>
     </div>
   );

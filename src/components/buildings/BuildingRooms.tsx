@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
-import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin, DoorOpen } from 'lucide-react';
+import { User, Users, Users2, Bath, Info, ArrowLeft, ArrowRight, MapPin, DoorOpen, Home as HomeIcon, ChefHat } from 'lucide-react';
 import { Card, Button, RoomImage } from '@/components/ui';
 import type { PublicBuilding } from '@/lib/buildings/public';
 import { formatPrice, cn } from '@/lib/utils';
@@ -113,6 +113,36 @@ export default function BuildingRooms({ building }: BuildingRoomsProps) {
           <p className="text-navy/70">
             {tBuildings('pageTitle')}
           </p>
+          {/* Apartment summary chips — only render when the building has been
+              organized into apartments (count > 0). The kitchen tag shows
+              only when ALL apartments have one, to avoid promising a feature
+              the resident might not actually get. */}
+          {building.apartmentSummary.count > 0 && (
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream text-navy/80">
+                <HomeIcon className="w-3.5 h-3.5 text-coral" />
+                {tBuildings('apartmentsSummary', {
+                  apartments: building.apartmentSummary.count,
+                  floors: building.apartmentSummary.floors,
+                })}
+              </span>
+              {building.apartmentSummary.withKitchen ===
+                building.apartmentSummary.count &&
+                building.apartmentSummary.count > 0 && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream text-navy/80">
+                    <ChefHat className="w-3.5 h-3.5 text-coral" />
+                    {tBuildings('allApartmentsHaveKitchen')}
+                  </span>
+                )}
+              {building.apartmentSummary.bedroomCounts.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream text-navy/80">
+                  {tBuildings('bedroomMix', {
+                    counts: building.apartmentSummary.bedroomCounts.join(', '),
+                  })}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Filter Tabs */}
@@ -155,10 +185,24 @@ export default function BuildingRooms({ building }: BuildingRoomsProps) {
 
               <div className="p-6">
                 {/* Room Details */}
-                <div className="flex items-center gap-2 text-navy/60 mb-4">
+                <div className="flex items-center gap-2 text-navy/60 mb-2">
                   <Bath className="w-4 h-4" />
                   <span className="text-sm">{getBathroomName(room.bathroomType)}</span>
                 </div>
+                {/* Apartment context — "available across N apartments" tells
+                    students how flexible their placement is and confirms the
+                    building's structure. Hidden when the data hasn't been
+                    organized yet (count = 0). */}
+                {room.apartmentCount > 0 && (
+                  <div className="flex items-center gap-2 text-navy/60 mb-4">
+                    <HomeIcon className="w-4 h-4" />
+                    <span className="text-xs">
+                      {tBuildings('roomCardApartmentContext', {
+                        count: room.apartmentCount,
+                      })}
+                    </span>
+                  </div>
+                )}
 
                 {/* Pricing */}
                 <div className="space-y-2 mb-6">

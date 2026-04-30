@@ -237,14 +237,14 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-        <div className="h-24 bg-gray-200 rounded-xl animate-pulse" />
+        <div className="h-8 w-48 bg-gray-200 dark:bg-[var(--admin-border)] rounded animate-pulse" />
+        <div className="h-24 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
-            <div className="h-64 bg-gray-200 rounded-xl animate-pulse" />
-            <div className="h-48 bg-gray-200 rounded-xl animate-pulse" />
+            <div className="h-64 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
+            <div className="h-48 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
           </div>
-          <div className="h-96 bg-gray-200 rounded-xl animate-pulse" />
+          <div className="h-96 bg-gray-200 dark:bg-[var(--admin-border)] rounded-xl animate-pulse" />
         </div>
       </div>
     );
@@ -253,7 +253,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
   if (!booking) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Booking request not found</p>
+        <p className="text-gray-500 dark:text-[var(--admin-text-muted)]">Booking request not found</p>
       </div>
     );
   }
@@ -269,13 +269,13 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.push('/admin/bookings')}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors"
         >
-          <ArrowLeft size={20} className="text-gray-600" />
+          <ArrowLeft size={20} className="text-gray-600 dark:text-[var(--admin-text-muted)]" />
         </button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-navy">{t('detail.title')}</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl font-bold text-navy dark:text-[var(--admin-text)]">{t('detail.title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
             {t('detail.createdAt')}: {formatDateTime(booking.created_at)}
           </p>
         </div>
@@ -288,61 +288,61 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
         {/* Main content */}
         <div className="lg:col-span-2 space-y-4">
           {/* Contact info */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
               {t('detail.contactInfo')}
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <User size={16} className="text-gray-500" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <User size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">{t('table.name')}</p>
-                  <p className="font-medium text-navy">{booking.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('table.name')}</p>
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)]">{booking.name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <Mail size={16} className="text-gray-500" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <Mail size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">{t('table.email')}</p>
-                  <p className="font-medium text-navy">{booking.email}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('table.email')}</p>
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)]">{booking.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <Phone size={16} className="text-gray-500" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <Phone size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">{t('table.phone')}</p>
-                  <p className="font-medium text-navy" dir="ltr">{booking.phone}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('table.phone')}</p>
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)]" dir="ltr">{booking.phone}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <MapPin size={16} className="text-gray-500" />
+                <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                  <MapPin size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">{t('table.city')}</p>
-                  <p className="font-medium text-navy capitalize">{booking.city_interested}</p>
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('table.city')}</p>
+                  <p className="font-medium text-navy dark:text-[var(--admin-text)] capitalize">{booking.city_interested}</p>
                 </div>
               </div>
             </div>
 
             {/* Contact actions */}
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
+            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-[var(--admin-border)]">
               <a
                 href={`mailto:${booking.email}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors"
               >
                 <Mail size={14} />
                 {t('detail.sendEmail')}
               </a>
               <a
                 href={`tel:${booking.phone}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors"
               >
                 <Phone size={14} />
                 {t('detail.callPhone')}
@@ -361,19 +361,19 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
 
           {/* Personal Info & Emergency Contact */}
           {(booking.date_of_birth || booking.occupation || booking.emergency_contact_name) && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-base font-semibold text-navy mb-4">
+            <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+              <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
                 {t('detail.personalInfo')}
               </h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {booking.date_of_birth && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                      <Calendar size={16} className="text-gray-500" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                      <Calendar size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('detail.dateOfBirth')}</p>
-                      <p className="font-medium text-navy" dir="ltr">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.dateOfBirth')}</p>
+                      <p className="font-medium text-navy dark:text-[var(--admin-text)]" dir="ltr">
                         {formatDate(booking.date_of_birth, 'en')}
                       </p>
                     </div>
@@ -381,12 +381,12 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                 )}
                 {booking.occupation && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                      <Briefcase size={16} className="text-gray-500" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                      <Briefcase size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('detail.occupation')}</p>
-                      <p className="font-medium text-navy">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.occupation')}</p>
+                      <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                         {t(`detail.occupationValues.${booking.occupation}`)}
                       </p>
                     </div>
@@ -396,29 +396,29 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
 
               {/* Emergency Contact */}
               {booking.emergency_contact_name && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h3 className="text-sm font-semibold text-navy mb-3 flex items-center gap-1.5">
-                    <AlertTriangle size={14} className="text-orange-500" />
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-[var(--admin-border)]">
+                  <h3 className="text-sm font-semibold text-navy dark:text-[var(--admin-text)] mb-3 flex items-center gap-1.5">
+                    <AlertTriangle size={14} className="text-orange-500 dark:text-orange-400" />
                     {t('detail.emergencyContact')}
                   </h3>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
-                        <User size={16} className="text-orange-500" />
+                      <div className="w-9 h-9 rounded-lg bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center">
+                        <User size={16} className="text-orange-500 dark:text-orange-400" />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">{t('detail.emergencyContactName')}</p>
-                        <p className="font-medium text-navy">{booking.emergency_contact_name}</p>
+                        <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.emergencyContactName')}</p>
+                        <p className="font-medium text-navy dark:text-[var(--admin-text)]">{booking.emergency_contact_name}</p>
                       </div>
                     </div>
                     {booking.emergency_contact_phone && (
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
-                          <Phone size={16} className="text-orange-500" />
+                        <div className="w-9 h-9 rounded-lg bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center">
+                          <Phone size={16} className="text-orange-500 dark:text-orange-400" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">{t('detail.emergencyContactPhone')}</p>
-                          <p className="font-medium text-navy" dir="ltr">{booking.emergency_contact_phone}</p>
+                          <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.emergencyContactPhone')}</p>
+                          <p className="font-medium text-navy dark:text-[var(--admin-text)]" dir="ltr">{booking.emergency_contact_phone}</p>
                         </div>
                       </div>
                     )}
@@ -430,31 +430,31 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
 
           {/* Contract Details */}
           {(booking.contract_start_date || booking.with_transportation !== undefined) && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-base font-semibold text-navy mb-4">
+            <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+              <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
                 {t('detail.contractDetails')}
               </h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {booking.contract_start_date && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                      <Calendar size={16} className="text-gray-500" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                      <Calendar size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('detail.contractStartDate')}</p>
-                      <p className="font-medium text-navy" dir="ltr">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.contractStartDate')}</p>
+                      <p className="font-medium text-navy dark:text-[var(--admin-text)]" dir="ltr">
                         {formatDate(booking.contract_start_date, 'en')}
                       </p>
                     </div>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                    <Bus size={16} className="text-gray-500" />
+                  <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                    <Bus size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{t('detail.transportation')}</p>
-                    <p className="font-medium text-navy">
+                    <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.transportation')}</p>
+                    <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                       {booking.with_transportation ? t('detail.withTransportation') : t('detail.withoutTransportation')}
                     </p>
                   </div>
@@ -465,19 +465,19 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
 
           {/* Additional Info (medical + referral) */}
           {booking.metadata && (booking.metadata.medical_issues || booking.metadata.referral_source) && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h2 className="text-base font-semibold text-navy mb-4">
+            <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+              <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
                 {t('detail.additionalInfo')}
               </h2>
               <div className="space-y-4">
                 {booking.metadata.medical_issues && (
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      <Heart size={16} className="text-gray-500" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center flex-shrink-0">
+                      <Heart size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('detail.medicalIssues')}</p>
-                      <p className="font-medium text-navy">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.medicalIssues')}</p>
+                      <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                         {booking.metadata.medical_issues.has_issues
                           ? booking.metadata.medical_issues.description || t('detail.notProvided')
                           : t('detail.noMedicalIssues')}
@@ -487,12 +487,12 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                 )}
                 {booking.metadata.referral_source && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                      <Megaphone size={16} className="text-gray-500" />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-[var(--admin-surface-2)] flex items-center justify-center">
+                      <Megaphone size={16} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('detail.referralSource')}</p>
-                      <p className="font-medium text-navy">
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('detail.referralSource')}</p>
+                      <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                         {t(`detail.referralValues.${booking.metadata.referral_source}`)}
                       </p>
                     </div>
@@ -503,18 +503,18 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
           )}
 
           {/* Message */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-3">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
               {t('detail.message')}
             </h2>
-            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+            <p className="text-gray-700 dark:text-[var(--admin-text-muted)] whitespace-pre-wrap leading-relaxed">
               {booking.message}
             </p>
           </div>
 
           {/* Notes section */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
               {t('notes.title')}
             </h2>
 
@@ -525,7 +525,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                 onChange={(e) => setNewNote(e.target.value)}
                 placeholder={t('notes.placeholder')}
                 rows={2}
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none"
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none"
               />
               <button
                 onClick={handleAddNote}
@@ -548,21 +548,21 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
               const userNotes = notes.filter(n => !n.note.startsWith('[system]'));
               return userNotes.length === 0 ? (
                 <div className="text-center py-6">
-                  <StickyNote size={24} className="mx-auto text-gray-300 mb-2" />
-                  <p className="text-sm text-gray-400">{t('notes.empty')}</p>
-                  <p className="text-xs text-gray-300 mt-1">{t('notes.emptyDescription')}</p>
+                  <StickyNote size={24} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)] mb-2" />
+                  <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('notes.empty')}</p>
+                  <p className="text-xs text-gray-300 dark:text-[var(--admin-text-subtle)] mt-1">{t('notes.emptyDescription')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {userNotes.map((note) => (
                     <div
                       key={note.id}
-                      className="rounded-lg p-3 border bg-gray-50 border-gray-100"
+                      className="rounded-lg p-3 border bg-gray-50 dark:bg-[var(--admin-bg)] border-gray-100 dark:border-[var(--admin-border)]"
                     >
-                      <p className="text-sm whitespace-pre-wrap text-gray-700">
+                      <p className="text-sm whitespace-pre-wrap text-gray-700 dark:text-[var(--admin-text-muted)]">
                         {note.note}
                       </p>
-                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         <span className="font-medium">
                           {note.author?.full_name}
                         </span>
@@ -577,8 +577,8 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
           </div>
 
           {/* Activity Log section */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4 flex items-center gap-2">
               <History size={18} />
               {t('activityLog.title')}
             </h2>
@@ -600,12 +600,12 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                     return (
                       <div
                         key={note.id}
-                        className="rounded-lg p-3 border bg-blue-50/50 border-blue-100"
+                        className="rounded-lg p-3 border bg-blue-50/50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20"
                       >
-                        <p className="text-sm whitespace-pre-wrap text-blue-700 italic">
+                        <p className="text-sm whitespace-pre-wrap text-blue-700 dark:text-blue-400 italic">
                           {displayText}
                         </p>
-                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                           <span className="font-medium">
                             {note.author?.full_name || t('notes.system')}
                           </span>
@@ -617,12 +617,12 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                   })}
 
                   {/* Creation event — always shown at the bottom (oldest) */}
-                  <div className="rounded-lg p-3 border bg-gray-50 border-gray-200">
-                    <p className="text-sm text-gray-600 italic flex items-center gap-1.5">
-                      <Clock size={14} className="text-gray-400" />
+                  <div className="rounded-lg p-3 border bg-gray-50 dark:bg-[var(--admin-bg)] border-gray-200 dark:border-[var(--admin-border)]">
+                    <p className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)] italic flex items-center gap-1.5">
+                      <Clock size={14} className="text-gray-400 dark:text-[var(--admin-text-subtle)]" />
                       {t('activityLog.created')}
                     </p>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
                       <span>{formatDateTime(booking.created_at)}</span>
                     </div>
                   </div>
@@ -635,15 +635,15 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Status & Actions */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="text-base font-semibold text-navy mb-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+            <h2 className="text-base font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
               {t('detail.assignment')}
             </h2>
 
             <div className="space-y-4">
               {/* Current status */}
               <div>
-                <p className="text-xs text-gray-500 mb-1.5">{t('table.status')}</p>
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5">{t('table.status')}</p>
                 <StatusBadge
                   label={t(`status.${booking.status}`)}
                   variant={getBookingStatusVariant(booking.status)}
@@ -653,8 +653,8 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
               {/* Department */}
               {department && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1.5">{t('detail.currentDepartment')}</p>
-                  <p className="text-sm font-medium text-navy">
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5">{t('detail.currentDepartment')}</p>
+                  <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                     {t(`pipeline.department.${department}`)}
                   </p>
                 </div>
@@ -662,24 +662,24 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
 
               {/* Assigned to */}
               <div>
-                <p className="text-xs text-gray-500 mb-1.5">{t('detail.assignedTo')}</p>
-                <p className="text-sm font-medium text-navy">
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-1.5">{t('detail.assignedTo')}</p>
+                <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                   {booking.assigned_staff?.full_name || (
-                    <span className="text-gray-400">{t('table.unassigned')}</span>
+                    <span className="text-gray-400 dark:text-[var(--admin-text-subtle)]">{t('table.unassigned')}</span>
                   )}
                 </p>
               </div>
 
               {/* Handoff modal */}
               {showHandoff && (
-                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-3">
-                  <p className="text-sm font-medium text-navy">
+                <div className="bg-gray-50 dark:bg-[var(--admin-bg)] rounded-lg p-3 border border-gray-200 dark:border-[var(--admin-border)] space-y-3">
+                  <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                     {t('detail.assignTo')}
                   </p>
                   <select
                     value={selectedHandoffStaff}
                     onChange={(e) => setSelectedHandoffStaff(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral bg-white"
+                    className="w-full px-3 py-2 border border-gray-200 dark:border-[var(--admin-border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral bg-white dark:bg-[var(--admin-surface)]"
                   >
                     <option value="">{t('detail.selectStaff')}</option>
                     {handoffStaff.map((s) => (
@@ -696,7 +696,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                     </button>
                     <button
                       onClick={() => setShowHandoff(false)}
-                      className="px-3 py-2 text-sm text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                      className="px-3 py-2 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] bg-gray-200 dark:bg-[var(--admin-border)] rounded-lg hover:bg-gray-300 dark:hover:bg-[var(--admin-border)] transition-colors"
                     >
                       {t('deleteConfirm.cancel')}
                     </button>
@@ -726,7 +726,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                   <button
                     onClick={() => setConfirmAction('reject')}
                     disabled={actionLoading}
-                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 disabled:opacity-50 transition-colors"
                   >
                     <XCircle size={14} />
                     {t('pipeline.actions.reject')}
@@ -734,7 +734,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                   <button
                     onClick={() => setConfirmAction('cancel')}
                     disabled={actionLoading}
-                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 dark:text-[var(--admin-text-muted)] bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50 transition-colors"
                   >
                     <XCircle size={14} />
                     {t('pipeline.actions.cancel')}
@@ -747,7 +747,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
                 <button
                   onClick={handleReopen}
                   disabled={actionLoading}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-navy bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-navy dark:text-[var(--admin-text)] bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg hover:bg-gray-200 dark:bg-[var(--admin-border)] disabled:opacity-50 transition-colors"
                 >
                   <RotateCcw size={14} />
                   {t('pipeline.actions.reopen')}
@@ -769,7 +769,7 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
               {booking.status === 'completed' && booking.metadata?.resident_id && (
                 <Link
                   href={`/${locale}/admin/residents/${booking.metadata.resident_id}`}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors"
                 >
                   <User size={14} />
                   {t('pipeline.actions.viewResident')}

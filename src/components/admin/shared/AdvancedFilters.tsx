@@ -43,7 +43,7 @@ export default function AdvancedFilters({
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
             open || activeCount > 0
               ? 'bg-coral text-white border border-coral'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-transparent'
+              : 'bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:bg-gray-200 dark:hover:bg-[var(--admin-border)] border border-transparent'
           }`}
         >
           <SlidersHorizontal className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function AdvancedFilters({
         {activeCount > 0 && (
           <button
             onClick={onClear}
-            className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-gray-700 dark:hover:text-[var(--admin-text)] hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] transition-colors"
           >
             <X className="w-3 h-3" />
             {clearLabel}
@@ -69,14 +69,14 @@ export default function AdvancedFilters({
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {fields.map((field) => (
             <div key={field.key}>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-medium text-gray-500 dark:text-[var(--admin-text-muted)] mb-1">
                 {field.label}
               </label>
               {field.type === 'select' ? (
                 <select
                   value={values[field.key] || ''}
                   onChange={(e) => onChange(field.key, e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-[var(--admin-border)] text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)]"
                 >
                   {field.options?.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -91,12 +91,12 @@ export default function AdvancedFilters({
                     lang="en"
                     value={values[field.key] || ''}
                     onChange={(e) => onChange(field.key, e.target.value)}
-                    className={`w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white ${
-                      !values[field.key] ? 'text-transparent' : ''
+                    className={`w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-[var(--admin-border)] text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] ${
+                      !values[field.key] ? 'text-transparent dark:text-transparent' : ''
                     }`}
                   />
                   {!values[field.key] && (
-                    <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400">
+                    <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
                       {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
                     </span>
                   )}

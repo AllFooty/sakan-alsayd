@@ -10,10 +10,13 @@ export type UserRole =
   | 'supervision_staff'
   | 'finance_staff';
 
+export type ThemePreference = 'light' | 'dark' | 'system';
+
 export interface StaffProfile {
   id: string;
   full_name: string;
   phone: string | null;
   role: UserRole;
   is_active: boolean;
+  theme_preference: ThemePreference | null;
 }

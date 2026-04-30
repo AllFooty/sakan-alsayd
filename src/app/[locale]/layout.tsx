@@ -88,7 +88,7 @@ export default async function LocaleLayout({
     : `${ibmPlexSans.variable} ${ibmPlexSansArabic.variable}`;
 
   return (
-    <html lang={locale} dir={direction} className={fontClass}>
+    <html lang={locale} dir={direction} className={fontClass} suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           {children}

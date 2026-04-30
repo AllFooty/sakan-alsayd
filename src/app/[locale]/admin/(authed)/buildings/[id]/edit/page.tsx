@@ -137,7 +137,7 @@ export default function EditBuildingPage({
 
   if (!canEdit) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={Building2}
           title={t('forbidden.title')}
@@ -149,7 +149,7 @@ export default function EditBuildingPage({
 
   if (notFound || !initial) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={Building2}
           title={t('notFound.title')}
@@ -164,9 +164,9 @@ export default function EditBuildingPage({
   return (
     <div className="space-y-4">
       {isInactive && (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
           <div className="flex items-start gap-3">
-            <PowerOff size={18} className="mt-0.5 text-amber-600 shrink-0" />
+            <PowerOff size={18} className="mt-0.5 text-amber-600 dark:text-amber-400 shrink-0" />
             <div>
               <p className="text-sm font-semibold text-amber-900">
                 {t('inactiveBanner.title')}
@@ -183,7 +183,7 @@ export default function EditBuildingPage({
               type="button"
               onClick={handleReactivate}
               disabled={reactivating}
-              className="self-start inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-emerald-300 text-emerald-700 text-sm font-medium rounded-lg hover:bg-emerald-50 disabled:opacity-50 transition-colors"
+              className="self-start inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[var(--admin-surface)] border border-emerald-300 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-lg hover:bg-emerald-50 dark:bg-emerald-500/10 disabled:opacity-50 transition-colors"
             >
               {reactivating ? (
                 <Loader2 size={14} className="animate-spin" />

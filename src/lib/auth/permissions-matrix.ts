@@ -394,6 +394,75 @@ export const PERMISSIONS_MATRIX: PermissionGroup[] = [
     ],
   },
   {
+    key: 'apartments',
+    rows: [
+      {
+        key: 'apartments.list',
+        // GET list (per building) and detail. Mirrors rooms.list — admin tier
+        // sees everything, other roles see only their assigned buildings.
+        // RLS at 028_apartments.sql:178-181 lets all auth users SELECT, but
+        // the admin API narrows to assigned buildings via getAssignedBuildingIds.
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+          maintenance_manager: 'scoped',
+          transportation_manager: 'scoped',
+          finance_manager: 'scoped',
+          maintenance_staff: 'scoped',
+          transportation_staff: 'scoped',
+          supervision_staff: 'scoped',
+          finance_staff: 'scoped',
+        },
+        source: [
+          'supabase/migrations/028_apartments.sql:236-238',
+          'src/app/api/admin/buildings/[id]/apartments/route.ts:30-49',
+          'src/app/api/admin/apartments/[id]/route.ts:60-92',
+        ],
+      },
+      {
+        key: 'apartments.create',
+        // POST is admin-tier only (mirror of POST /api/admin/rooms). RLS at
+        // 028_apartments.sql:257-260 still permits manager-tier inserts into
+        // assigned buildings, but no admin API exposes that path today.
+        access: { ...ADMIN_TIER },
+        source: [
+          'supabase/migrations/028_apartments.sql:257-260',
+          'src/app/api/admin/buildings/[id]/apartments/route.ts:157-170',
+        ],
+      },
+      {
+        key: 'apartments.update',
+        // PATCH allows admin tier + branch_manager scoped to the apartment's
+        // building. is_active toggles are gated to admin-tier only. The
+        // editable fields cover apartment_number, floor, descriptions,
+        // shared-facility flags, bathroom counts, sort_order, and notes.
+        scopeNoteKey: 'assignedBuilding',
+        access: {
+          ...ADMIN_TIER,
+          branch_manager: 'scoped',
+        },
+        source: [
+          'supabase/migrations/028_apartments.sql:262-266',
+          'src/app/api/admin/apartments/[id]/route.ts:189-200',
+        ],
+      },
+      {
+        key: 'apartments.delete',
+        // Hard-delete; admin tier only. Postgres FK
+        // `rooms.apartment_id ON DELETE RESTRICT` blocks delete for any
+        // apartment with rooms in it (surfaced to the UI as
+        // `apartmentHasRooms`). Move the rooms or mark the apartment
+        // inactive instead.
+        access: { ...ADMIN_TIER },
+        source: [
+          'supabase/migrations/028_apartments.sql:268-271',
+          'src/app/api/admin/apartments/[id]/route.ts:328-340',
+        ],
+      },
+    ],
+  },
+  {
     key: 'residents',
     rows: [
       {

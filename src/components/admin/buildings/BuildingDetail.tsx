@@ -28,7 +28,6 @@ import { toast } from 'sonner';
 import StatusBadge from '@/components/admin/shared/StatusBadge';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BuildingPhotosManager from './BuildingPhotosManager';
-import BuildingRoomsTab from './BuildingRoomsTab';
 import BuildingFloorMap, { type FloorMapRoom } from './BuildingFloorMap';
 import { useAuth } from '@/lib/auth/hooks';
 import { formatDate } from '@/lib/utils';
@@ -69,7 +68,11 @@ interface Building {
   room_stats: RoomStats;
   rooms: FloorMapRoom[];
   active_maintenance_count: number;
-  active_residents_count: number;
+  // null when the caller's role can't read residents/assignments under RLS
+  // (see can_view_occupants in src/app/api/admin/buildings/[id]/route.ts).
+  active_residents_count: number | null;
+  apartments_count: number;
+  can_view_occupants: boolean;
 }
 
 function isLandmarkArray(val: unknown): val is Landmark[] {
@@ -100,20 +103,50 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  // Deep-link via URL hash so Slice 3's "View floor map" links land directly
-  // on the right tab without a separate route. Use a lazy initializer so the
-  // first paint already shows the right tab — the previous useEffect-based
-  // approach flashed 'overview' for one frame before swapping.
-  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'floorMap'>(
-    () => {
-      if (typeof window === 'undefined') return 'overview';
-      const hash = window.location.hash.replace(/^#/, '');
-      if (hash === 'floorMap' || hash === 'rooms' || hash === 'overview') {
-        return hash;
-      }
-      return 'overview';
+  // Bumped by child tabs after they mutate apartments/rooms. router.refresh()
+  // only re-renders server components; this client component fetches via
+  // useEffect, so we need a reactive signal to refetch the headline counts
+  // (apartments_count / room_stats) shown in the tab badges.
+  const [childReloadKey, setChildReloadKey] = useState(0);
+  // Deep-link via URL hash so links from elsewhere in the app land directly
+  // on the right tab. `#layout` and its sub-anchors (`#layout=floor-N`,
+  // `#layout=flat`) are kept as legacy aliases for the merged Floor Map tab —
+  // ApartmentForm / RoomForm / ApartmentDetail still push `#layout` after
+  // submit, and BuildingFloorMap reads the sub-anchor itself for floor-scroll
+  // / list-mode routing.
+  type ActiveTab = 'overview' | 'floorMap';
+  const [activeTab, setActiveTabState] = useState<ActiveTab>(() => {
+    if (typeof window === 'undefined') return 'overview';
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash === 'overview') return 'overview';
+    if (
+      hash === 'floorMap' ||
+      hash === 'layout' ||
+      hash === 'apartments' ||
+      hash === 'rooms' ||
+      hash.startsWith('layout=') ||
+      hash.startsWith('floorMap=')
+    ) {
+      return 'floorMap';
     }
-  );
+    return 'overview';
+  });
+
+  // Keep the URL hash in sync so reloads land on the same tab and the URL
+  // stays shareable. No-op when the tab hasn't changed so a re-click of the
+  // active tab doesn't clobber a sub-anchor (e.g. `#layout=floor-2` from a
+  // deep-link, or `#floorMap=list` written by the FloorMap view toggle).
+  function setActiveTab(next: ActiveTab) {
+    setActiveTabState((prev) => {
+      if (prev === next) return prev;
+      if (typeof window !== 'undefined') {
+        const hash = next === 'overview' ? '' : `#${next}`;
+        const url = `${window.location.pathname}${window.location.search}${hash}`;
+        window.history.replaceState(null, '', url);
+      }
+      return next;
+    });
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -143,7 +176,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [buildingId, t]);
+  }, [buildingId, t, childReloadKey]);
 
   const BackIcon = isArabic ? ArrowRight : ArrowLeft;
 
@@ -190,12 +223,12 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
 
   if (notFound || !building) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <Building2 size={40} className="mx-auto text-gray-300" />
-        <h2 className="mt-4 text-lg font-semibold text-navy">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-12 text-center">
+        <Building2 size={40} className="mx-auto text-gray-300 dark:text-[var(--admin-text-subtle)]" />
+        <h2 className="mt-4 text-lg font-semibold text-navy dark:text-[var(--admin-text)]">
           {t('detail.notFound.title')}
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
           {t('detail.notFound.description')}
         </p>
         <button
@@ -227,7 +260,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
         <button
           type="button"
           onClick={() => router.push(`/${locale}/admin/buildings`)}
-          className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-navy transition-colors w-fit"
+          className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors w-fit"
         >
           <BackIcon size={16} />
           {t('detail.backToList')}
@@ -239,7 +272,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
                 type="button"
                 onClick={() => setShowDeactivateConfirm(true)}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:border-red-200 hover:text-red-600 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] text-gray-700 dark:text-[var(--admin-text-muted)] text-sm font-medium rounded-lg hover:border-red-200 dark:border-red-500/30 hover:text-red-600 dark:text-red-400 disabled:opacity-50 transition-colors"
               >
                 <PowerOff size={14} />
                 {t('detail.deactivate')}
@@ -249,7 +282,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
                 type="button"
                 onClick={handleReactivate}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 text-emerald-700 text-sm font-medium rounded-lg hover:border-emerald-300 hover:bg-emerald-50 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-lg hover:border-emerald-300 dark:border-emerald-500/40 hover:bg-emerald-50 dark:bg-emerald-500/10 disabled:opacity-50 transition-colors"
               >
                 {actionLoading ? <Loader2 size={14} className="animate-spin" /> : <Power size={14} />}
                 {t('detail.reactivate')}
@@ -267,8 +300,8 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
       </div>
 
       {/* Hero — cover image + overlaid name/city */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="relative aspect-[16/7] bg-gray-100">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
+        <div className="relative aspect-[16/7] bg-gray-100 dark:bg-[var(--admin-surface-2)]">
           {activeImage ? (
             <Image
               src={activeImage}
@@ -279,7 +312,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
               priority
             />
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300 dark:text-[var(--admin-text-subtle)]">
               <ImageOff size={40} />
               <span className="text-sm mt-2">{t('card.noPhoto')}</span>
             </div>
@@ -305,7 +338,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
 
         {/* Photo strip */}
         {(building.cover_image || galleryImages.length > 0) && (
-          <div className="border-t border-gray-100 bg-gray-50 p-3 flex gap-2 overflow-x-auto">
+          <div className="border-t border-gray-100 dark:border-[var(--admin-border)] bg-gray-50 dark:bg-[var(--admin-bg)] p-3 flex gap-2 overflow-x-auto">
             {building.cover_image && (
               <PhotoThumb
                 src={building.cover_image}
@@ -362,7 +395,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-[var(--admin-border)]">
         <nav className="flex gap-2" role="tablist" aria-label={t('detail.tabsLabel')}>
           <TabButton
             active={activeTab === 'overview'}
@@ -371,25 +404,22 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
             {t('detail.tabs.overview')}
           </TabButton>
           <TabButton
-            active={activeTab === 'rooms'}
-            onClick={() => setActiveTab('rooms')}
-            count={building.room_stats.total}
-          >
-            {t('detail.tabs.rooms')}
-          </TabButton>
-          <TabButton
             active={activeTab === 'floorMap'}
             onClick={() => setActiveTab('floorMap')}
+            count={building.room_stats.total > 0 ? building.room_stats.total : undefined}
           >
             {t('floorMap.tabLabel')}
           </TabButton>
         </nav>
       </div>
 
-      {activeTab === 'rooms' ? (
-        <BuildingRoomsTab buildingId={building.id} />
-      ) : activeTab === 'floorMap' ? (
-        <BuildingFloorMap rooms={building.rooms ?? []} />
+      {activeTab === 'floorMap' ? (
+        <BuildingFloorMap
+          buildingId={building.id}
+          rooms={building.rooms ?? []}
+          canViewOccupants={building.can_view_occupants}
+          onMutate={() => setChildReloadKey((k) => k + 1)}
+        />
       ) : (
       <>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -398,11 +428,11 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
           {/* Description */}
           <Section title={t('detail.about')}>
             {description ? (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              <p className="text-sm text-gray-700 dark:text-[var(--admin-text-muted)] leading-relaxed whitespace-pre-line">
                 {description}
               </p>
             ) : (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('detail.noDescription')}
               </p>
             )}
@@ -411,11 +441,11 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
           {/* Landmarks */}
           <Section title={t('detail.landmarks')} icon={MapPin}>
             {landmarks.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('detail.noLandmarks')}
               </p>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-gray-100 dark:divide-[var(--admin-border)]">
                 {landmarks.map((lm, i) => {
                   const lmName = isArabic ? lm.name_ar : lm.name_en;
                   const lmDistance = isArabic ? lm.distance_ar : lm.distance_en;
@@ -425,9 +455,9 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
                       key={i}
                       className="flex items-center justify-between py-2.5 text-sm"
                     >
-                      <span className="text-gray-700">{lmName}</span>
+                      <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">{lmName}</span>
                       {lmDistance && (
-                        <span className="text-gray-500 text-xs">{lmDistance}</span>
+                        <span className="text-gray-500 dark:text-[var(--admin-text-muted)] text-xs">{lmDistance}</span>
                       )}
                     </li>
                   );
@@ -455,7 +485,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
           ) : (
             <Section title={t('detail.photoGallery')} icon={ImageIcon}>
               {galleryImages.length === 0 && !building.cover_image ? (
-                <p className="text-sm text-gray-400 italic">
+                <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                   {t('detail.noPhotos')}
                 </p>
               ) : (
@@ -468,7 +498,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
                         type="button"
                         onClick={() => setActiveImage(src)}
                         className={`relative aspect-square overflow-hidden rounded-lg border ${
-                          activeImage === src ? 'border-coral' : 'border-gray-200'
+                          activeImage === src ? 'border-coral' : 'border-gray-200 dark:border-[var(--admin-border)]'
                         } hover:border-coral/50 transition-colors`}
                       >
                         <Image
@@ -501,7 +531,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
                 <ExternalLink size={14} />
               </a>
             ) : (
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">
                 {t('detail.noMap')}
               </p>
             )}
@@ -509,11 +539,13 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
 
           {/* Residents quick link */}
           <Section title={t('detail.residents')} icon={UsersIcon}>
-            <div className="text-2xl font-bold text-navy tabular-nums">
-              {building.active_residents_count}
+            <div className="text-2xl font-bold text-navy dark:text-[var(--admin-text)] tabular-nums">
+              {building.active_residents_count ?? '—'}
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              {t('detail.activeAssignmentsHint')}
+            <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">
+              {building.can_view_occupants
+                ? t('detail.activeAssignmentsHint')
+                : t('detail.activeAssignmentsHidden')}
             </p>
           </Section>
 
@@ -521,22 +553,22 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
           <Section title={t('detail.metadata')}>
             <dl className="space-y-3 text-sm">
               <MetaRow icon={Hash} label={t('detail.meta.slug')}>
-                <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">
+                <code className="text-xs bg-gray-100 dark:bg-[var(--admin-surface-2)] px-1.5 py-0.5 rounded text-gray-700 dark:text-[var(--admin-text-muted)]">
                   {building.slug}
                 </code>
               </MetaRow>
               <MetaRow icon={Hash} label={t('detail.meta.sortOrder')}>
-                <span className="text-gray-700 tabular-nums">
+                <span className="text-gray-700 dark:text-[var(--admin-text-muted)] tabular-nums">
                   {building.sort_order}
                 </span>
               </MetaRow>
               <MetaRow icon={Calendar} label={t('detail.meta.createdAt')}>
-                <span className="text-gray-700">
+                <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">
                   {formatDate(building.created_at, isArabic ? 'ar' : 'en')}
                 </span>
               </MetaRow>
               <MetaRow icon={Calendar} label={t('detail.meta.updatedAt')}>
-                <span className="text-gray-700">
+                <span className="text-gray-700 dark:text-[var(--admin-text-muted)]">
                   {formatDate(building.updated_at, isArabic ? 'ar' : 'en')}
                 </span>
               </MetaRow>
@@ -547,24 +579,24 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
 
       {/* Bilingual names — useful for super admins curating content */}
       {canEdit && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="text-sm font-semibold text-navy mb-3">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+          <h2 className="text-sm font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
             {t('detail.bilingualNames')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">
+              <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] uppercase tracking-wide">
                 {t('detail.bilingual.english')}
               </p>
-              <p className="mt-1 text-gray-700" dir="ltr">
+              <p className="mt-1 text-gray-700 dark:text-[var(--admin-text-muted)]" dir="ltr">
                 {building.neighborhood_en}, {building.city_en}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">
+              <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] uppercase tracking-wide">
                 {t('detail.bilingual.arabic')}
               </p>
-              <p className="mt-1 text-gray-700" dir="rtl">
+              <p className="mt-1 text-gray-700 dark:text-[var(--admin-text-muted)]" dir="rtl">
                 {building.neighborhood_ar}، {building.city_ar}
               </p>
             </div>
@@ -576,7 +608,7 @@ export default function BuildingDetail({ buildingId }: { buildingId: string }) {
       <div className="pt-2">
         <Link
           href={`/${locale}/admin/buildings`}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)] transition-colors"
         >
           <BackIcon size={14} />
           {t('detail.backToList')}
@@ -620,14 +652,14 @@ function TabButton({
       className={`relative px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 ${
         active
           ? 'text-coral'
-          : 'text-gray-500 hover:text-navy'
+          : 'text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-navy dark:text-[var(--admin-text)]'
       }`}
     >
       {children}
       {typeof count === 'number' && (
         <span
           className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
-            active ? 'bg-coral/10 text-coral' : 'bg-gray-100 text-gray-500'
+            active ? 'bg-coral/10 text-coral' : 'bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-500 dark:text-[var(--admin-text-muted)]'
           }`}
         >
           {count}
@@ -656,7 +688,7 @@ function PhotoThumb({
       type="button"
       onClick={onClick}
       className={`relative h-16 w-24 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
-        active ? 'border-coral' : 'border-transparent hover:border-gray-300'
+        active ? 'border-coral' : 'border-transparent hover:border-gray-300 dark:border-[var(--admin-border)]'
       }`}
     >
       <Image src={src} alt="" fill sizes="96px" className="object-cover" />
@@ -683,27 +715,27 @@ function StatCard({
   tone: 'navy' | 'emerald' | 'coral' | 'amber';
 }) {
   const tones: Record<typeof tone, string> = {
-    navy: 'bg-navy/5 text-navy',
-    emerald: 'bg-emerald-50 text-emerald-600',
+    navy: 'bg-navy/5 text-navy dark:text-[var(--admin-text)]',
+    emerald: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
     coral: 'bg-coral/10 text-coral',
-    amber: 'bg-amber-50 text-amber-600',
+    amber: 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400',
   };
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4">
       <div className="flex items-center gap-2">
         <div className={`p-1.5 rounded-md ${tones[tone]}`}>
           <Icon size={16} />
         </div>
-        <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
+        <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] uppercase tracking-wide truncate">
           {label}
         </p>
       </div>
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-2xl font-bold text-navy tabular-nums">
+        <span className="text-2xl font-bold text-navy dark:text-[var(--admin-text)] tabular-nums">
           {value}
         </span>
         {subValue && (
-          <span className="text-xs text-gray-500 tabular-nums">{subValue}</span>
+          <span className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] tabular-nums">{subValue}</span>
         )}
       </div>
     </div>
@@ -720,9 +752,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-xl border border-gray-200 p-5">
-      <h2 className="flex items-center gap-2 text-sm font-semibold text-navy mb-3">
-        {Icon && <Icon size={16} className="text-gray-400" />}
+    <section className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5">
+      <h2 className="flex items-center gap-2 text-sm font-semibold text-navy dark:text-[var(--admin-text)] mb-3">
+        {Icon && <Icon size={16} className="text-gray-400 dark:text-[var(--admin-text-subtle)]" />}
         {title}
       </h2>
       {children}
@@ -741,7 +773,7 @@ function MetaRow({
 }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <dt className="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wide flex-shrink-0">
+      <dt className="flex items-center gap-1.5 text-gray-500 dark:text-[var(--admin-text-muted)] text-xs uppercase tracking-wide flex-shrink-0">
         <Icon size={12} />
         {label}
       </dt>
@@ -753,18 +785,18 @@ function MetaRow({
 function DetailSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="h-5 w-32 bg-gray-100 rounded animate-pulse" />
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="aspect-[16/7] bg-gray-100 animate-pulse" />
+      <div className="h-5 w-32 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
+        <div className="aspect-[16/7] bg-gray-100 dark:bg-[var(--admin-surface-2)] animate-pulse" />
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="bg-white rounded-xl border border-gray-200 p-4 space-y-3"
+            className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-4 space-y-3"
           >
-            <div className="h-4 bg-gray-100 rounded animate-pulse w-20" />
-            <div className="h-7 bg-gray-100 rounded animate-pulse w-16" />
+            <div className="h-4 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-20" />
+            <div className="h-7 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-16" />
           </div>
         ))}
       </div>
@@ -773,11 +805,11 @@ function DetailSkeleton() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl border border-gray-200 p-5 space-y-3"
+              className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5 space-y-3"
             >
-              <div className="h-4 bg-gray-100 rounded animate-pulse w-32" />
-              <div className="h-3 bg-gray-100 rounded animate-pulse w-full" />
-              <div className="h-3 bg-gray-100 rounded animate-pulse w-3/4" />
+              <div className="h-4 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-32" />
+              <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-full" />
+              <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-3/4" />
             </div>
           ))}
         </div>
@@ -785,10 +817,10 @@ function DetailSkeleton() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl border border-gray-200 p-5 space-y-3"
+              className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-5 space-y-3"
             >
-              <div className="h-4 bg-gray-100 rounded animate-pulse w-24" />
-              <div className="h-3 bg-gray-100 rounded animate-pulse w-full" />
+              <div className="h-4 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-24" />
+              <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-full" />
             </div>
           ))}
         </div>

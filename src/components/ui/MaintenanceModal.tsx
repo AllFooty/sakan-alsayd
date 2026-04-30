@@ -33,6 +33,8 @@ const maintenanceSchema = z.object({
   description: z.string().min(3, 'required').max(SUMMARY_MAX, 'tooLong'),
   extra_details: z.string().max(2000).optional(),
   room_number: z.string().optional(),
+  apartment_number: z.string().optional(),
+  is_apartment_shared: z.boolean().optional(),
   requester_name: z.string().min(2, 'required'),
   requester_phone: z.string().regex(SAUDI_PHONE_REGEX, 'invalidPhone'),
 });
@@ -61,6 +63,10 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const fileInputRef = useRef<HTMLInputElement>(null);
   // City selection sub-step within 'building' step
   const [citySelected, setCitySelected] = useState(false);
+  // Apartment-shared issue toggle (kitchen, hallway AC, water heater, etc.)
+  // When true the room_number field is hidden; the apartment_number field
+  // takes its place as a hint for the maintenance manager.
+  const [isApartmentShared, setIsApartmentShared] = useState(false);
 
   const {
     register,
@@ -111,6 +117,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
       setSelectedCity('');
       setSelectedLocationId('');
       setCitySelected(false);
+      setIsApartmentShared(false);
       setCurrentStep('building');
       setSubmitStatus('idle');
       resetForm();
@@ -221,7 +228,15 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
         requester_name: data.requester_name,
         requester_phone: data.requester_phone,
         building_slug: loc.id,
-        room_number: data.room_number || null,
+        // For apartment-shared issues we send apartment_number (a free-text
+        // hint) and the is_apartment_shared flag — the API resolves the
+        // apartment_id when the hint matches a real apartment, otherwise
+        // it lands as a building-level shared-area request.
+        room_number: isApartmentShared ? null : data.room_number || null,
+        apartment_number: isApartmentShared
+          ? data.apartment_number || null
+          : null,
+        is_apartment_shared: isApartmentShared,
         category: data.category,
         description: data.description,
         extra_details: data.extra_details || null,
@@ -256,30 +271,30 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
     >
       <div
         className={cn(
-          'relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl',
+          'relative bg-white dark:bg-[var(--admin-surface)] w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl',
           'max-h-[90dvh] sm:max-h-[85vh] flex flex-col',
           'transition-transform duration-300'
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-[var(--admin-border)] flex-shrink-0">
           <div className="flex items-center gap-3">
             {showBack && submitStatus !== 'success' && (
               <button
                 onClick={currentStep === 'building' && citySelected
                   ? () => { setCitySelected(false); setSelectedCity(''); setSelectedLocationId(''); }
                   : handleBack}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors"
               >
-                <BackIcon size={20} className="text-gray-600" />
+                <BackIcon size={20} className="text-gray-600 dark:text-[var(--admin-text-muted)]" />
               </button>
             )}
             <div>
-              <h2 className="text-lg font-bold text-navy">
+              <h2 className="text-lg font-bold text-navy dark:text-[var(--admin-text)]">
                 {submitStatus === 'success' ? t('success.title') : t('title')}
               </h2>
               {submitStatus !== 'success' && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
                   {currentStep === 'building'
                     ? t('steps.building.title')
                     : t(`steps.${currentStep}.title`)}
@@ -289,10 +304,10 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors"
             aria-label="Close"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
           </button>
         </div>
 
@@ -304,7 +319,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 key={step}
                 className={cn(
                   'h-1 flex-1 rounded-full transition-colors duration-300',
-                  i <= stepIndex ? 'bg-coral' : 'bg-gray-200'
+                  i <= stepIndex ? 'bg-coral' : 'bg-gray-200 dark:bg-[var(--admin-border)]'
                 )}
               />
             ))}
@@ -319,10 +334,10 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
               <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
                 <CheckCircle size={32} className="text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-navy mb-2">
+              <h3 className="text-xl font-bold text-navy dark:text-[var(--admin-text)] mb-2">
                 {t('success.heading')}
               </h3>
-              <p className="text-gray-600 mb-6 max-w-sm">
+              <p className="text-gray-600 dark:text-[var(--admin-text-muted)] mb-6 max-w-sm">
                 {t('success.description')}
               </p>
               <button
@@ -342,23 +357,23 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   className={cn(
                     'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
                     selectedCity === city.name.toLowerCase()
-                      ? 'border-coral bg-coral/5'
-                      : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
+                      ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                      : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50 hover:bg-gray-50 dark:bg-[var(--admin-bg)]'
                   )}
                 >
                   <div className="w-11 h-11 rounded-xl bg-coral/10 flex items-center justify-center flex-shrink-0">
                     <MapPin size={20} className="text-coral" />
                   </div>
                   <div className="text-start flex-1">
-                    <p className="font-semibold text-navy">
+                    <p className="font-semibold text-navy dark:text-[var(--admin-text)]">
                       {isArabic ? city.nameAr : city.name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
                       {buildings.filter((l) => l.city === city.name).length}{' '}
                       {t('steps.building.buildings')}
                     </p>
                   </div>
-                  <div className="text-gray-400">
+                  <div className="text-gray-400 dark:text-[var(--admin-text-subtle)]">
                     {isArabic ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                   </div>
                 </button>
@@ -374,22 +389,22 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   className={cn(
                     'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
                     selectedLocationId === loc.id
-                      ? 'border-coral bg-coral/5'
-                      : 'border-gray-200 hover:border-coral/50 hover:bg-gray-50'
+                      ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                      : 'border-gray-200 dark:border-[var(--admin-border)] hover:border-coral/50 hover:bg-gray-50 dark:bg-[var(--admin-bg)]'
                   )}
                 >
                   <div className="w-11 h-11 rounded-xl bg-navy/10 flex items-center justify-center flex-shrink-0">
-                    <Building2 size={20} className="text-navy" />
+                    <Building2 size={20} className="text-navy dark:text-[var(--admin-text)]" />
                   </div>
                   <div className="text-start flex-1">
-                    <p className="font-semibold text-navy">
+                    <p className="font-semibold text-navy dark:text-[var(--admin-text)]">
                       {isArabic ? loc.neighborhoodAr : loc.neighborhood}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
                       {isArabic ? loc.cityAr : loc.city}
                     </p>
                   </div>
-                  <div className="text-gray-400">
+                  <div className="text-gray-400 dark:text-[var(--admin-text-subtle)]">
                     {isArabic ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                   </div>
                 </button>
@@ -399,14 +414,14 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
             /* Issue Details */
             <div className="space-y-4">
               {/* Building summary */}
-              <div className="bg-gray-50 rounded-xl p-3.5">
+              <div className="bg-gray-50 dark:bg-[var(--admin-bg)] rounded-xl p-3.5">
                 <div className="flex items-center gap-3">
-                  <Building2 size={18} className="text-navy flex-shrink-0" />
+                  <Building2 size={18} className="text-navy dark:text-[var(--admin-text)] flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-navy text-sm">
+                    <p className="font-medium text-navy dark:text-[var(--admin-text)] text-sm">
                       {selectedLocation && (isArabic ? selectedLocation.neighborhoodAr : selectedLocation.neighborhood)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">
                       {selectedLocation && (isArabic ? selectedLocation.cityAr : selectedLocation.city)}
                     </p>
                   </div>
@@ -415,7 +430,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
 
               {/* Category */}
               <div>
-                <label className="text-sm font-medium text-navy mb-2 block">
+                <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2 block">
                   {t('steps.details.category')} *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -427,8 +442,8 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                       className={cn(
                         'p-2.5 rounded-xl border-2 text-sm font-medium transition-all',
                         selectedCategory === cat
-                          ? 'border-coral bg-coral/5 text-coral'
-                          : 'border-gray-200 text-gray-600 hover:border-coral/50'
+                          ? 'border-coral bg-coral/5 dark:bg-coral/10 text-coral'
+                          : 'border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-coral/50'
                       )}
                     >
                       {t(`categories.${cat}`)}
@@ -436,19 +451,19 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   ))}
                 </div>
                 {errors.category && (
-                  <p className="text-red-500 text-xs mt-1">{t('steps.details.categoryPlaceholder')}</p>
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1">{t('steps.details.categoryPlaceholder')}</p>
                 )}
               </div>
 
               {/* Summary */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium text-navy">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)]">
                     {t('steps.details.summary')} *
                   </label>
                   <span className={cn(
                     'text-xs tabular-nums',
-                    (watch('description')?.length || 0) > SUMMARY_MAX ? 'text-red-500' : 'text-gray-400'
+                    (watch('description')?.length || 0) > SUMMARY_MAX ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-[var(--admin-text-subtle)]'
                   )} dir="ltr">
                     {watch('description')?.length || 0} / {SUMMARY_MAX}
                   </span>
@@ -460,48 +475,88 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   placeholder={t('steps.details.summaryPlaceholder')}
                   className={cn(
                     'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors',
-                    errors.description ? 'border-red-400' : 'border-gray-200'
+                    errors.description ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                   )}
                 />
               </div>
 
               {/* Extra Details (optional) */}
               <div>
-                <label className="text-sm font-medium text-navy mb-1 block">
+                <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                   {t('steps.details.extraDetails')}
                 </label>
                 <textarea
                   {...register('extra_details')}
                   rows={4}
                   placeholder={t('steps.details.extraDetailsPlaceholder')}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                 />
               </div>
 
-              {/* Room Number */}
+              {/* Where: room vs apartment-shared toggle */}
               <div>
-                <label className="text-sm font-medium text-navy mb-1 block">
-                  {t('steps.details.roomNumber')}
+                <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2 block">
+                  {t('steps.details.locationLabel')}
                 </label>
-                <input
-                  {...register('room_number')}
-                  placeholder={t('steps.details.roomNumberPlaceholder')}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
-                />
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsApartmentShared(false)}
+                    className={cn(
+                      'p-2.5 rounded-xl border-2 text-sm font-medium transition-all text-start',
+                      !isApartmentShared
+                        ? 'border-coral bg-coral/5 dark:bg-coral/10 text-coral'
+                        : 'border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-coral/50'
+                    )}
+                  >
+                    {t('steps.details.locationRoom')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsApartmentShared(true)}
+                    className={cn(
+                      'p-2.5 rounded-xl border-2 text-sm font-medium transition-all text-start',
+                      isApartmentShared
+                        ? 'border-coral bg-coral/5 dark:bg-coral/10 text-coral'
+                        : 'border-gray-200 dark:border-[var(--admin-border)] text-gray-600 dark:text-[var(--admin-text-muted)] hover:border-coral/50'
+                    )}
+                  >
+                    {t('steps.details.locationShared')}
+                  </button>
+                </div>
+                {!isApartmentShared ? (
+                  <input
+                    {...register('room_number')}
+                    placeholder={t('steps.details.roomNumberPlaceholder')}
+                    className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
+                  />
+                ) : (
+                  <>
+                    <input
+                      {...register('apartment_number')}
+                      placeholder={t('steps.details.apartmentNumberPlaceholder')}
+                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
+                      dir="ltr"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-1.5">
+                      {t('steps.details.apartmentNumberHelper')}
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Photos */}
               <div>
-                <label className="text-sm font-medium text-navy mb-1 block">
+                <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                   {t('photos')}
                 </label>
-                <p className="text-xs text-gray-500 mb-2">{t('photosHint')}</p>
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mb-2">{t('photosHint')}</p>
 
                 {/* Thumbnails */}
                 {photosPreviews.length > 0 && (
                   <div className="flex gap-2 mb-2">
                     {photosPreviews.map((src, i) => (
-                      <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 group">
+                      <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-[var(--admin-border)] group">
                         <img src={src} alt="" className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -519,7 +574,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-coral hover:text-coral transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-300 dark:border-[var(--admin-border)] rounded-xl text-sm text-gray-500 dark:text-[var(--admin-text-muted)] hover:border-coral hover:text-coral transition-colors"
                   >
                     <Camera size={16} />
                     <span>{selectedPhotos.length === 0 ? t('photos') : `${selectedPhotos.length}/3`}</span>
@@ -540,28 +595,28 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
             /* Contact Info */
             <div>
               {/* Summary */}
-              <div className="bg-gray-50 rounded-xl p-3.5 mb-4">
+              <div className="bg-gray-50 dark:bg-[var(--admin-bg)] rounded-xl p-3.5 mb-4">
                 <div className="flex items-center justify-between text-sm">
                   <div>
-                    <p className="text-gray-500 text-xs">{t('placeholders.building')}</p>
-                    <p className="font-medium text-navy">
+                    <p className="text-gray-500 dark:text-[var(--admin-text-muted)] text-xs">{t('placeholders.building')}</p>
+                    <p className="font-medium text-navy dark:text-[var(--admin-text)]">
                       {selectedLocation && (isArabic ? selectedLocation.neighborhoodAr : selectedLocation.neighborhood)}
                     </p>
                   </div>
                   <div className="text-end">
-                    <p className="text-gray-500 text-xs">{t('steps.details.category')}</p>
+                    <p className="text-gray-500 dark:text-[var(--admin-text-muted)] text-xs">{t('steps.details.category')}</p>
                     <p className="font-medium text-coral">
                       {selectedCategory && t(`categories.${selectedCategory}`)}
                     </p>
                   </div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">{t('steps.details.summary')}</p>
-                  <p className="text-sm font-medium text-navy whitespace-pre-wrap">{watch('description')}</p>
+                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-[var(--admin-border)]">
+                  <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)]">{t('steps.details.summary')}</p>
+                  <p className="text-sm font-medium text-navy dark:text-[var(--admin-text)] whitespace-pre-wrap">{watch('description')}</p>
                   {watch('extra_details') && (
                     <>
-                      <p className="text-xs text-gray-500 mt-2">{t('steps.details.extraDetails')}</p>
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{watch('extra_details')}</p>
+                      <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-2">{t('steps.details.extraDetails')}</p>
+                      <p className="text-sm text-gray-700 dark:text-[var(--admin-text-muted)] whitespace-pre-wrap">{watch('extra_details')}</p>
                     </>
                   )}
                 </div>
@@ -570,7 +625,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
               {/* Form */}
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5" id="maintenance-form">
                 <div>
-                  <label className="text-sm font-medium text-navy mb-1 block">
+                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
                     {t('steps.info.name')} *
                   </label>
                   <input
@@ -578,7 +633,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                     placeholder={t('placeholders.fullName')}
                     className={cn(
                       'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                      errors.requester_name ? 'border-red-400' : 'border-gray-200'
+                      errors.requester_name ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                     )}
                   />
                 </div>
@@ -592,13 +647,13 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                     error={errors.requester_phone ? t('invalidPhone') : undefined}
                     className={cn(
                       'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
-                      errors.requester_phone ? 'border-red-400' : 'border-gray-200'
+                      errors.requester_phone ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                     )}
                   />
                 </div>
 
                 {submitStatus === 'error' && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl text-sm">
+                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-sm">
                     <AlertCircle size={16} className="flex-shrink-0" />
                     <span>{t('error')}</span>
                   </div>
@@ -610,7 +665,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
 
         {/* Footer */}
         {submitStatus !== 'success' && currentStep === 'details' && (
-          <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0">
+          <div className="px-5 py-4 border-t border-gray-100 dark:border-[var(--admin-border)] flex-shrink-0">
             <button
               type="button"
               onClick={handleDetailsNext}
@@ -624,7 +679,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
         )}
 
         {currentStep === 'info' && submitStatus !== 'success' && (
-          <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0">
+          <div className="px-5 py-4 border-t border-gray-100 dark:border-[var(--admin-border)] flex-shrink-0">
             <button
               type="submit"
               form="maintenance-form"

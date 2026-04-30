@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
-import { getAssignedBuildingIds, hasAdminAccess } from '@/lib/auth/guards';
+import {
+  canReadOccupants,
+  getAssignedBuildingIds,
+  hasAdminAccess,
+} from '@/lib/auth/guards';
 import { revalidatePublicBuildings } from '@/lib/buildings/public';
 
 interface BuildingRow {
@@ -31,10 +35,22 @@ interface RoomFloorMapRow {
   capacity: number;
   occupancy_mode: 'private' | 'shared';
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
+  apartment_id: string;
+  apartment: { id: string; apartment_number: string; floor: number } | null;
 }
 
-interface AssignmentRoomIdRow {
+interface AssignmentRow {
+  id: string;
   room_id: string;
+  resident_id: string;
+  check_in_date: string;
+  resident: { id: string; full_name: string } | null;
+}
+
+interface ActiveAssignmentLite {
+  id: string;
+  resident_id: string;
+  resident_name: string;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -87,27 +103,51 @@ export async function GET(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    // Run aggregate queries in parallel. Rooms now carry the per-room fields
-    // the floor-map tab needs (capacity, occupancy_mode); active assignments
-    // are pulled with their room_id so we can compute per-room occupied-bed
+    // RLS on residents + room_assignments is gated to admin tier +
+    // branch_manager + supervision_staff (014_rls_perf.sql,
+    // 027_residents_supervision_staff_and_capacity.sql). Other roles allowed
+    // on this endpoint (maintenance/finance/transportation managers + staff)
+    // would silently get zero rows from the join — making every building look
+    // empty. Skip the fetch entirely for them and signal via
+    // `can_view_occupants` so the UI can render a "no access" placeholder
+    // instead of misleading vacant bars.
+    const occupantsVisible = canReadOccupants(profile.role);
+
+    // Run aggregate queries in parallel. Rooms carry the per-room fields the
+    // floor-map tab needs (capacity, occupancy_mode); active assignments are
+    // pulled with their room_id so we can compute per-room occupied-bed
     // counts client-side without N round-trips.
-    const [roomsRes, activeMaintRes, activeAssignmentsRes] = await Promise.all([
-      supabase
-        .from('rooms')
-        .select('id, room_number, floor, room_type, capacity, occupancy_mode, status')
-        .eq('building_id', id),
-      supabase
-        .from('maintenance_requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('building_id', id)
-        .not('status', 'in', '(completed,cancelled)'),
-      supabase
-        .from('room_assignments')
-        .select('room_id')
-        .eq('building_id', id)
-        .eq('status', 'active')
-        .returns<AssignmentRoomIdRow[]>(),
-    ]);
+    const [roomsRes, activeMaintRes, activeAssignmentsRes, apartmentsCountRes] =
+      await Promise.all([
+        supabase
+          .from('rooms')
+          .select(
+            'id, room_number, floor, room_type, capacity, occupancy_mode, status, apartment_id, apartment:apartments!apartment_id(id, apartment_number, floor)'
+          )
+          .eq('building_id', id)
+          .returns<RoomFloorMapRow[]>(),
+        supabase
+          .from('maintenance_requests')
+          .select('id', { count: 'exact', head: true })
+          .eq('building_id', id)
+          .not('status', 'in', '(completed,cancelled)'),
+        occupantsVisible
+          ? supabase
+              .from('room_assignments')
+              .select(
+                'id, room_id, resident_id, check_in_date, resident:residents(id, full_name)'
+              )
+              .eq('building_id', id)
+              .eq('status', 'active')
+              .order('check_in_date', { ascending: true })
+              .order('id', { ascending: true })
+              .returns<AssignmentRow[]>()
+          : Promise.resolve({ data: [] as AssignmentRow[], error: null }),
+        supabase
+          .from('apartments')
+          .select('id', { count: 'exact', head: true })
+          .eq('building_id', id),
+      ]);
 
     if (roomsRes.error) {
       console.error('Error fetching rooms:', roomsRes.error);
@@ -121,13 +161,25 @@ export async function GET(
       console.error('Error fetching assignments:', activeAssignmentsRes.error);
       return NextResponse.json({ error: 'Failed to fetch building' }, { status: 500 });
     }
+    if (apartmentsCountRes.error) {
+      console.error('Error fetching apartments count:', apartmentsCountRes.error);
+      return NextResponse.json({ error: 'Failed to fetch building' }, { status: 500 });
+    }
 
     const roomRows = (roomsRes.data || []) as RoomFloorMapRow[];
-    const activeAssignments = (activeAssignmentsRes.data || []) as AssignmentRoomIdRow[];
+    const activeAssignments = (activeAssignmentsRes.data || []) as AssignmentRow[];
 
-    const activeCountByRoom = new Map<string, number>();
+    // Pre-sorted by check_in_date ASC at the query — preserves stable
+    // segment order in the floor-map bar across refetches.
+    const activeAssignmentsByRoom = new Map<string, ActiveAssignmentLite[]>();
     for (const a of activeAssignments) {
-      activeCountByRoom.set(a.room_id, (activeCountByRoom.get(a.room_id) ?? 0) + 1);
+      const list = activeAssignmentsByRoom.get(a.room_id) ?? [];
+      list.push({
+        id: a.id,
+        resident_id: a.resident_id,
+        resident_name: a.resident?.full_name ?? '',
+      });
+      activeAssignmentsByRoom.set(a.room_id, list);
     }
 
     const stats = { total: 0, available: 0, occupied: 0, maintenance: 0, reserved: 0 };
@@ -136,16 +188,22 @@ export async function GET(
       stats[r.status] += 1;
     }
 
-    const rooms = roomRows.map((r) => ({
-      id: r.id,
-      room_number: r.room_number,
-      floor: r.floor,
-      room_type: r.room_type,
-      capacity: r.capacity,
-      occupancy_mode: r.occupancy_mode,
-      status: r.status,
-      active_assignments_count: activeCountByRoom.get(r.id) ?? 0,
-    }));
+    const rooms = roomRows.map((r) => {
+      const assignments = activeAssignmentsByRoom.get(r.id) ?? [];
+      return {
+        id: r.id,
+        room_number: r.room_number,
+        floor: r.floor,
+        room_type: r.room_type,
+        capacity: r.capacity,
+        occupancy_mode: r.occupancy_mode,
+        status: r.status,
+        apartment_id: r.apartment_id,
+        apartment: r.apartment,
+        active_assignments: assignments,
+        active_assignments_count: assignments.length,
+      };
+    });
 
     return NextResponse.json({
       data: {
@@ -153,7 +211,11 @@ export async function GET(
         room_stats: stats,
         rooms,
         active_maintenance_count: activeMaintRes.count ?? 0,
-        active_residents_count: activeAssignments.length,
+        // active_residents_count is also occupant-restricted; null (rather
+        // than 0) so the UI can distinguish "no data" from "zero residents".
+        active_residents_count: occupantsVisible ? activeAssignments.length : null,
+        apartments_count: apartmentsCountRes.count ?? 0,
+        can_view_occupants: occupantsVisible,
       },
     });
   } catch (error) {

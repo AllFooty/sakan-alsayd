@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Menu, LogOut, Globe } from 'lucide-react';
 import { useAuth } from '@/lib/auth/hooks';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
+import ThemeToggle from '@/components/admin/layout/ThemeToggle';
 
 interface AdminTopbarProps {
   onMenuToggle: () => void;
@@ -46,23 +47,23 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3">
+    <header className="sticky top-0 z-30 bg-white dark:bg-[var(--admin-surface)] border-b border-gray-200 dark:border-[var(--admin-border)] px-4 py-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuToggle}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)]"
             aria-label="Toggle menu"
           >
-            <Menu size={20} className="text-navy" />
+            <Menu size={20} className="text-navy dark:text-[var(--admin-text)]" />
           </button>
           <div className="hidden sm:block min-w-0 max-w-[16rem]">
-            <h2 className="text-sm font-semibold text-navy truncate">
+            <h2 className="text-sm font-semibold text-navy dark:text-[var(--admin-text)] truncate">
               {profile?.full_name || t('welcome')}
             </h2>
             {profile && (
               <p
-                className="text-xs text-gray-500 truncate"
+                className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] truncate"
                 title={roleLabels[profile.role] || profile.role}
               >
                 {roleLabels[profile.role] || profile.role}
@@ -72,9 +73,10 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <button
             onClick={switchLanguage}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-100 text-navy transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] text-navy dark:text-[var(--admin-text)] transition-colors"
           >
             <Globe size={16} />
             <span>{locale === 'ar' ? 'EN' : 'عربي'}</span>
@@ -82,7 +84,7 @@ export default function AdminTopbar({ onMenuToggle }: AdminTopbarProps) {
 
           <button
             onClick={() => setShowSignOutDialog(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg hover:bg-red-50 text-red-600 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400 transition-colors"
           >
             <LogOut size={16} />
             <span className="hidden sm:inline">{t('logout')}</span>

@@ -19,10 +19,14 @@ interface BuildingLite {
 
 export default function NewRoomPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; locale: string }>;
+  searchParams: Promise<{ apartmentId?: string; returnTo?: string }>;
 }) {
   const { id: buildingId } = use(params);
+  const { apartmentId: presetApartmentId, returnTo } = use(searchParams);
+  const returnToList = returnTo === 'list' ? 'list' : undefined;
   const { profile, loading: authLoading } = useAuth();
   const router = useRouter();
   const locale = useLocale();
@@ -88,7 +92,7 @@ export default function NewRoomPage({
 
   if (!canCreate) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={DoorOpen}
           title={t('forbidden.title')}
@@ -100,7 +104,7 @@ export default function NewRoomPage({
 
   if (notFound || !building) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={DoorOpen}
           title={t('notFound.title')}
@@ -119,6 +123,8 @@ export default function NewRoomPage({
       mode="create"
       buildingId={buildingId}
       buildingLabel={buildingLabel}
+      initial={presetApartmentId ? { apartment_id: presetApartmentId } : undefined}
+      returnTo={returnToList}
     />
   );
 }

@@ -112,7 +112,7 @@ function NewResidentInner() {
     return (
       <div className="space-y-4">
         {bookingLoading && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">
             <Loader2 size={14} className="animate-spin" />
             {t('fromBooking.loading')}
           </div>
@@ -125,13 +125,13 @@ function NewResidentInner() {
   return (
     <div className="space-y-4">
       {isValidBookingId && prefill && (
-        <div className="flex items-start gap-3 rounded-xl border border-coral/30 bg-coral/5 p-4">
+        <div className="flex items-start gap-3 rounded-xl border border-coral/30 bg-coral/5 dark:bg-coral/10 p-4">
           <Sparkles size={18} className="text-coral mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-navy">
+            <p className="text-sm font-semibold text-navy dark:text-[var(--admin-text)]">
               {t('fromBooking.bannerTitle')}
             </p>
-            <p className="text-sm text-gray-600 mt-0.5">
+            <p className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)] mt-0.5">
               {t('fromBooking.bannerDescription', {
                 name: bookingName ?? '—',
               })}

@@ -30,6 +30,8 @@ const HISTORICAL_APPLIED_OUT_OF_BAND = new Set([
   '025_maintenance_manager_full_update.sql', // applied via Dashboard SQL Editor; maintenance_manager_role_update policy confirmed present on prod
   '026_contracts_bucket.sql',          // applied via Dashboard SQL Editor; bucket + helper fn + 3 storage policies confirmed present on prod
   '027_residents_supervision_staff_and_capacity.sql', // applied via Dashboard SQL Editor; broadened RLS + uniq index + capacity trigger confirmed present on prod
+  '028_apartments.sql',                // applied via apply_migration MCP; recorded with the leading "028_" prefix retained in the name
+  '029_theme_preference.sql',          // applied via apply_migration MCP; recorded with the leading "029_" prefix retained in the name
 ]);
 
 const PROJECT_REF = 'xvcpyofwhmuohpvinrry';

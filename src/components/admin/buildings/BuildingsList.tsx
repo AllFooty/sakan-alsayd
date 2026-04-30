@@ -175,8 +175,8 @@ export default function BuildingsList() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{t('title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <ViewToggle view={view} onChange={setViewPersist} t={t} />
@@ -195,13 +195,13 @@ export default function BuildingsList() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 min-w-0">
-          <Search size={18} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={18} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[var(--admin-text-subtle)]" />
           <input
             type="text"
             placeholder={t('filters.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full ps-10 pe-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
+            className="w-full ps-10 pe-4 py-2 border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] placeholder:text-gray-400 dark:placeholder:text-[var(--admin-text-subtle)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral"
           />
         </div>
       </div>
@@ -252,25 +252,25 @@ export default function BuildingsList() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden"
               >
-                <div className="aspect-[4/3] bg-gray-100 animate-pulse" />
+                <div className="aspect-[4/3] bg-gray-100 dark:bg-[var(--admin-surface-2)] animate-pulse" />
                 <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-100 rounded animate-pulse w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded animate-pulse w-1/2" />
+                  <div className="h-4 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-3/4" />
+                  <div className="h-3 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse w-1/2" />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+          <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] p-6 space-y-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
+              <div key={i} className="h-12 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded animate-pulse" />
             ))}
           </div>
         )
       ) : buildings.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
           <EmptyState
             icon={Building2}
             title={filtersActive ? t('empty.filteredTitle') : t('empty.title')}
@@ -285,9 +285,9 @@ export default function BuildingsList() {
             <Link
               key={b.id}
               href={`/${locale}/admin/buildings/${b.id}`}
-              className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-coral/30 transition-all"
+              className="group bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden hover:shadow-md hover:border-coral/30 dark:hover:border-coral/40 transition-all"
             >
-              <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+              <div className="aspect-[4/3] bg-gray-100 dark:bg-[var(--admin-surface-2)] relative overflow-hidden">
                 {b.cover_image ? (
                   <Image
                     src={b.cover_image}
@@ -297,7 +297,7 @@ export default function BuildingsList() {
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300 dark:text-[var(--admin-text-subtle)]">
                     <ImageOff size={32} />
                     <span className="text-xs mt-2">{t('card.noPhoto')}</span>
                   </div>
@@ -312,17 +312,17 @@ export default function BuildingsList() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-navy group-hover:text-coral transition-colors">
+                <h3 className="font-semibold text-navy dark:text-[var(--admin-text)] group-hover:text-coral dark:group-hover:text-coral transition-colors">
                   {name(b)}
                 </h3>
-                <p className="text-sm text-gray-500 mt-0.5">{city(b)}</p>
-                <div className="flex items-center gap-3 mt-3 text-xs text-gray-600">
+                <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{city(b)}</p>
+                <div className="flex items-center gap-3 mt-3 text-xs text-gray-600 dark:text-[var(--admin-text-muted)]">
                   <span>{t('card.totalRooms', { count: b.room_stats.total })}</span>
-                  <span className="text-gray-300">·</span>
-                  <span className="text-emerald-600">
+                  <span className="text-gray-300 dark:text-[var(--admin-text-subtle)]">·</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">
                     {t('card.available', { count: b.room_stats.available })}
                   </span>
-                  <span className="text-gray-300">·</span>
+                  <span className="text-gray-300 dark:text-[var(--admin-text-subtle)]">·</span>
                   <span className="text-coral">
                     {t('card.occupied', { count: b.room_stats.occupied })}
                   </span>
@@ -332,11 +332,11 @@ export default function BuildingsList() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
+                <tr className="border-b border-gray-200 dark:border-[var(--admin-border)] bg-gray-50 dark:bg-[var(--admin-surface-2)]">
                   <SortableHeader
                     label={t('table.city')}
                     column="city_en"
@@ -351,10 +351,10 @@ export default function BuildingsList() {
                     sortDir={sortDir}
                     onSort={handleSort}
                   />
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden md:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden md:table-cell">
                     {t('table.rooms')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden lg:table-cell">
                     {t('table.occupancy')}
                   </th>
                   <SortableHeader
@@ -378,10 +378,10 @@ export default function BuildingsList() {
                 {buildings.map((b) => (
                   <tr
                     key={b.id}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="border-b border-gray-100 dark:border-[var(--admin-border)] hover:bg-gray-50 dark:hover:bg-[var(--admin-surface-2)] transition-colors"
                   >
-                    <td className="px-4 py-3 text-gray-700">{city(b)}</td>
-                    <td className="px-4 py-3 font-medium text-navy">
+                    <td className="px-4 py-3 text-gray-700 dark:text-[var(--admin-text-muted)]">{city(b)}</td>
+                    <td className="px-4 py-3 font-medium text-navy dark:text-[var(--admin-text)]">
                       <Link
                         href={`/${locale}/admin/buildings/${b.id}`}
                         className="hover:text-coral transition-colors"
@@ -389,7 +389,7 @@ export default function BuildingsList() {
                         {name(b)}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-gray-600 hidden md:table-cell">
+                    <td className="px-4 py-3 text-gray-600 dark:text-[var(--admin-text-muted)] hidden md:table-cell">
                       {b.room_stats.total}
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
@@ -405,7 +405,7 @@ export default function BuildingsList() {
                         variant={b.is_active ? 'success' : 'neutral'}
                       />
                     </td>
-                    <td className="px-4 py-3 text-gray-500 hidden xl:table-cell">
+                    <td className="px-4 py-3 text-gray-500 dark:text-[var(--admin-text-muted)] hidden xl:table-cell">
                       {formatDate(b.updated_at, isArabic ? 'ar' : 'en')}
                     </td>
                   </tr>
@@ -428,7 +428,7 @@ export default function BuildingsList() {
       )}
 
       {view === 'grid' && totalPages > 1 && (
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
           <Pagination
             page={page}
             totalPages={totalPages}
@@ -453,14 +453,14 @@ function ViewToggle({
   t: (key: string) => string;
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
+    <div className="inline-flex rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] p-0.5">
       <button
         type="button"
         onClick={() => onChange('grid')}
         aria-pressed={view === 'grid'}
         title={t('view.grid')}
         className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
-          view === 'grid' ? 'bg-navy text-white' : 'text-gray-600 hover:text-navy'
+          view === 'grid' ? 'bg-navy text-white' : 'text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:hover:text-[var(--admin-text)]'
         }`}
       >
         <LayoutGrid size={14} />
@@ -472,7 +472,7 @@ function ViewToggle({
         aria-pressed={view === 'table'}
         title={t('view.table')}
         className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
-          view === 'table' ? 'bg-navy text-white' : 'text-gray-600 hover:text-navy'
+          view === 'table' ? 'bg-navy text-white' : 'text-gray-600 dark:text-[var(--admin-text-muted)] hover:text-navy dark:hover:text-[var(--admin-text)]'
         }`}
       >
         <Rows3 size={14} />
@@ -492,17 +492,17 @@ function OccupancyBar({
   pct: number;
 }) {
   if (total === 0) {
-    return <span className="text-gray-400 text-xs">—</span>;
+    return <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] text-xs">—</span>;
   }
   return (
     <div className="flex items-center gap-2 min-w-[6rem]">
-      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-full overflow-hidden">
         <div
           className="h-full bg-coral transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="text-xs text-gray-600 tabular-nums whitespace-nowrap">
+      <span className="text-xs text-gray-600 dark:text-[var(--admin-text-muted)] tabular-nums whitespace-nowrap">
         {occupied}/{total}
       </span>
     </div>
@@ -529,24 +529,24 @@ function Pagination({
   const PrevIcon = isArabic ? ChevronRight : ChevronLeft;
   const NextIcon = isArabic ? ChevronLeft : ChevronRight;
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
-      <p className="text-sm text-gray-500">{summary}</p>
+    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[var(--admin-border)]">
+      <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)]">{summary}</p>
       <div className="flex items-center gap-2">
         <button
           onClick={onPrev}
           disabled={page === 1}
-          className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] text-gray-600 dark:text-[var(--admin-text-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={tCommon('pagination.previous')}
         >
           <PrevIcon size={16} />
         </button>
-        <span className="text-sm text-gray-600 tabular-nums">
+        <span className="text-sm text-gray-600 dark:text-[var(--admin-text-muted)] tabular-nums">
           {page} / {totalPages}
         </span>
         <button
           onClick={onNext}
           disabled={page === totalPages}
-          className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)] text-gray-600 dark:text-[var(--admin-text-muted)] disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={tCommon('pagination.next')}
         >
           <NextIcon size={16} />
@@ -575,14 +575,14 @@ function SortableHeader({
   const Icon = active ? (sortDir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
   return (
     <th
-      className={`text-start px-4 py-3 font-medium text-gray-500 ${className}`}
+      className={`text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] ${className}`}
       aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
     >
       <button
         type="button"
         onClick={() => onSort(column)}
-        className={`flex items-center gap-1.5 hover:text-navy transition-colors ${
-          active ? 'text-navy' : ''
+        className={`flex items-center gap-1.5 hover:text-navy dark:hover:text-[var(--admin-text)] transition-colors ${
+          active ? 'text-navy dark:text-[var(--admin-text)]' : ''
         }`}
       >
         <span>{label}</span>

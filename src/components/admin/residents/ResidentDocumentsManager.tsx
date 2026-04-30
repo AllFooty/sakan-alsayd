@@ -193,7 +193,7 @@ export default function ResidentDocumentsManager({
   return (
     <div className="space-y-3">
       {documents.length === 0 ? (
-        <p className="text-sm text-gray-400 italic">{t('detail.noDocuments')}</p>
+        <p className="text-sm text-gray-400 dark:text-[var(--admin-text-subtle)] italic">{t('detail.noDocuments')}</p>
       ) : (
         <ul className="space-y-2">
           {documents.map((path) => {
@@ -202,11 +202,11 @@ export default function ResidentDocumentsManager({
             return (
               <li
                 key={path}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors group"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-gray-50 dark:bg-[var(--admin-bg)] hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] transition-colors group"
               >
                 <Icon
                   size={14}
-                  className="text-gray-400 flex-shrink-0"
+                  className="text-gray-400 dark:text-[var(--admin-text-subtle)] flex-shrink-0"
                 />
                 <button
                   type="button"
@@ -221,7 +221,7 @@ export default function ResidentDocumentsManager({
                   type="button"
                   onClick={() => handleOpen(path)}
                   disabled={opening}
-                  className="p-1 text-gray-400 hover:text-coral transition-colors flex-shrink-0"
+                  className="p-1 text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-coral transition-colors flex-shrink-0"
                   aria-label={t('documents.openLabel')}
                 >
                   {opening ? (
@@ -234,7 +234,7 @@ export default function ResidentDocumentsManager({
                   <button
                     type="button"
                     onClick={() => setConfirmDelete(path)}
-                    className="p-1 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                    className="p-1 text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-red-500 dark:text-red-400 transition-colors flex-shrink-0"
                     aria-label={t('documents.deleteLabel')}
                   >
                     <Trash2 size={14} />
@@ -254,8 +254,8 @@ export default function ResidentDocumentsManager({
           className={cn(
             'mt-2 rounded-lg border-2 border-dashed p-4 text-center transition-colors',
             dragActive
-              ? 'border-coral bg-coral/5'
-              : 'border-gray-200 bg-white hover:border-coral/50'
+              ? 'border-coral bg-coral/5 dark:bg-coral/10'
+              : 'border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] hover:border-coral/50'
           )}
         >
           <input
@@ -281,16 +281,16 @@ export default function ResidentDocumentsManager({
               ? t('documents.uploadingLabel')
               : t('documents.uploadLabel')}
           </button>
-          <p className="text-xs text-gray-400 mt-1.5">
+          <p className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] mt-1.5">
             {t('documents.dropHint')}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] mt-0.5">
             {t('documents.constraintsHint')}
           </p>
         </div>
       )}
 
-      <div className="flex items-start gap-2 text-xs text-gray-400">
+      <div className="flex items-start gap-2 text-xs text-gray-400 dark:text-[var(--admin-text-subtle)]">
         <AlertCircle size={12} className="mt-0.5 flex-shrink-0" />
         <p>{t('documents.privacyHint')}</p>
       </div>

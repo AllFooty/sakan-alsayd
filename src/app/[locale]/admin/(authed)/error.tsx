@@ -26,7 +26,7 @@ export default function AdminError({
   }, [error]);
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-16 bg-white">
+    <main className="min-h-screen flex items-center justify-center px-4 py-16 bg-white dark:bg-[var(--admin-surface)]">
       <div className="bg-cream rounded-3xl p-8 md:p-12 max-w-lg w-full text-center">
         <h1 className="text-2xl md:text-3xl font-bold text-coral mb-3">
           {t('title')}

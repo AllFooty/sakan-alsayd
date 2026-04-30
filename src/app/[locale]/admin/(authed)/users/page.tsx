@@ -17,7 +17,7 @@ export default function UsersPage() {
 
   if (profile?.role !== 'super_admin') {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={ShieldAlert}
           title={t('forbidden.title')}
@@ -30,8 +30,8 @@ export default function UsersPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
-        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-navy dark:text-[var(--admin-text)]">{t('title')}</h1>
+        <p className="text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">{t('subtitle')}</p>
       </div>
 
       <UsersList />

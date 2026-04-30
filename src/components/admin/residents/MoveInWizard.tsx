@@ -57,6 +57,8 @@ interface BuildingRoomItem {
   occupancy_mode: 'private' | 'shared';
   status: 'available' | 'occupied' | 'maintenance' | 'reserved';
   active_assignments_count: number;
+  apartment_id: string;
+  apartment: { id: string; apartment_number: string; floor: number } | null;
 }
 
 interface BuildingDetailResponse {
@@ -327,14 +329,14 @@ export default function MoveInWizard({
         if (e.target === e.currentTarget && !submitting) onClose();
       }}
     >
-      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-3xl bg-white dark:bg-[var(--admin-surface)] rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100 dark:border-[var(--admin-border)]">
           <div>
-            <h2 className="text-lg font-semibold text-navy">
+            <h2 className="text-lg font-semibold text-navy dark:text-[var(--admin-text)]">
               {t('moveIn.title')}
             </h2>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">
               {t('moveIn.subtitle', { name: residentName })}
             </p>
           </div>
@@ -342,7 +344,7 @@ export default function MoveInWizard({
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
+            className="p-1.5 rounded-md text-gray-400 dark:text-[var(--admin-text-subtle)] hover:text-gray-600 dark:text-[var(--admin-text-muted)] hover:bg-gray-100 dark:bg-[var(--admin-surface-2)] disabled:opacity-50 transition-colors"
             aria-label={t('moveIn.actions.cancel')}
           >
             <X size={18} />
@@ -350,7 +352,7 @@ export default function MoveInWizard({
         </div>
 
         {/* Stepper */}
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 overflow-x-auto">
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-[var(--admin-border)] overflow-x-auto">
           {STEP_ORDER.map((s, i) => {
             const active = s === step;
             const done = i < stepIdx;
@@ -360,8 +362,8 @@ export default function MoveInWizard({
                   className={cn(
                     'flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
                     active && 'bg-coral text-white',
-                    done && 'bg-emerald-50 text-emerald-700',
-                    !active && !done && 'bg-gray-100 text-gray-500'
+                    done && 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                    !active && !done && 'bg-gray-100 dark:bg-[var(--admin-surface-2)] text-gray-500 dark:text-[var(--admin-text-muted)]'
                   )}
                 >
                   <span className="tabular-nums">{i + 1}</span>
@@ -369,7 +371,7 @@ export default function MoveInWizard({
                   {done && <Check size={12} />}
                 </div>
                 {i < STEP_ORDER.length - 1 && (
-                  <span className="text-gray-300">·</span>
+                  <span className="text-gray-300 dark:text-[var(--admin-text-subtle)]">·</span>
                 )}
               </div>
             );
@@ -433,12 +435,12 @@ export default function MoveInWizard({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-gray-100 bg-gray-50">
+        <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-gray-100 dark:border-[var(--admin-border)] bg-gray-50 dark:bg-[var(--admin-bg)]">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
           >
             {t('moveIn.actions.cancel')}
           </button>
@@ -448,7 +450,7 @@ export default function MoveInWizard({
                 type="button"
                 onClick={goBack}
                 disabled={submitting}
-                className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 dark:text-[var(--admin-text-muted)] bg-white dark:bg-[var(--admin-surface)] border border-gray-200 dark:border-[var(--admin-border)] rounded-lg hover:bg-gray-50 dark:bg-[var(--admin-bg)] disabled:opacity-50 transition-colors"
               >
                 <ChevronPrev size={14} />
                 {t('moveIn.actions.back')}
@@ -507,15 +509,15 @@ function BuildingStep({
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
+          <div key={i} className="h-20 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg animate-pulse" />
         ))}
       </div>
     );
   }
   if (buildings.length === 0) {
     return (
-      <div className="text-center py-10 text-gray-400">
-        <Building2 size={32} className="mx-auto mb-2 text-gray-300" />
+      <div className="text-center py-10 text-gray-400 dark:text-[var(--admin-text-subtle)]">
+        <Building2 size={32} className="mx-auto mb-2 text-gray-300 dark:text-[var(--admin-text-subtle)]" />
         <p className="text-sm">{emptyMsg}</p>
       </div>
     );
@@ -533,24 +535,24 @@ function BuildingStep({
             className={cn(
               'text-start p-3 rounded-lg border-2 transition-colors',
               isSelected
-                ? 'border-coral bg-coral/5'
-                : 'border-gray-200 bg-white hover:border-coral/50'
+                ? 'border-coral bg-coral/5 dark:bg-coral/10'
+                : 'border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] hover:border-coral/50'
             )}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="font-semibold text-navy truncate">{labelGetter(b)}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{cityGetter(b)}</p>
+                <p className="font-semibold text-navy dark:text-[var(--admin-text)] truncate">{labelGetter(b)}</p>
+                <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-0.5">{cityGetter(b)}</p>
               </div>
               <Building2
                 size={16}
                 className={cn(
                   'flex-shrink-0',
-                  isSelected ? 'text-coral' : 'text-gray-300'
+                  isSelected ? 'text-coral' : 'text-gray-300 dark:text-[var(--admin-text-subtle)]'
                 )}
               />
             </div>
-            <p className="text-xs text-emerald-600 mt-2 tabular-nums">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 tabular-nums">
               {availableBeds} / {b.room_stats.total}
             </p>
           </button>
@@ -581,21 +583,25 @@ function RoomStep({
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+          <div key={i} className="h-24 bg-gray-100 dark:bg-[var(--admin-surface-2)] rounded-lg animate-pulse" />
         ))}
       </div>
     );
   }
   if (rooms.length === 0) {
     return (
-      <div className="text-center py-10 text-gray-400">
-        <DoorOpen size={32} className="mx-auto mb-2 text-gray-300" />
+      <div className="text-center py-10 text-gray-400 dark:text-[var(--admin-text-subtle)]">
+        <DoorOpen size={32} className="mx-auto mb-2 text-gray-300 dark:text-[var(--admin-text-subtle)]" />
         <p className="text-sm">{emptyMsg}</p>
       </div>
     );
   }
-  // Sort: vacant first, then by room_number
+  // Sort: by apartment first (so rooms in the same apartment cluster), then
+  // vacant first within an apartment, then by room_number.
   const sorted = [...rooms].sort((a, b) => {
+    const aApt = a.apartment?.apartment_number ?? '';
+    const bApt = b.apartment?.apartment_number ?? '';
+    if (aApt !== bApt) return aApt.localeCompare(bApt);
     const av = roomVacant(a) ? 0 : 1;
     const bv = roomVacant(b) ? 0 : 1;
     if (av !== bv) return av - bv;
@@ -616,9 +622,9 @@ function RoomStep({
             disabled={!vacant}
             className={cn(
               'text-start p-3 rounded-lg border-2 transition-colors',
-              !vacant && 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60',
-              vacant && !isSelected && 'border-gray-200 bg-white hover:border-coral/50',
-              vacant && isSelected && 'border-coral bg-coral/5'
+              !vacant && 'border-gray-100 dark:border-[var(--admin-border)] bg-gray-50 dark:bg-[var(--admin-bg)] cursor-not-allowed opacity-60',
+              vacant && !isSelected && 'border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] hover:border-coral/50',
+              vacant && isSelected && 'border-coral bg-coral/5 dark:bg-coral/10'
             )}
           >
             <div className="flex items-center gap-1.5">
@@ -626,25 +632,36 @@ function RoomStep({
                 size={14}
                 className={cn(
                   'flex-shrink-0',
-                  vacant ? 'text-gray-400' : 'text-gray-300'
+                  vacant ? 'text-gray-400 dark:text-[var(--admin-text-subtle)]' : 'text-gray-300 dark:text-[var(--admin-text-subtle)]'
                 )}
               />
-              <p className="font-semibold text-navy text-sm tabular-nums truncate">
+              <p className="font-semibold text-navy dark:text-[var(--admin-text)] text-sm tabular-nums truncate">
                 {r.room_number ?? '—'}
               </p>
             </div>
+            {/* Apartment context — useful for supervisors who need to keep
+                gender separation, friend grouping, etc. consistent within an
+                apartment. Hidden when the apartment_number is the auto-default
+                so it doesn't add noise for buildings that haven't been
+                organized into real apartments yet. */}
+            {r.apartment &&
+              !/^F-?\d+-DEFAULT$/.test(r.apartment.apartment_number) && (
+                <p className="text-[10px] text-gray-500 dark:text-[var(--admin-text-muted)] mt-1 truncate" dir="ltr">
+                  {r.apartment.apartment_number}
+                </p>
+              )}
             {floor && (
-              <p className="text-xs text-gray-400 mt-1 tabular-nums">{floor}</p>
+              <p className="text-xs text-gray-400 dark:text-[var(--admin-text-subtle)] mt-1 tabular-nums">{floor}</p>
             )}
             <p
               className={cn(
                 'text-xs mt-2 tabular-nums',
-                vacant ? 'text-emerald-600' : 'text-gray-400'
+                vacant ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-[var(--admin-text-subtle)]'
               )}
             >
               {vacancyLabelGetter(r)}
             </p>
-            <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">
+            <p className="text-[10px] text-gray-400 dark:text-[var(--admin-text-subtle)] mt-0.5 uppercase tracking-wide">
               {r.room_type}
             </p>
           </button>
@@ -675,7 +692,7 @@ function DatesStep({
   return (
     <div className="space-y-4 max-w-md">
       <div>
-        <label className="block text-sm font-medium text-navy mb-1.5">
+        <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5">
           {t('moveIn.fields.checkIn')}
         </label>
         <div className="relative">
@@ -685,19 +702,19 @@ function DatesStep({
             value={checkIn}
             onChange={(e) => onCheckIn(e.target.value)}
             className={cn(
-              'block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-navy shadow-sm focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
+              'block w-full rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] px-3 py-2 text-sm text-navy dark:text-[var(--admin-text)] shadow-sm focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
               !checkIn && 'text-transparent'
             )}
           />
           {!checkIn && (
-            <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400">
+            <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
               {placeholder}
             </span>
           )}
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-navy mb-1.5">
+        <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5">
           {t('moveIn.fields.checkOut')}
         </label>
         <div className="relative">
@@ -708,19 +725,19 @@ function DatesStep({
             min={checkIn || undefined}
             onChange={(e) => onCheckOut(e.target.value)}
             className={cn(
-              'block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-navy shadow-sm focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
+              'block w-full rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] px-3 py-2 text-sm text-navy dark:text-[var(--admin-text)] shadow-sm focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
               !checkOut && 'text-transparent'
             )}
           />
           {!checkOut && (
-            <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400">
+            <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
               {placeholder}
             </span>
           )}
         </div>
       </div>
       {error && (
-        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-700 text-sm">
+        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-700 text-sm">
           <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
           <p>{error}</p>
         </div>
@@ -754,28 +771,34 @@ function ConfirmStep({
   return (
     <div className="space-y-3 max-w-xl">
       <Row icon={Building2} label={t('moveIn.fields.building')}>
-        <span className="text-navy font-medium">{buildingNeighborhood}</span>
-        <span className="text-gray-400 ms-2 text-xs">{buildingCity}</span>
+        <span className="text-navy dark:text-[var(--admin-text)] font-medium">{buildingNeighborhood}</span>
+        <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] ms-2 text-xs">{buildingCity}</span>
       </Row>
       <Row icon={DoorOpen} label={t('moveIn.fields.room')}>
-        <span className="text-navy font-medium tabular-nums">
+        <span className="text-navy dark:text-[var(--admin-text)] font-medium tabular-nums">
           {room.room_number ?? '—'}
         </span>
         {roomFloorLabel && (
-          <span className="text-gray-400 ms-2 text-xs">{roomFloorLabel}</span>
+          <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] ms-2 text-xs">{roomFloorLabel}</span>
         )}
+        {room.apartment &&
+          !/^F-?\d+-DEFAULT$/.test(room.apartment.apartment_number) && (
+            <span className="text-gray-400 dark:text-[var(--admin-text-subtle)] ms-2 text-xs" dir="ltr">
+              · {room.apartment.apartment_number}
+            </span>
+          )}
       </Row>
       <Row icon={Calendar} label={t('moveIn.fields.checkIn')}>
-        <span className="text-navy tabular-nums">
+        <span className="text-navy dark:text-[var(--admin-text)] tabular-nums">
           {formatDate(checkIn, dateLocale)}
         </span>
       </Row>
       <Row icon={Calendar} label={t('moveIn.fields.checkOut')}>
-        <span className="text-navy tabular-nums">
+        <span className="text-navy dark:text-[var(--admin-text)] tabular-nums">
           {checkOut ? formatDate(checkOut, dateLocale) : '—'}
         </span>
       </Row>
-      <div className="mt-4 px-3 py-2 rounded-lg bg-coral/5 border border-coral/30 text-sm text-navy">
+      <div className="mt-4 px-3 py-2 rounded-lg bg-coral/5 dark:bg-coral/10 border border-coral/30 text-sm text-navy dark:text-[var(--admin-text)]">
         {t('moveIn.subtitle', { name: residentName })}
       </div>
     </div>
@@ -792,8 +815,8 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-gray-50">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 flex-shrink-0">
+    <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-gray-50 dark:bg-[var(--admin-bg)]">
+      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-[var(--admin-text-muted)] flex-shrink-0">
         <Icon size={12} />
         {label}
       </div>

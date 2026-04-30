@@ -27,7 +27,7 @@ export default function NewBuildingPage() {
   if (loading) return <LoadingScreen />;
   if (!canCreate) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
         <EmptyState
           icon={Building2}
           title={t('forbidden.title')}

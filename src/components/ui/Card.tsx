@@ -13,9 +13,9 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     const baseStyles = 'rounded-2xl overflow-hidden';
 
     const variants = {
-      default: 'bg-white',
-      elevated: 'bg-white shadow-lg shadow-navy/5',
-      outlined: 'bg-white border border-border',
+      default: 'bg-white dark:bg-[var(--admin-surface)]',
+      elevated: 'bg-white dark:bg-[var(--admin-surface)] shadow-lg shadow-navy/5 dark:shadow-black/30',
+      outlined: 'bg-white dark:bg-[var(--admin-surface)] border border-border dark:border-[var(--admin-border)]',
     };
 
     const hoverStyles = hover
