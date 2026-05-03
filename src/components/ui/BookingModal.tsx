@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -103,6 +104,15 @@ export default function BookingModal({
   const [selectedRoom, setSelectedRoom] = useState<{ type: string; bathroomType: string; price: number } | null>(null);
   const [currentStep, setCurrentStep] = useState<Step>('city');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [mounted, setMounted] = useState(false);
+  const scrimRef = useRef<HTMLDivElement>(null);
+
+  // Mark mounted so we only portal client-side. The component is loaded with
+  // dynamic({ ssr: false }) so SSR isn't an issue, but this also gives us a
+  // safe `document.body` reference.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     register,
@@ -229,6 +239,33 @@ export default function BookingModal({
       window.scrollTo(0, scrollY);
     };
   }, [isOpen, handleClose]);
+
+  // Visual viewport tracking. CSS `position: fixed` is anchored to the LAYOUT
+  // viewport, but on iOS Safari the layout viewport and the visual viewport
+  // diverge while the keyboard is open — the result is a fixed modal that
+  // appears to scroll off the top of the screen when an input is focused.
+  // Pin the modal scrim to the visual viewport's box so the modal stays in
+  // the user's actual visible area no matter what iOS does.
+  useEffect(() => {
+    if (!isOpen) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const el = scrimRef.current;
+      if (!el) return;
+      el.style.top = `${vv.offsetTop}px`;
+      el.style.left = `${vv.offsetLeft}px`;
+      el.style.width = `${vv.width}px`;
+      el.style.height = `${vv.height}px`;
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [isOpen]);
 
   const selectedLocation = useMemo(
     () => buildings.find((l) => l.id === selectedLocationId),
@@ -429,9 +466,13 @@ export default function BookingModal({
     </div>
   );
 
-  return (
+  if (!mounted) return null;
+
+  const modalNode = (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60"
+      ref={scrimRef}
+      className="fixed z-[100] flex items-end sm:items-center justify-center bg-black/60"
+      style={{ top: 0, left: 0, width: '100%', height: '100%' }}
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
       <div
@@ -988,4 +1029,6 @@ export default function BookingModal({
       </div>
     </div>
   );
+
+  return createPortal(modalNode, document.body);
 }

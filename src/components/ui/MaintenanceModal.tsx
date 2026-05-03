@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -61,6 +62,12 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [photosPreviews, setPhotosPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const scrimRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   // City selection sub-step within 'building' step
   const [citySelected, setCitySelected] = useState(false);
   // Apartment-shared issue toggle (kitchen, hallway AC, water heater, etc.)
@@ -162,6 +169,28 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
       window.scrollTo(0, scrollY);
     };
   }, [isOpen, handleClose]);
+
+  // Visual viewport tracking — see BookingModal for the rationale.
+  useEffect(() => {
+    if (!isOpen) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const el = scrimRef.current;
+      if (!el) return;
+      el.style.top = `${vv.offsetTop}px`;
+      el.style.left = `${vv.offsetLeft}px`;
+      el.style.width = `${vv.width}px`;
+      el.style.height = `${vv.height}px`;
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, [isOpen]);
 
   const selectedLocation = useMemo(
     () => buildings.find((l) => l.id === selectedLocationId),
@@ -281,13 +310,16 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   };
 
   if (!isOpen) return null;
+  if (!mounted) return null;
 
   const BackIcon = isArabic ? ChevronRight : ChevronLeft;
   const showBack = (currentStep === 'building' && citySelected) || stepIndex > 0;
 
-  return (
+  const modalNode = (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
+      ref={scrimRef}
+      className="fixed z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
+      style={{ top: 0, left: 0, width: '100%', height: '100%' }}
       onClick={(e) => e.target === e.currentTarget && handleClose()}
     >
       <div
@@ -724,4 +756,6 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
       </div>
     </div>
   );
+
+  return createPortal(modalNode, document.body);
 }
