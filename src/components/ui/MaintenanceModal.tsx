@@ -128,17 +128,23 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
     }, 300);
   }, [onClose, resetForm, photosPreviews]);
 
-  // Keyboard
+  // Keyboard + scroll lock. Lock both <html> and <body> so iOS rubber-band
+  // scrolling doesn't leak through behind the modal, and snapshot the prior
+  // overflow values so we can restore them cleanly on close.
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
     document.addEventListener('keydown', handleKey);
+    const prevHtml = document.documentElement.style.overflow;
+    const prevBody = document.body.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', handleKey);
-      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = prevHtml;
+      document.body.style.overflow = prevBody;
     };
   }, [isOpen, handleClose]);
 
@@ -474,7 +480,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   maxLength={SUMMARY_MAX}
                   placeholder={t('steps.details.summaryPlaceholder')}
                   className={cn(
-                    'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors',
+                    'w-full px-4 py-2.5 border rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors',
                     errors.description ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                   )}
                 />
@@ -489,7 +495,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   {...register('extra_details')}
                   rows={4}
                   placeholder={t('steps.details.extraDetailsPlaceholder')}
-                  className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                 />
               </div>
 
@@ -528,14 +534,14 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   <input
                     {...register('room_number')}
                     placeholder={t('steps.details.roomNumberPlaceholder')}
-                    className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
+                    className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
                   />
                 ) : (
                   <>
                     <input
                       {...register('apartment_number')}
                       placeholder={t('steps.details.apartmentNumberPlaceholder')}
-                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors"
                       dir="ltr"
                     />
                     <p className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] mt-1.5">
@@ -632,7 +638,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                     {...register('requester_name')}
                     placeholder={t('placeholders.fullName')}
                     className={cn(
-                      'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
+                      'w-full px-4 py-2.5 border rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
                       errors.requester_name ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                     )}
                   />
@@ -646,7 +652,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                     formatHint={t('phoneHint')}
                     error={errors.requester_phone ? t('invalidPhone') : undefined}
                     className={cn(
-                      'w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
+                      'w-full px-4 py-2.5 border rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
                       errors.requester_phone ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                     )}
                   />
@@ -698,8 +704,8 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
           </div>
         )}
 
-        {/* Mobile bottom safe area */}
-        <div className="h-safe-bottom sm:hidden" />
+        {/* Mobile bottom safe area (iPhone home indicator) */}
+        <div className="pb-[env(safe-area-inset-bottom)] sm:hidden" />
       </div>
     </div>
   );

@@ -192,17 +192,23 @@ export default function BookingModal({
     }, 300);
   }, [onClose, resetForm]);
 
-  // Keyboard
+  // Keyboard + scroll lock. Lock both <html> and <body> so iOS rubber-band
+  // scrolling doesn't leak through behind the modal, and snapshot the prior
+  // overflow values so we can restore them cleanly on close.
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
     document.addEventListener('keydown', handleKey);
+    const prevHtml = document.documentElement.style.overflow;
+    const prevBody = document.body.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', handleKey);
-      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = prevHtml;
+      document.body.style.overflow = prevBody;
     };
   }, [isOpen, handleClose]);
 
@@ -334,7 +340,7 @@ export default function BookingModal({
 
   const inputClassName = (hasError: boolean) =>
     cn(
-      'w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
+      'w-full px-4 py-3 border rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
       hasError ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
     );
 
@@ -647,7 +653,7 @@ export default function BookingModal({
                       )}
                     />
                     {!watchDateOfBirth && (
-                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
+                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-base sm:text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
                       </span>
                     )}
@@ -764,7 +770,7 @@ export default function BookingModal({
                       )}
                     />
                     {!watchContractStartDate && (
-                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
+                      <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-base sm:text-sm text-gray-400 dark:text-[var(--admin-text-subtle)]">
                         {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
                       </span>
                     )}
@@ -873,7 +879,7 @@ export default function BookingModal({
                         {...register('medicalIssuesDescription')}
                         rows={3}
                         placeholder={t('placeholders.medicalDescription')}
-                        className="w-full px-4 py-3 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                       />
                     </div>
                   )}
@@ -912,7 +918,7 @@ export default function BookingModal({
                     {...register('notes')}
                     rows={2}
                     placeholder={t('placeholders.notes')}
-                    className="w-full px-4 py-3 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-[var(--admin-border)] rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors"
                   />
                 </div>
 
@@ -959,8 +965,8 @@ export default function BookingModal({
           </div>
         )}
 
-        {/* Mobile bottom safe area */}
-        <div className="h-safe-bottom sm:hidden" />
+        {/* Mobile bottom safe area (iPhone home indicator) */}
+        <div className="pb-[env(safe-area-inset-bottom)] sm:hidden" />
       </div>
     </div>
   );
