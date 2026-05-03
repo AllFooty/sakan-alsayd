@@ -192,23 +192,41 @@ export default function BookingModal({
     }, 300);
   }, [onClose, resetForm]);
 
-  // Keyboard + scroll lock. Lock both <html> and <body> so iOS rubber-band
-  // scrolling doesn't leak through behind the modal, and snapshot the prior
-  // overflow values so we can restore them cleanly on close.
+  // Keyboard + iOS-safe scroll lock. The naive overflow:hidden lock does NOT
+  // stop iOS Safari from scrolling <html> to "bring the focused input into
+  // view" — when that happens inside a position:fixed modal, the entire modal
+  // scrolls off the top of the screen. The fix is to pin <body> in place with
+  // position:fixed + a negative top offset so iOS has no document to scroll;
+  // it then scrolls the modal's overflow-y-auto content instead, which keeps
+  // the modal anchored. Restore scroll position on close.
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
     document.addEventListener('keydown', handleKey);
-    const prevHtml = document.documentElement.style.overflow;
-    const prevBody = document.body.style.overflow;
+
+    const scrollY = window.scrollY;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyWidth = document.body.style.width;
+    const prevBodyOverflow = document.body.style.overflow;
+
     document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
+
     return () => {
       document.removeEventListener('keydown', handleKey);
-      document.documentElement.style.overflow = prevHtml;
-      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.width = prevBodyWidth;
+      document.body.style.overflow = prevBodyOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen, handleClose]);
 

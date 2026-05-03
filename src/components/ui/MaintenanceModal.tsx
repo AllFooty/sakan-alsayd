@@ -128,23 +128,38 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
     }, 300);
   }, [onClose, resetForm, photosPreviews]);
 
-  // Keyboard + scroll lock. Lock both <html> and <body> so iOS rubber-band
-  // scrolling doesn't leak through behind the modal, and snapshot the prior
-  // overflow values so we can restore them cleanly on close.
+  // Keyboard + iOS-safe scroll lock. See BookingModal.tsx for the full
+  // rationale — short version: pin <body> with position:fixed + negative top
+  // offset so iOS Safari can't scroll <html> when an input is focused, which
+  // is what was making the modal disappear off the top of the screen.
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
     document.addEventListener('keydown', handleKey);
-    const prevHtml = document.documentElement.style.overflow;
-    const prevBody = document.body.style.overflow;
+
+    const scrollY = window.scrollY;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyWidth = document.body.style.width;
+    const prevBodyOverflow = document.body.style.overflow;
+
     document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
+
     return () => {
       document.removeEventListener('keydown', handleKey);
-      document.documentElement.style.overflow = prevHtml;
-      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.width = prevBodyWidth;
+      document.body.style.overflow = prevBodyOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen, handleClose]);
 
