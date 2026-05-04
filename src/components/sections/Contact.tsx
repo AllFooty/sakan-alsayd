@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
-import { Phone, MessageCircle, Send, CheckCircle, AlertCircle, Wrench } from 'lucide-react';
+import { Phone, MessageCircle, Send, CheckCircle, AlertCircle, RotateCcw, Wrench } from 'lucide-react';
 import { Button, Input, Textarea, Select, PhoneInput } from '@/components/ui';
 import WhatsAppRegionModal from '@/components/ui/WhatsAppRegionModal';
 import { contacts } from '@/data/contacts';
 import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
 import { SAUDI_PHONE_REGEX } from '@/lib/utils';
+import { classifyError, type SubmitErrorKind } from '@/lib/errors/catalog';
 
 // Lazy: maintenance is for existing residents — most home-page visitors
 // never open it. Holds back the photo-upload tree + extra lucide icons.
@@ -28,9 +29,11 @@ interface ContactFormData {
 
 export default function Contact() {
   const t = useTranslations('contact');
+  const tErr = useTranslations('errors.submitFailure');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [submitErrorKind, setSubmitErrorKind] = useState<SubmitErrorKind>('unknown');
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [isMaintenanceOpen, setIsMaintenanceOpen] = useState(false);
 
@@ -50,8 +53,9 @@ export default function Contact() {
   const onSubmit = async (data: ContactFormData) => {
     setSubmitStatus('loading');
 
+    let res: Response | undefined;
     try {
-      const res = await fetch('/api/contact', {
+      res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -63,9 +67,11 @@ export default function Contact() {
       reset();
 
       setTimeout(() => setSubmitStatus('idle'), 3000);
-    } catch {
+    } catch (err) {
+      // Keep the error visible until the user retries or moves on — auto-
+      // dismissing it would race with the Retry button below.
+      setSubmitErrorKind(classifyError({ res, err }));
       setSubmitStatus('error');
-      setTimeout(() => setSubmitStatus('idle'), 3000);
     }
   };
 
@@ -174,9 +180,19 @@ export default function Contact() {
                 </div>
               )}
               {submitStatus === 'error' && (
-                <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-xl">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <span>{t('form.error')}</span>
+                <div className="flex items-start gap-3 text-red-600 bg-red-50 p-4 rounded-xl" role="alert">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p>{tErr(submitErrorKind)}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleSubmit(onSubmit)()}
+                      className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-red-700 hover:text-red-800 underline underline-offset-2"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      {tErr('retry')}
+                    </button>
+                  </div>
                 </div>
               )}
             </form>

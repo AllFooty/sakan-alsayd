@@ -14,6 +14,7 @@ import {
   ChevronRight,
   CheckCircle,
   AlertCircle,
+  RotateCcw,
   Send,
   Building2,
   Wrench,
@@ -22,6 +23,7 @@ import {
 import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
 import { cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/PhoneInput';
+import { classifyError, type SubmitErrorKind } from '@/lib/errors/catalog';
 
 interface MaintenanceModalProps {
   isOpen: boolean;
@@ -53,6 +55,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const t = useTranslations('maintenanceModal');
+  const tErr = useTranslations('errors.submitFailure');
 
   const { buildings, cities } = usePublicBuildings();
 
@@ -60,6 +63,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [currentStep, setCurrentStep] = useState<Step>('building');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [submitErrorKind, setSubmitErrorKind] = useState<SubmitErrorKind>('unknown');
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [photosPreviews, setPhotosPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -248,6 +252,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
 
   const onSubmit = async (data: MaintenanceFormData) => {
     setSubmitStatus('loading');
+    let res: Response | undefined;
     try {
       const loc = selectedLocation;
       if (!loc) throw new Error('No building selected');
@@ -297,7 +302,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
         requestBody.photos = photoPaths;
       }
 
-      const res = await fetch('/api/maintenance', {
+      res = await fetch('/api/maintenance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
@@ -305,7 +310,8 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
 
       if (!res.ok) throw new Error('Failed');
       setSubmitStatus('success');
-    } catch {
+    } catch (err) {
+      setSubmitErrorKind(classifyError({ res, err }));
       setSubmitStatus('error');
     }
   };
@@ -711,9 +717,19 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 </div>
 
                 {submitStatus === 'error' && (
-                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-sm">
-                    <AlertCircle size={16} className="flex-shrink-0" />
-                    <span>{t('error')}</span>
+                  <div className="flex items-start gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-sm" role="alert">
+                    <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p>{tErr(submitErrorKind)}</p>
+                      <button
+                        type="button"
+                        onClick={() => handleSubmit(onSubmit)()}
+                        className="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 underline underline-offset-2"
+                      >
+                        <RotateCcw size={14} />
+                        {tErr('retry')}
+                      </button>
+                    </div>
                   </div>
                 )}
               </form>

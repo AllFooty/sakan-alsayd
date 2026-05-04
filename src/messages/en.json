@@ -304,7 +304,16 @@
     "title": "Something went wrong",
     "subtitle": "We'll be right back. Please try again in a moment.",
     "tryAgain": "Try again",
-    "goHome": "Go to home page"
+    "goHome": "Go to home page",
+    "submitFailure": {
+      "network": "Couldn't reach the server. Check your connection and try again.",
+      "validation": "Some fields need attention — review and try again.",
+      "conflict": "This request already exists or conflicts with another. Please review.",
+      "permission": "You don't have permission to perform this action.",
+      "server": "Unexpected error — the team has been notified.",
+      "unknown": "Something went wrong. Please try again.",
+      "retry": "Retry"
+    }
   },
   "whatsappModal": {
     "title": "Choose Your Region",

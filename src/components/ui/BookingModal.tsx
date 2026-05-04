@@ -16,6 +16,7 @@ import {
   ChevronRight,
   CheckCircle,
   AlertCircle,
+  RotateCcw,
   Send,
   Bath,
   Users,
@@ -28,6 +29,7 @@ import {
 import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvider';
 import { formatPrice, cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/PhoneInput';
+import { classifyError, type SubmitErrorKind } from '@/lib/errors/catalog';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -96,6 +98,7 @@ export default function BookingModal({
   const isArabic = locale === 'ar';
   const t = useTranslations('bookingModal');
   const tRooms = useTranslations('rooms');
+  const tErr = useTranslations('errors.submitFailure');
 
   const { buildings, cities } = usePublicBuildings();
 
@@ -105,6 +108,7 @@ export default function BookingModal({
   const [selectedRoom, setSelectedRoom] = useState<{ type: string; bathroomType: string; price: number } | null>(null);
   const [currentStep, setCurrentStep] = useState<Step>('city');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [submitErrorKind, setSubmitErrorKind] = useState<SubmitErrorKind>('unknown');
   const [mounted, setMounted] = useState(false);
   const scrimRef = useRef<HTMLDivElement>(null);
 
@@ -337,6 +341,7 @@ export default function BookingModal({
 
   const onSubmit = async (data: BookingFormData) => {
     setSubmitStatus('loading');
+    let res: Response | undefined;
     try {
       const loc = selectedLocation;
       const roomLabel = selectedRoom
@@ -355,7 +360,7 @@ export default function BookingModal({
         data.notes ? `\n${t('steps.additional.notes')}: ${data.notes}` : '',
       ].filter(Boolean).join('\n');
 
-      const res = await fetch('/api/contact', {
+      res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -385,7 +390,8 @@ export default function BookingModal({
 
       if (!res.ok) throw new Error('Failed');
       setSubmitStatus('success');
-    } catch {
+    } catch (err) {
+      setSubmitErrorKind(classifyError({ res, err }));
       setSubmitStatus('error');
     }
   };
@@ -987,9 +993,19 @@ export default function BookingModal({
                 </div>
 
                 {submitStatus === 'error' && (
-                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-sm">
-                    <AlertCircle size={16} className="flex-shrink-0" />
-                    <span>{t('error')}</span>
+                  <div className="flex items-start gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 p-3 rounded-xl text-sm" role="alert">
+                    <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p>{tErr(submitErrorKind)}</p>
+                      <button
+                        type="button"
+                        onClick={() => handleSubmit(onSubmit)()}
+                        className="mt-1.5 inline-flex items-center gap-1 text-sm font-medium text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 underline underline-offset-2"
+                      >
+                        <RotateCcw size={14} />
+                        {tErr('retry')}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
