@@ -488,7 +488,15 @@
       "backToEmail": "Change email",
       "backToWebsite": "Back to Website",
       "errors": {
-        "unexpected": "An unexpected error occurred. Please try again."
+        "unexpected": "An unexpected error occurred. Please try again.",
+        "invalidCredentials": "Email or password is incorrect.",
+        "emailNotConfirmed": "Email not confirmed. Check your inbox or contact admin.",
+        "invalidOtp": "The code is invalid or expired. Request a new one.",
+        "rateLimited": "Too many attempts. Please wait before trying again.",
+        "userNotFound": "No account with this email. Contact admin.",
+        "emailInvalid": "That email address looks invalid.",
+        "network": "Couldn't reach the server. Check your connection and try again.",
+        "unknown": "Couldn't sign in. Please try again."
       }
     },
     "sidebar": {

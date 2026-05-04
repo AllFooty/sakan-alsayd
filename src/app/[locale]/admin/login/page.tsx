@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { classifyAuthError } from '@/lib/errors/auth';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 type Step = 'email' | 'otp';
@@ -76,13 +77,13 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(t(`errors.${classifyAuthError(error)}`));
         setLoading(false);
       } else {
         window.location.href = redirectTo;
       }
-    } catch {
-      setError(t('errors.unexpected'));
+    } catch (err) {
+      setError(t(`errors.${classifyAuthError(err)}`));
       setLoading(false);
     }
   }
@@ -98,12 +99,12 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(t(`errors.${classifyAuthError(error)}`));
       } else {
         setStep('otp');
       }
-    } catch {
-      setError(t('errors.unexpected'));
+    } catch (err) {
+      setError(t(`errors.${classifyAuthError(err)}`));
     } finally {
       setLoading(false);
     }
@@ -122,13 +123,13 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(error.message);
+        setError(t(`errors.${classifyAuthError(error)}`));
         setLoading(false);
       } else {
         window.location.href = redirectTo;
       }
-    } catch {
-      setError(t('errors.unexpected'));
+    } catch (err) {
+      setError(t(`errors.${classifyAuthError(err)}`));
       setLoading(false);
     }
   }
