@@ -165,6 +165,8 @@ export default function ResidentForm({
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
     defaultValues,
   });
 
