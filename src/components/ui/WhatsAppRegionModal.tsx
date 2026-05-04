@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
+import FocusLock from 'react-focus-lock';
 import { X, MessageCircle, MapPin } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { contacts } from '@/data/contacts';
@@ -69,7 +70,11 @@ export default function WhatsAppRegionModal({
   if (!isOpen) return null;
 
   return (
+    <FocusLock returnFocus>
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('title')}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={handleBackdropClick}
     >
@@ -122,5 +127,6 @@ export default function WhatsAppRegionModal({
         </div>
       </div>
     </div>
+    </FocusLock>
   );
 }

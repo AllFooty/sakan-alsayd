@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import FocusLock from 'react-focus-lock';
 import { AlertTriangle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,7 +50,14 @@ export default function ConfirmDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <FocusLock returnFocus>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-description"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white dark:bg-[var(--admin-surface)] rounded-2xl shadow-xl max-w-md w-full p-6">
         <button
@@ -79,8 +87,8 @@ export default function ConfirmDialog({
             />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-navy dark:text-[var(--admin-text)]">{title}</h3>
-            <p className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">{description}</p>
+            <h3 id="confirm-dialog-title" className="text-lg font-semibold text-navy dark:text-[var(--admin-text)]">{title}</h3>
+            <p id="confirm-dialog-description" className="text-sm text-gray-500 dark:text-[var(--admin-text-muted)] mt-1">{description}</p>
           </div>
         </div>
 
@@ -107,5 +115,6 @@ export default function ConfirmDialog({
         </div>
       </div>
     </div>
+    </FocusLock>
   );
 }

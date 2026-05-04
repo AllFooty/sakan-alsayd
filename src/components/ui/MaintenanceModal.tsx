@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import FocusLock from 'react-focus-lock';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -316,8 +317,12 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const showBack = (currentStep === 'building' && citySelected) || stepIndex > 0;
 
   const modalNode = (
+    <FocusLock returnFocus>
     <div
       ref={scrimRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={submitStatus === 'success' ? t('success.title') : t('title')}
       className="fixed z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
       style={{ top: 0, left: 0, width: '100%', height: '100%' }}
       onClick={(e) => e.target === e.currentTarget && handleClose()}
@@ -755,6 +760,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
         <div className="pb-[env(safe-area-inset-bottom)] sm:hidden" />
       </div>
     </div>
+    </FocusLock>
   );
 
   return createPortal(modalNode, document.body);

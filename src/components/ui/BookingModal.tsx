@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import FocusLock from 'react-focus-lock';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -469,8 +470,12 @@ export default function BookingModal({
   if (!mounted) return null;
 
   const modalNode = (
+    <FocusLock returnFocus>
     <div
       ref={scrimRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={submitStatus === 'success' ? t('success.title') : t('title')}
       className="fixed z-[100] flex items-end sm:items-center justify-center bg-black/60"
       style={{ top: 0, left: 0, width: '100%', height: '100%' }}
       onClick={(e) => e.target === e.currentTarget && handleClose()}
@@ -1028,6 +1033,7 @@ export default function BookingModal({
         <div className="pb-[env(safe-area-inset-bottom)] sm:hidden" />
       </div>
     </div>
+    </FocusLock>
   );
 
   return createPortal(modalNode, document.body);
