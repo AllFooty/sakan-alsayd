@@ -294,3 +294,20 @@
     transform: translateX(0);
   }
 }
+
+/* ===========================================
+   REDUCED MOTION - Respect user preference
+   ===========================================
+   Honors WCAG 2.3.3 (Animation from Interactions).
+   `!important` is required to override Tailwind's transition-* utilities,
+   which compile to plain `transition-*` properties at the same specificity. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

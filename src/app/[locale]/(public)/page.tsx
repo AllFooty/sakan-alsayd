@@ -26,7 +26,7 @@ export default async function HomePage({
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content" tabIndex={-1} className="focus:outline-none">
         <Hero />
         <About />
         <Services />

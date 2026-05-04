@@ -207,6 +207,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                           onClick={onClose}
                           title={desktopCollapsed ? label : undefined}
                           aria-label={desktopCollapsed ? label : undefined}
+                          aria-current={active ? 'page' : undefined}
                           className={cn(
                             'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                             desktopCollapsed && 'lg:justify-center lg:px-0',

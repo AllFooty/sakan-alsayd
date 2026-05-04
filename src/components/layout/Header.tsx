@@ -50,6 +50,7 @@ const navItems: NavItem[] = [
 
 export default function Header() {
   const t = useTranslations('nav');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -111,6 +112,13 @@ export default function Header() {
   };
 
   return (
+    <>
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[200] focus:bg-coral focus:text-white focus:px-4 focus:py-2 focus:rounded focus:font-medium focus:shadow-lg"
+    >
+      {tCommon('skipToContent')}
+    </a>
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
@@ -253,5 +261,6 @@ export default function Header() {
         />
       )}
     </header>
+    </>
   );
 }
