@@ -41,6 +41,7 @@ export interface BuildingFormValues {
   is_active: boolean;
   is_placeholder: boolean;
   sort_order: number;
+  operational_since: string;
 }
 
 interface BuildingFormProps {
@@ -48,6 +49,10 @@ interface BuildingFormProps {
   buildingId?: string;
   initial?: Partial<BuildingFormValues>;
   canToggleStatus?: boolean;
+  // Whether the current user can edit operational_since. Only super_admin
+  // and deputy_general_manager can — for everyone else the field renders
+  // read-only or hidden so they can't backdate buildings.
+  canEditOperationalSince?: boolean;
   // When true, all inputs are disabled and the save buttons are hidden.
   // Used on the edit page when the building is soft-deleted (every PATCH
   // would 409 anyway), so users see the data without triggering errors.
@@ -74,6 +79,7 @@ const EMPTY_VALUES: BuildingFormValues = {
   is_active: true,
   is_placeholder: false,
   sort_order: 0,
+  operational_since: '',
 };
 
 function slugify(input: string): string {
@@ -89,6 +95,7 @@ export default function BuildingForm({
   buildingId,
   initial,
   canToggleStatus = false,
+  canEditOperationalSince = false,
   readOnly = false,
 }: BuildingFormProps) {
   const t = useTranslations('admin.buildings.form');
@@ -191,6 +198,12 @@ export default function BuildingForm({
       if (canToggleStatus) {
         payload.is_active = values.is_active;
         payload.is_placeholder = values.is_placeholder;
+      }
+      // Only super_admin / deputy_general_manager can rewrite when the
+      // building came online. Skip the field for everyone else (the API
+      // would 403 anyway).
+      if (canEditOperationalSince && values.operational_since) {
+        payload.operational_since = values.operational_since;
       }
 
       const url =
@@ -367,6 +380,20 @@ export default function BuildingForm({
             error={errors.sort_order}
           />
         </div>
+        {canEditOperationalSince && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <Input
+              label={t('fields.operationalSince')}
+              type="date"
+              lang="en"
+              max={new Date().toISOString().slice(0, 10)}
+              value={values.operational_since}
+              onChange={(e) => update('operational_since', e.target.value)}
+              error={errors.operational_since}
+              helperText={t('helpers.operationalSince')}
+            />
+          </div>
+        )}
         {canToggleStatus && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <ToggleField

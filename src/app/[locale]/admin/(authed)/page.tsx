@@ -18,7 +18,15 @@ export default async function AdminDashboard({
   ]);
 
   const supabase = await createClient();
-  const { data } = await supabase.rpc('dashboard_counters');
+  // 30-day default matches the audit-recommended cadence. Client can swap
+  // to 7 or 90 via the range pills and re-fetch.
+  const initialRange = '30';
+  const fromIso = new Date(Date.now() - Number(initialRange) * 24 * 60 * 60 * 1000).toISOString();
+  const toIso = new Date().toISOString();
+  const { data } = await supabase.rpc('dashboard_counters', {
+    p_from: fromIso,
+    p_to: toIso,
+  });
   const row = Array.isArray(data) ? data[0] : data;
 
   const initialStats: DashboardStats = {

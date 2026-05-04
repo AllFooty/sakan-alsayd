@@ -23,6 +23,7 @@ interface BuildingRow {
   is_active: boolean;
   is_placeholder: boolean;
   sort_order: number;
+  operational_since: string;
   created_at: string;
   updated_at: string;
 }
@@ -90,7 +91,7 @@ export async function GET(
     const { data: building, error: buildingErr } = await supabase
       .from('buildings')
       .select(
-        'id, slug, city_en, city_ar, neighborhood_en, neighborhood_ar, description_en, description_ar, cover_image, images, map_url, landmarks, is_active, is_placeholder, sort_order, created_at, updated_at'
+        'id, slug, city_en, city_ar, neighborhood_en, neighborhood_ar, description_en, description_ar, cover_image, images, map_url, landmarks, is_active, is_placeholder, sort_order, operational_since, created_at, updated_at'
       )
       .eq('id', id)
       .maybeSingle<BuildingRow>();
@@ -368,6 +369,30 @@ export async function PATCH(
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
       updates.is_placeholder = b.is_placeholder === true;
+    }
+    // operational_since is the manager-asserted "when did this building come
+    // online" date, separate from the row's created_at. Admin-tier only so
+    // it can't be silently rewritten by branch staff.
+    if (Object.prototype.hasOwnProperty.call(b, 'operational_since')) {
+      if (!hasAdminAccess(profile.role)) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      const v = b.operational_since;
+      if (v === null || (typeof v === 'string' && v.trim() === '')) {
+        return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+      } else if (typeof v === 'string') {
+        const t = v.trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) {
+          return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+        }
+        const parsed = new Date(t + 'T00:00:00Z');
+        if (Number.isNaN(parsed.getTime()) || parsed.getTime() > Date.now()) {
+          return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+        }
+        updates.operational_since = t;
+      } else {
+        return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+      }
     }
     if (Object.prototype.hasOwnProperty.call(b, 'sort_order')) {
       const n = b.sort_order;

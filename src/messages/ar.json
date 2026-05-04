@@ -589,7 +589,11 @@
         "newBookings": "حجوزات جديدة",
         "openMaintenance": "صيانة مفتوحة",
         "totalBuildings": "إجمالي المباني",
-        "activeResidents": "ساكنات نشطات"
+        "activeResidents": "ساكنات نشطات",
+        "rangeLabel": "الفترة الزمنية",
+        "rangeOption": "آخر {days} يوم",
+        "inLastDays": "في آخر {days} يوم",
+        "snapshotNow": "حالياً"
       },
       "recentActivity": "آخر النشاطات",
       "noActivity": "لا توجد نشاطات حديثة",
@@ -1138,13 +1142,15 @@
           "landmarkNameEn": "الاسم (إنجليزي)",
           "landmarkNameAr": "الاسم (عربي)",
           "landmarkDistanceEn": "المسافة (إنجليزي)",
-          "landmarkDistanceAr": "المسافة (عربي)"
+          "landmarkDistanceAr": "المسافة (عربي)",
+          "operationalSince": "تاريخ بدء التشغيل"
         },
         "helpers": {
           "slug": "أحرف إنجليزية صغيرة وأرقام وشرطات فقط. يُستخدم في الروابط.",
           "isActive": "المباني غير النشطة لا تظهر في الموقع العام.",
           "isPlaceholder": "احجز مكاناً قبل تأكيد التفاصيل.",
-          "mapUrl": "اختياري. الصق رابط مشاركة من خرائط جوجل."
+          "mapUrl": "اختياري. الصق رابط مشاركة من خرائط جوجل.",
+          "operationalSince": "متى بدأ تشغيل هذا المبنى فعلياً — لا متى أُضيف للنظام."
         },
         "errors": {
           "fixBelow": "يرجى تصحيح الأخطاء أدناه.",

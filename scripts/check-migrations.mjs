@@ -32,6 +32,7 @@ const HISTORICAL_APPLIED_OUT_OF_BAND = new Set([
   '027_residents_supervision_staff_and_capacity.sql', // applied via Dashboard SQL Editor; broadened RLS + uniq index + capacity trigger confirmed present on prod
   '028_apartments.sql',                // applied via apply_migration MCP; recorded with the leading "028_" prefix retained in the name
   '029_theme_preference.sql',          // applied via apply_migration MCP; recorded with the leading "029_" prefix retained in the name
+  '030_dashboard_range_and_operational_since.sql', // applied via apply_migration MCP; recorded with the leading "030_" prefix retained in the name
 ]);
 
 const PROJECT_REF = 'xvcpyofwhmuohpvinrry';

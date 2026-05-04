@@ -26,6 +26,7 @@ interface BuildingApi {
   is_active: boolean;
   is_placeholder: boolean;
   sort_order: number;
+  operational_since: string | null;
 }
 
 function parseLandmarks(raw: unknown): LandmarkInput[] {
@@ -120,6 +121,7 @@ export default function EditBuildingPage({
           is_active: b.is_active,
           is_placeholder: b.is_placeholder,
           sort_order: b.sort_order,
+          operational_since: b.operational_since ?? '',
         });
       } catch (err) {
         console.error('Failed to load building:', err);
@@ -200,6 +202,7 @@ export default function EditBuildingPage({
         buildingId={id}
         initial={initial}
         canToggleStatus={canToggleStatus}
+        canEditOperationalSince={canToggleStatus}
         readOnly={isInactive}
       />
     </div>

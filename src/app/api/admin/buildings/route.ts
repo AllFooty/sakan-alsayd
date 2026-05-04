@@ -40,6 +40,7 @@ interface BuildingRow {
   is_active: boolean;
   is_placeholder: boolean;
   sort_order: number;
+  operational_since: string;
   created_at: string;
   updated_at: string;
 }
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('buildings')
       .select(
-        'id, slug, city_en, city_ar, neighborhood_en, neighborhood_ar, description_en, description_ar, cover_image, images, map_url, landmarks, is_active, is_placeholder, sort_order, created_at, updated_at',
+        'id, slug, city_en, city_ar, neighborhood_en, neighborhood_ar, description_en, description_ar, cover_image, images, map_url, landmarks, is_active, is_placeholder, sort_order, operational_since, created_at, updated_at',
         { count: 'exact' }
       )
       .order(sortColumn, { ascending: sortAscending });

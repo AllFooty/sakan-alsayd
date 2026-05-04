@@ -589,7 +589,11 @@
         "newBookings": "New Bookings",
         "openMaintenance": "Open Maintenance",
         "totalBuildings": "Total Buildings",
-        "activeResidents": "Active Residents"
+        "activeResidents": "Active Residents",
+        "rangeLabel": "Time range",
+        "rangeOption": "Last {days} days",
+        "inLastDays": "in last {days} days",
+        "snapshotNow": "currently"
       },
       "recentActivity": "Recent Activity",
       "noActivity": "No recent activity to show",
@@ -1138,13 +1142,15 @@
           "landmarkNameEn": "Name (English)",
           "landmarkNameAr": "Name (Arabic)",
           "landmarkDistanceEn": "Distance (English)",
-          "landmarkDistanceAr": "Distance (Arabic)"
+          "landmarkDistanceAr": "Distance (Arabic)",
+          "operationalSince": "Operational since"
         },
         "helpers": {
           "slug": "Lowercase letters, numbers, and dashes only. Used in URLs.",
           "isActive": "Inactive buildings are hidden from the public site.",
           "isPlaceholder": "Reserve a slot before details are confirmed.",
-          "mapUrl": "Optional. Paste a Google Maps share link."
+          "mapUrl": "Optional. Paste a Google Maps share link.",
+          "operationalSince": "When this building actually came online — not when it was added to the system."
         },
         "errors": {
           "fixBelow": "Please fix the errors below.",
