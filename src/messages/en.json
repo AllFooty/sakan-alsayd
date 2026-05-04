@@ -944,6 +944,7 @@
       "empty": {
         "title": "No buildings yet",
         "description": "Add your first building to get started.",
+        "cta": "Add your first building",
         "filteredTitle": "No buildings match your filters",
         "filteredDescription": "Try adjusting your search or clearing filters."
       },
@@ -1204,7 +1205,8 @@
         "summary": "{count, plural, one {# room} other {# rooms}}",
         "clickHint": "Click any room to see its current occupant and history.",
         "emptyTitle": "No rooms in this building yet",
-        "emptyDescription": "Click \"Add room\" to create the first one.",
+        "emptyDescription": "Add your first room to start placing residents.",
+        "emptyCta": "Add your first room",
         "emptyFilteredTitle": "No rooms match your filters",
         "emptyFilteredDescription": "Try clearing the filters or adjusting your search.",
         "errorTitle": "Couldn't load rooms",
@@ -1584,7 +1586,8 @@
       },
       "empty": {
         "title": "No residents yet",
-        "description": "Residents will appear here as they're added or moved in from completed bookings.",
+        "description": "Add your first resident, or they'll appear here automatically when a completed booking is moved in.",
+        "cta": "Add your first resident",
         "filteredTitle": "No residents match your filters",
         "filteredDescription": "Try adjusting the filters or clearing them."
       },

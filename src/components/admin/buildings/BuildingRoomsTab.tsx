@@ -293,26 +293,24 @@ export default function BuildingRoomsTab({ buildingId, onMutate }: BuildingRooms
             description={t('errorDescription')}
           />
         ) : filteredRooms.length === 0 ? (
-          <div>
-            <EmptyState
-              icon={hasFilters ? FilterIcon : DoorOpen}
-              title={hasFilters ? t('emptyFilteredTitle') : t('emptyTitle')}
-              description={
-                hasFilters ? t('emptyFilteredDescription') : t('emptyDescription')
-              }
-            />
-            {!hasFilters && canCreate && (
-              <div className="flex justify-center pb-6 -mt-4">
+          <EmptyState
+            icon={hasFilters ? FilterIcon : DoorOpen}
+            title={hasFilters ? t('emptyFilteredTitle') : t('emptyTitle')}
+            description={
+              hasFilters ? t('emptyFilteredDescription') : t('emptyDescription')
+            }
+            action={
+              !hasFilters && canCreate ? (
                 <Link
                   href={newRoomHref}
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-coral text-white text-sm font-medium rounded-lg hover:bg-coral/90 transition-colors shadow-sm"
                 >
                   <Plus size={14} />
-                  {t('addRoom')}
+                  {t('emptyCta')}
                 </Link>
-              </div>
-            )}
-          </div>
+              ) : undefined
+            }
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

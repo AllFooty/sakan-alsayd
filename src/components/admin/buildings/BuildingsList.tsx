@@ -277,6 +277,17 @@ export default function BuildingsList() {
             description={
               filtersActive ? t('empty.filteredDescription') : t('empty.description')
             }
+            action={
+              !filtersActive && canCreate ? (
+                <Link
+                  href={`/${locale}/admin/buildings/new`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-coral text-white text-sm font-medium rounded-lg hover:bg-coral/90 transition-colors shadow-sm"
+                >
+                  <Plus size={16} />
+                  {t('empty.cta')}
+                </Link>
+              ) : undefined
+            }
           />
         </div>
       ) : view === 'grid' ? (
