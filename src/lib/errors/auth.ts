@@ -14,8 +14,17 @@ export type AuthErrorKind =
   | 'rateLimited'
   | 'userNotFound'
   | 'emailInvalid'
+  | 'weakPassword'
+  | 'samePassword'
+  | 'accountDisabled'
   | 'network'
   | 'unknown';
+
+// Which auth call produced this error. Lets us disambiguate the status-only
+// 400/401 fallback: a 400 from signInWithOtp is almost always a malformed
+// email (the flow has no password to be wrong), while a 400 from
+// signInWithPassword is a credentials error.
+export type AuthFlow = 'password' | 'otp_send' | 'otp_verify';
 
 interface MaybeAuthError {
   code?: string;
@@ -23,7 +32,10 @@ interface MaybeAuthError {
   message?: string;
 }
 
-export function classifyAuthError(err: unknown): AuthErrorKind {
+export function classifyAuthError(
+  err: unknown,
+  flow: AuthFlow = 'password'
+): AuthErrorKind {
   // Fetch-level network failures bubble up as TypeError (e.g. user offline,
   // CORS preflight blocked, DNS failure).
   if (err instanceof TypeError) return 'network';
@@ -45,7 +57,14 @@ export function classifyAuthError(err: unknown): AuthErrorKind {
     case 'user_not_found':
       return 'userNotFound';
     case 'email_address_invalid':
+    case 'validation_failed':
       return 'emailInvalid';
+    case 'weak_password':
+      return 'weakPassword';
+    case 'same_password':
+      return 'samePassword';
+    case 'user_banned':
+      return 'accountDisabled';
     case 'request_timeout':
       return 'network';
   }
@@ -64,9 +83,15 @@ export function classifyAuthError(err: unknown): AuthErrorKind {
   if (msg.includes('rate limit') || msg.includes('too many')) return 'rateLimited';
   if (msg.includes('user not found')) return 'userNotFound';
 
-  // 4xx without a recognized code → treat as credentials error (typical for
-  // a bad password attempt without an explicit code field).
-  if (e.status === 400 || e.status === 401) return 'invalidCredentials';
+  // 4xx without a recognized code. Disambiguate by flow:
+  //   password   → bad password attempt (invalidCredentials)
+  //   otp_send   → likely a malformed email (no password to be wrong)
+  //   otp_verify → wrong / expired token
+  if (e.status === 400 || e.status === 401) {
+    if (flow === 'otp_send') return 'emailInvalid';
+    if (flow === 'otp_verify') return 'invalidOtp';
+    return 'invalidCredentials';
+  }
   if (e.status === 422) return 'emailInvalid';
   if (e.status === 429) return 'rateLimited';
 

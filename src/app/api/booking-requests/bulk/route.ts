@@ -16,11 +16,16 @@ export async function PATCH(request: NextRequest) {
     const { user, profile, supabase } = auth;
 
     const body = await request.json();
-    const { ids, status } = body;
+    const { ids: rawIds, status } = body;
 
-    if (!Array.isArray(ids) || ids.length === 0) {
+    if (!Array.isArray(rawIds) || rawIds.length === 0) {
       return NextResponse.json({ error: 'ids array is required and must be non-empty' }, { status: 400 });
     }
+
+    // Dedupe — Supabase `.in()` returns unique rows, so without this a
+    // duplicated id in the request would make `current.length !== ids.length`
+    // false-trigger the not-found 404.
+    const ids = Array.from(new Set(rawIds));
 
     if (!status || !VALID_STATUSES.includes(status)) {
       return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 });

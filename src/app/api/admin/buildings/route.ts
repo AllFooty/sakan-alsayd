@@ -3,7 +3,7 @@ import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 import { getAssignedBuildingIds, hasAdminAccess } from '@/lib/auth/guards';
 import { revalidatePublicBuildings } from '@/lib/buildings/public';
 
-const SORTABLE_COLUMNS = ['city_en', 'neighborhood_en', 'sort_order', 'created_at', 'is_active'] as const;
+const SORTABLE_COLUMNS = ['city_en', 'neighborhood_en', 'sort_order', 'created_at', 'updated_at', 'is_active'] as const;
 type SortColumn = (typeof SORTABLE_COLUMNS)[number];
 
 function isSortColumn(value: unknown): value is SortColumn {
@@ -67,7 +67,10 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const isActiveParam = searchParams.get('is_active');
-    const city = searchParams.get('city');
+    // city is composed into a PostgREST .or() expression below — sanitize so
+    // a crafted value like `foo,is_active.eq.true` can't extend the .or()
+    // and bypass the intended filter. Same strip set as `search`.
+    const city = sanitizeSearch(searchParams.get('city'));
     const search = sanitizeSearch(searchParams.get('search'));
     const limit = Math.min(Math.max(safeInt(searchParams.get('limit'), 25), 1), 100);
     const page = Math.max(safeInt(searchParams.get('page'), 1), 1);
@@ -230,6 +233,7 @@ interface BuildingInsert {
   is_active: boolean;
   is_placeholder: boolean;
   sort_order: number;
+  operational_since?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -295,6 +299,35 @@ export async function POST(request: NextRequest) {
       is_placeholder = bodyRec.is_placeholder;
     }
 
+    // operational_since is optional on create — the column has a CURRENT_DATE
+    // default. When provided we validate the same way PATCH does so admins
+    // can backfill historical buildings with their real online date.
+    let operational_since: string | undefined;
+    if (Object.prototype.hasOwnProperty.call(bodyRec, 'operational_since')) {
+      const v = bodyRec.operational_since;
+      if (v === null || (typeof v === 'string' && v.trim() === '')) {
+        return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+      } else if (typeof v === 'string') {
+        const t = v.trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) {
+          return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+        }
+        const parsed = new Date(t + 'T00:00:00Z');
+        // Compare against end-of-today UTC, not Date.now(). A date-only field
+        // submitted in early-morning Asia/Riyadh (UTC+3) maps to midnight UTC
+        // of the same date, which can be > Date.now() while still being
+        // "today" or earlier in the user's locale.
+        const endOfTodayUtc = new Date();
+        endOfTodayUtc.setUTCHours(23, 59, 59, 999);
+        if (Number.isNaN(parsed.getTime()) || parsed.getTime() > endOfTodayUtc.getTime()) {
+          return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+        }
+        operational_since = t;
+      } else {
+        return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
+      }
+    }
+
     const insert: BuildingInsert = {
       slug,
       city_en,
@@ -308,6 +341,7 @@ export async function POST(request: NextRequest) {
       is_active,
       is_placeholder,
       sort_order,
+      ...(operational_since ? { operational_since } : {}),
     };
 
     const { data, error } = await supabase

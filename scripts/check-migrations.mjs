@@ -32,7 +32,6 @@ const HISTORICAL_APPLIED_OUT_OF_BAND = new Set([
   '027_residents_supervision_staff_and_capacity.sql', // applied via Dashboard SQL Editor; broadened RLS + uniq index + capacity trigger confirmed present on prod
   '028_apartments.sql',                // applied via apply_migration MCP; recorded with the leading "028_" prefix retained in the name
   '029_theme_preference.sql',          // applied via apply_migration MCP; recorded with the leading "029_" prefix retained in the name
-  '030_dashboard_range_and_operational_since.sql', // applied via apply_migration MCP; recorded with the leading "030_" prefix retained in the name
 ]);
 
 const PROJECT_REF = 'xvcpyofwhmuohpvinrry';
@@ -56,13 +55,21 @@ const localFiles = readdirSync(migrationsDir)
   .filter((f) => f.endsWith('.sql'))
   .sort();
 
+// A migration is considered applied if EITHER recorded name is present:
+//   • prefix-stripped stem (apply_migration historically recorded this form)
+//   • full filename stem with NNN_ prefix retained (current MCP behavior)
+// Accepting both shapes removes the need to allowlist every MCP-applied
+// migration just because of the prefix-retention quirk.
 const localToCheck = localFiles
   .filter((f) => !HISTORICAL_APPLIED_OUT_OF_BAND.has(f))
   .map((f) => {
     const m = f.match(/^\d+_(.+)\.sql$/);
-    return { file: f, name: m ? m[1] : null };
+    if (!m) return { file: f, names: [] };
+    const fullStem = f.replace(/\.sql$/, '');
+    const stripped = m[1];
+    return { file: f, names: [fullStem, stripped] };
   })
-  .filter((f) => f.name);
+  .filter((f) => f.names.length > 0);
 
 let appliedNames;
 try {
@@ -91,7 +98,9 @@ try {
   process.exit(2);
 }
 
-const missing = localToCheck.filter((f) => !appliedNames.has(f.name));
+const missing = localToCheck.filter(
+  (f) => !f.names.some((n) => appliedNames.has(n))
+);
 
 if (missing.length === 0) {
   console.log(

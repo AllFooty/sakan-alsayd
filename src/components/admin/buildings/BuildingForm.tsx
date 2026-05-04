@@ -228,6 +228,12 @@ export default function BuildingForm({
         } else if (code === 'invalidMapUrl') {
           setErrors((e) => ({ ...e, map_url: t('errors.urlInvalid') }));
           toast.error(t('errors.urlInvalid'));
+        } else if (code === 'invalidOperationalSince') {
+          setErrors((e) => ({
+            ...e,
+            operational_since: t('errors.operationalSinceInvalid'),
+          }));
+          toast.error(t('errors.operationalSinceInvalid'));
         } else if (code === 'requiredFieldsMissing') {
           const revalidated = validate();
           if (Object.keys(revalidated).length > 0) {
@@ -382,16 +388,66 @@ export default function BuildingForm({
         </div>
         {canEditOperationalSince && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-            <Input
-              label={t('fields.operationalSince')}
-              type="date"
-              lang="en"
-              max={new Date().toISOString().slice(0, 10)}
-              value={values.operational_since}
-              onChange={(e) => update('operational_since', e.target.value)}
-              error={errors.operational_since}
-              helperText={t('helpers.operationalSince')}
-            />
+            {/* Native date input + overlay span. `lang="en"` is required so
+                the chosen value renders with Western numerals, but on AR
+                browsers the native placeholder ("يوم/شهر/سنة") then renders
+                left-to-right per word — characters reverse to "ةنس/رهش/موي".
+                Hide the native placeholder via text-transparent and overlay
+                our own (same pattern as BookingModal + AdvancedFilters). */}
+            <div className="w-full">
+              <label
+                htmlFor="building-operational-since"
+                className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2"
+              >
+                {t('fields.operationalSince')}
+              </label>
+              <div className="relative">
+                <input
+                  id="building-operational-since"
+                  type="date"
+                  lang="en"
+                  max={new Date().toISOString().slice(0, 10)}
+                  value={values.operational_since}
+                  onChange={(e) => update('operational_since', e.target.value)}
+                  aria-invalid={errors.operational_since ? true : undefined}
+                  aria-describedby={
+                    errors.operational_since
+                      ? 'building-operational-since-error'
+                      : 'building-operational-since-helper'
+                  }
+                  className={`w-full px-4 py-3 rounded-xl border bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent transition-all duration-200 ${
+                    errors.operational_since
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-border dark:border-[var(--admin-border)] hover:border-coral/50'
+                  } ${
+                    !values.operational_since
+                      ? 'text-transparent dark:text-transparent'
+                      : ''
+                  }`}
+                />
+                {!values.operational_since && (
+                  <span className="absolute inset-y-0 start-4 flex items-center pointer-events-none text-base text-muted-foreground dark:text-[var(--admin-text-subtle)]">
+                    {isArabic ? 'يوم/شهر/سنة' : 'dd/mm/yyyy'}
+                  </span>
+                )}
+              </div>
+              {errors.operational_since ? (
+                <p
+                  id="building-operational-since-error"
+                  role="alert"
+                  className="mt-1.5 text-sm text-red-500"
+                >
+                  {errors.operational_since}
+                </p>
+              ) : (
+                <p
+                  id="building-operational-since-helper"
+                  className="mt-1.5 text-sm text-muted-foreground"
+                >
+                  {t('helpers.operationalSince')}
+                </p>
+              )}
+            </div>
           </div>
         )}
         {canToggleStatus && (

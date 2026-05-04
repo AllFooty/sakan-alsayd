@@ -267,12 +267,14 @@ export async function PATCH(
     if (isAuthError(auth)) return auth;
     const { profile, supabase } = auth;
 
-    // Existence check first.
+    // Existence check first. We also pull `status` here so the activity log
+    // below can distinguish a Slice 9 undo (checked_out → active = restore)
+    // from a generic edit.
     const { data: existing, error: existErr } = await supabase
       .from('residents')
-      .select('id')
+      .select('id, status')
       .eq('id', id)
-      .maybeSingle<{ id: string }>();
+      .maybeSingle<{ id: string; status: ResidentStatus }>();
     if (existErr) {
       console.error('Resident existence-check failed:', existErr);
       return NextResponse.json({ error: 'updateFailed' }, { status: 500 });
@@ -408,6 +410,28 @@ export async function PATCH(
       ) {
         return NextResponse.json({ error: 'invalidStatus' }, { status: 400 });
       }
+      // Symmetric to the DELETE-side guard (no archive while active
+      // assignments exist): restoring a resident to 'active' requires at
+      // least one active room_assignment. Without this, the Slice 9 undo
+      // toast can leave a resident in an inconsistent state — active but
+      // unhoused — after a check-out → archive → undo cycle.
+      if (raw === 'active') {
+        const { count: activeCount, error: countErr } = await supabase
+          .from('room_assignments')
+          .select('id', { count: 'exact', head: true })
+          .eq('resident_id', id)
+          .eq('status', 'active');
+        if (countErr) {
+          console.error('Active-assignment count failed (PATCH):', countErr);
+          return NextResponse.json({ error: 'updateFailed' }, { status: 500 });
+        }
+        if ((activeCount ?? 0) === 0) {
+          return NextResponse.json(
+            { error: 'residentMustHaveAssignment' },
+            { status: 409 }
+          );
+        }
+      }
       updates.status = raw;
     }
 
@@ -461,19 +485,28 @@ export async function PATCH(
     }
 
     // Fire-and-forget activity log. Don't await — do not block response on it.
+    // A checked_out → active transition is the Slice 9 undo path; emit a
+    // distinct `resident.restored` action so the activity feed shows the
+    // restore semantic clearly instead of a generic "updated" entry.
     const changedFields = Object.keys(updates);
+    const isRestore =
+      existing.status === 'checked_out' &&
+      updates.status === 'active' &&
+      changedFields.length === 1;
     void supabase
       .from('activity_log')
       .insert({
         user_id: profile.id,
-        action: 'resident.updated',
+        action: isRestore ? 'resident.restored' : 'resident.updated',
         entity_type: 'resident',
         entity_id: id,
-        details: { changed_fields: changedFields },
+        details: isRestore
+          ? { from: existing.status, to: 'active' }
+          : { changed_fields: changedFields },
       })
       .then(({ error: logErr }) => {
         if (logErr) {
-          console.error('activity_log insert failed (resident.updated):', logErr);
+          console.error('activity_log insert failed (resident PATCH):', logErr);
         }
       });
 

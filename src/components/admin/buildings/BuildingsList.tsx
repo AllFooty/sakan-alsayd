@@ -24,7 +24,7 @@ import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
 import { useAuth } from '@/lib/auth/hooks';
 import { formatDate } from '@/lib/utils';
 
-type SortColumn = 'city_en' | 'neighborhood_en' | 'sort_order' | 'created_at' | 'is_active';
+type SortColumn = 'city_en' | 'neighborhood_en' | 'sort_order' | 'created_at' | 'updated_at' | 'is_active';
 type SortDir = 'asc' | 'desc';
 type ViewMode = 'grid' | 'table';
 
@@ -139,7 +139,7 @@ export default function BuildingsList() {
       setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortColumn(column);
-      setSortDir(column === 'created_at' ? 'desc' : 'asc');
+      setSortDir(column === 'created_at' || column === 'updated_at' ? 'desc' : 'asc');
     }
   }
 
@@ -377,7 +377,7 @@ export default function BuildingsList() {
                   />
                   <SortableHeader
                     label={t('table.updatedAt')}
-                    column="created_at"
+                    column="updated_at"
                     sortColumn={sortColumn}
                     sortDir={sortDir}
                     onSort={handleSort}

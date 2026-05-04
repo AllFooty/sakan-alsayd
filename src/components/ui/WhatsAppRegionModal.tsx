@@ -44,15 +44,36 @@ export default function WhatsAppRegionModal({
     [onClose]
   );
 
+  // iOS-safe scroll lock matching the other modals (BookingModal,
+  // MaintenanceModal, ConfirmDialog). The naïve overflow:hidden lock can
+  // leak `position:fixed` onto <body> if a stacked modal unwinds in a
+  // different order than it locked.
   useEffect(() => {
     if (!isOpen) return;
 
     document.addEventListener('keydown', handleKeyDown);
+
+    const scrollY = window.scrollY;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyWidth = document.body.style.width;
+    const prevBodyOverflow = document.body.style.overflow;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.width = prevBodyWidth;
+      document.body.style.overflow = prevBodyOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen, handleKeyDown]);
 
@@ -70,7 +91,7 @@ export default function WhatsAppRegionModal({
   if (!isOpen) return null;
 
   return (
-    <FocusLock returnFocus>
+    <FocusLock returnFocus={{ preventScroll: true }}>
     <div
       role="dialog"
       aria-modal="true"

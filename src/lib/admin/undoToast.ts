@@ -1,12 +1,18 @@
 import { toast } from 'sonner';
 
+// Return value semantics:
+//   true       → restore succeeded; helper shows restoredMessage.
+//   false      → generic failure; helper shows failedMessage.
+//   'handled'  → caller already surfaced its own toast (e.g. a specific
+//                409 error message); helper does NOT show any toast.
+export type UndoResult = boolean | 'handled';
+
 interface ShowUndoToastOpts {
   message: string;
   undoLabel: string;
   restoredMessage: string;
   failedMessage: string;
-  // Return true on success, false on failure. Throwing is treated as failure.
-  onUndo: () => Promise<boolean>;
+  onUndo: () => Promise<UndoResult>;
   durationMs?: number;
 }
 
@@ -20,8 +26,9 @@ export function showUndoToast(opts: ShowUndoToastOpts): void {
       label: opts.undoLabel,
       onClick: async () => {
         try {
-          const ok = await opts.onUndo();
-          if (ok) {
+          const result = await opts.onUndo();
+          if (result === 'handled') return;
+          if (result) {
             toast.success(opts.restoredMessage);
           } else {
             toast.error(opts.failedMessage);

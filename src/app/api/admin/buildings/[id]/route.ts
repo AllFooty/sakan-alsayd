@@ -386,7 +386,13 @@ export async function PATCH(
           return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
         }
         const parsed = new Date(t + 'T00:00:00Z');
-        if (Number.isNaN(parsed.getTime()) || parsed.getTime() > Date.now()) {
+        // Compare against end-of-today UTC, not Date.now(). A date-only
+        // field submitted in early-morning Asia/Riyadh (UTC+3) maps to
+        // midnight UTC of the same date, which can be > Date.now() while
+        // still being "today" or earlier in the user's locale.
+        const endOfTodayUtc = new Date();
+        endOfTodayUtc.setUTCHours(23, 59, 59, 999);
+        if (Number.isNaN(parsed.getTime()) || parsed.getTime() > endOfTodayUtc.getTime()) {
           return NextResponse.json({ error: 'invalidOperationalSince' }, { status: 400 });
         }
         updates.operational_since = t;

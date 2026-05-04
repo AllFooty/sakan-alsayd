@@ -5,13 +5,26 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Lock, Loader2, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { classifyAuthError } from '@/lib/errors/auth';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 const MIN_LEN = 12;
 const LETTER_RE = /[A-Za-z]/;
 const DIGIT_RE = /\d/;
 
-type ErrorKey = 'tooShort' | 'needsLetterAndDigit' | 'mismatch' | 'noSession' | 'unknown';
+// Local error keys for client-side validation + the recovery-session check.
+// Server-side errors from supabase.auth.updateUser flow through
+// classifyAuthError so we share copy with the login page.
+type ErrorKey =
+  | 'tooShort'
+  | 'needsLetterAndDigit'
+  | 'mismatch'
+  | 'noSession'
+  | 'weakPassword'
+  | 'samePassword'
+  | 'rateLimited'
+  | 'network'
+  | 'unknown';
 
 function validatePassword(pw: string): ErrorKey | null {
   if (pw.length < MIN_LEN) return 'tooShort';
@@ -41,27 +54,42 @@ function ResetPasswordForm() {
   const [hasSession, setHasSession] = useState<boolean | null>(null);
   const [errorKey, setErrorKey] = useState<ErrorKey | null>(null);
 
-  // Supabase delivers the recovery session via the URL fragment when the
-  // user clicks the email link. The auth-js client reads it on mount and
-  // emits PASSWORD_RECOVERY shortly after; we accept either an existing
-  // session OR that explicit event.
+  // A recovery flow is only authorized if the URL fragment carries
+  // type=recovery (the link Supabase emails). Without that, any existing
+  // session is just a regular admin session and must NOT be allowed to
+  // reset the password — that would let a stale tab rewrite a password
+  // without ever proving recovery-link possession.
   useEffect(() => {
     let cancelled = false;
-    supabase.auth.getSession().then(({ data }) => {
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    const isRecoveryUrl = hash.includes('type=recovery');
+
+    if (!isRecoveryUrl) {
+      setHasSession(false);
+      return;
+    }
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (cancelled) return;
-      if (data.session) setHasSession(true);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (cancelled) return;
-      if (event === 'PASSWORD_RECOVERY' || session) {
+      if (event === 'PASSWORD_RECOVERY') {
         setHasSession(true);
       }
     });
-    // Give the client a beat to surface the recovery session before we
-    // decide there isn't one.
+
+    // Fallback: the auth client may have processed the recovery hash and
+    // fired PASSWORD_RECOVERY before our subscribe call. Since we already
+    // gated on the URL hash, any resulting session here is a recovery
+    // session.
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session) setHasSession((prev) => prev ?? true);
+    });
+
+    // 5s is the slow-network ceiling; the URL hash already proved this is a
+    // recovery flow, so a longer wait can't false-positive a stale session.
     const timer = setTimeout(() => {
       setHasSession((prev) => (prev === null ? false : prev));
-    }, 1500);
+    }, 5000);
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -86,15 +114,29 @@ function ResetPasswordForm() {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
-        setErrorKey(error.message?.toLowerCase().includes('session') ? 'noSession' : 'unknown');
+        if (error.message?.toLowerCase().includes('session')) {
+          setErrorKey('noSession');
+        } else {
+          // Map the canonical Supabase error codes (weak_password,
+          // same_password, rate-limit, etc.) to the local error keys we have
+          // translations for. Falls back to 'unknown' for anything else.
+          const kind = classifyAuthError(error);
+          setErrorKey(
+            kind === 'weakPassword' ? 'weakPassword'
+              : kind === 'samePassword' ? 'samePassword'
+              : kind === 'rateLimited' ? 'rateLimited'
+              : kind === 'network' ? 'network'
+              : 'unknown'
+          );
+        }
         setLoading(false);
         return;
       }
       // Sign the user out so they have to re-login with the new password.
       await supabase.auth.signOut();
       setSubmitted(true);
-    } catch {
-      setErrorKey('unknown');
+    } catch (err) {
+      setErrorKey(classifyAuthError(err) === 'network' ? 'network' : 'unknown');
     } finally {
       setLoading(false);
     }

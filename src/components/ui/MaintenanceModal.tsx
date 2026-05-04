@@ -254,8 +254,11 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
     if (!valid) {
       try {
         if (!selectedCategory) {
-          // Category is a Controller-equivalent (button group) — no input to
-          // focus, but the FieldError + role=alert will announce.
+          // Category is a button-group (no input to focus). Move focus to
+          // the group container so screen readers re-announce the labelled
+          // group + the linked error message, and so keyboard users can
+          // Tab into the option buttons immediately.
+          document.getElementById('maintenance-category-group')?.focus();
         } else {
           setFocus('description');
         }
@@ -340,7 +343,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
   const showBack = (currentStep === 'building' && citySelected) || stepIndex > 0;
 
   const modalNode = (
-    <FocusLock returnFocus>
+    <FocusLock returnFocus={{ preventScroll: true }}>
     <div
       ref={scrimRef}
       role="dialog"
@@ -511,21 +514,25 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
 
               {/* Category */}
               <div>
-                <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2 block">
+                <label
+                  id="maintenance-category-label"
+                  className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2 block"
+                >
                   {t('steps.details.category')} *
                 </label>
                 <div
-                  role="radiogroup"
-                  aria-invalid={!!errors.category}
+                  id="maintenance-category-group"
+                  role="group"
+                  tabIndex={-1}
+                  aria-labelledby="maintenance-category-label"
                   aria-describedby={errors.category ? 'maintenance-category-error' : undefined}
-                  className="grid grid-cols-3 gap-2"
+                  className="grid grid-cols-3 gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 rounded-xl"
                 >
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat}
                       type="button"
-                      role="radio"
-                      aria-checked={selectedCategory === cat}
+                      aria-pressed={selectedCategory === cat}
                       onClick={() => setValue('category', cat, { shouldValidate: true })}
                       className={cn(
                         'p-2.5 rounded-xl border-2 text-sm font-medium transition-all',
@@ -751,6 +758,7 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
 
                 <div>
                   <PhoneInput
+                    id="maintenance-phone"
                     label={`${t('steps.info.phone')} *`}
                     {...register('requester_phone')}
                     placeholder={t('placeholders.phone')}

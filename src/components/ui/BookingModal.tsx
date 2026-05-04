@@ -356,6 +356,17 @@ export default function BookingModal({
     }
   };
 
+  // Wraps the form-step's content so the browser's native form-submit (Enter
+  // key in any input, type=submit footer button) calls the right handler.
+  const handleStepFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isLastStep) {
+      handleSubmit(onSubmit)();
+    } else {
+      handleNext();
+    }
+  };
+
   const onSubmit = async (data: BookingFormData) => {
     setSubmitStatus('loading');
     let res: Response | undefined;
@@ -493,7 +504,7 @@ export default function BookingModal({
   if (!mounted) return null;
 
   const modalNode = (
-    <FocusLock returnFocus>
+    <FocusLock returnFocus={{ preventScroll: true }}>
     <div
       ref={scrimRef}
       role="dialog"
@@ -706,7 +717,7 @@ export default function BookingModal({
             </div>
           ) : currentStep === 'personal' ? (
             /* Step 4: Personal Info */
-            <div>
+            <form id="booking-step-form" onSubmit={handleStepFormSubmit}>
               <SummaryCard />
               <div className="space-y-3.5">
                 {/* Name */}
@@ -765,7 +776,10 @@ export default function BookingModal({
 
                 {/* Occupation */}
                 <div>
-                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block">
+                  <label
+                    id="booking-occupation-label"
+                    className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block"
+                  >
                     {t('steps.personal.occupation')} *
                   </label>
                   <Controller
@@ -773,8 +787,8 @@ export default function BookingModal({
                     control={control}
                     render={({ field }) => (
                       <div
-                        role="radiogroup"
-                        aria-invalid={!!errors.occupation}
+                        role="group"
+                        aria-labelledby="booking-occupation-label"
                         aria-describedby={errors.occupation ? 'booking-occupation-error' : undefined}
                         className="grid grid-cols-2 gap-2"
                       >
@@ -782,8 +796,7 @@ export default function BookingModal({
                           <button
                             key={option}
                             type="button"
-                            role="radio"
-                            aria-checked={watchOccupation === option}
+                            aria-pressed={watchOccupation === option}
                             onClick={() => field.onChange(option)}
                             className={cn(
                               'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
@@ -804,10 +817,10 @@ export default function BookingModal({
                   />
                 </div>
               </div>
-            </div>
+            </form>
           ) : currentStep === 'contact' ? (
             /* Step 5: Contact Info */
-            <div>
+            <form id="booking-step-form" onSubmit={handleStepFormSubmit}>
               <SummaryCard />
               <div className="space-y-3">
                 <div>
@@ -837,6 +850,7 @@ export default function BookingModal({
                 </div>
                 <div>
                   <PhoneInput
+                    id="booking-phone"
                     label={`${t('steps.contact.phone')} *`}
                     {...register('phone')}
                     placeholder={t('placeholders.phone')}
@@ -873,6 +887,7 @@ export default function BookingModal({
 
                 <div>
                   <PhoneInput
+                    id="booking-emergency-phone"
                     label={`${t('steps.contact.emergencyContactPhone')} *`}
                     {...register('emergencyContactPhone')}
                     placeholder={t('placeholders.emergencyPhone')}
@@ -882,10 +897,10 @@ export default function BookingModal({
                   />
                 </div>
               </div>
-            </div>
+            </form>
           ) : currentStep === 'logistics' ? (
             /* Step 6: Logistics */
-            <div>
+            <form id="booking-step-form" onSubmit={handleStepFormSubmit}>
               <SummaryCard />
               <div className="space-y-4">
                 {/* Contract start date */}
@@ -926,16 +941,24 @@ export default function BookingModal({
 
                 {/* Transportation */}
                 <div>
-                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block">
+                  <label
+                    id="booking-transportation-label"
+                    className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block"
+                  >
                     {t('steps.logistics.transportation')} *
                   </label>
                   <Controller
                     name="withTransportation"
                     control={control}
                     render={({ field }) => (
-                      <div className="grid grid-cols-2 gap-3">
+                      <div
+                        role="group"
+                        aria-labelledby="booking-transportation-label"
+                        className="grid grid-cols-2 gap-3"
+                      >
                         <button
                           type="button"
+                          aria-pressed={watchTransportation === true}
                           onClick={() => field.onChange(true)}
                           className={cn(
                             'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors',
@@ -954,6 +977,7 @@ export default function BookingModal({
                         </button>
                         <button
                           type="button"
+                          aria-pressed={watchTransportation === false}
                           onClick={() => field.onChange(false)}
                           className={cn(
                             'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors',
@@ -975,23 +999,31 @@ export default function BookingModal({
                   />
                 </div>
               </div>
-            </div>
+            </form>
           ) : currentStep === 'additional' ? (
             /* Step 7: Additional Info */
-            <div>
+            <form id="booking-step-form" onSubmit={handleStepFormSubmit}>
               <div className="space-y-4">
                 {/* Medical issues */}
                 <div>
-                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block">
+                  <label
+                    id="booking-medical-label"
+                    className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1.5 block"
+                  >
                     {t('steps.additional.medicalIssues')}
                   </label>
                   <Controller
                     name="hasMedicalIssues"
                     control={control}
                     render={({ field }) => (
-                      <div className="grid grid-cols-2 gap-2">
+                      <div
+                        role="group"
+                        aria-labelledby="booking-medical-label"
+                        className="grid grid-cols-2 gap-2"
+                      >
                         <button
                           type="button"
+                          aria-pressed={!watchHasMedicalIssues}
                           onClick={() => field.onChange(false)}
                           className={cn(
                             'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
@@ -1004,6 +1036,7 @@ export default function BookingModal({
                         </button>
                         <button
                           type="button"
+                          aria-pressed={!!watchHasMedicalIssues}
                           onClick={() => field.onChange(true)}
                           className={cn(
                             'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
@@ -1096,7 +1129,7 @@ export default function BookingModal({
                   </div>
                 )}
               </div>
-            </div>
+            </form>
           ) : null}
         </div>
 
@@ -1105,8 +1138,8 @@ export default function BookingModal({
           <div className="px-5 py-4 border-t border-gray-100 dark:border-[var(--admin-border)] flex-shrink-0">
             {isLastStep ? (
               <button
-                type="button"
-                onClick={handleSubmit(onSubmit)}
+                type="submit"
+                form="booking-step-form"
                 disabled={submitStatus === 'loading'}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-coral text-white font-semibold rounded-xl hover:bg-coral/90 disabled:opacity-60 transition-colors shadow-lg shadow-coral/25"
               >
@@ -1121,8 +1154,8 @@ export default function BookingModal({
               </button>
             ) : (
               <button
-                type="button"
-                onClick={handleNext}
+                type="submit"
+                form="booking-step-form"
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-coral text-white font-semibold rounded-xl hover:bg-coral/90 transition-colors shadow-lg shadow-coral/25"
               >
                 <span>{t('next')}</span>

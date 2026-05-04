@@ -13,21 +13,32 @@ const intlMiddleware = createIntlMiddleware({
 // /admin/* routes that don't require an authenticated session.
 const ADMIN_PUBLIC_SUFFIXES = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
 
+// Match a public-admin suffix at the END of a path segment — i.e. exactly the
+// suffix, the suffix followed by `/`, or the suffix followed by `?`. Plain
+// `pathname.startsWith(prefix)` would also match `/ar/admin/login-bypass`,
+// silently exposing a sibling route under the same prefix to unauthenticated
+// users.
+function pathMatchesPublicSuffix(pathname: string): boolean {
+  for (const locale of locales) {
+    for (const suffix of ADMIN_PUBLIC_SUFFIXES) {
+      const full = `/${locale}${suffix}`;
+      if (pathname === full) return true;
+      if (pathname.startsWith(`${full}/`)) return true;
+      if (pathname.startsWith(`${full}?`)) return true;
+    }
+  }
+  return false;
+}
+
 function isAdminRoute(pathname: string): boolean {
   return locales.some((locale) => {
     if (!pathname.startsWith(`/${locale}/admin`)) return false;
-    return !ADMIN_PUBLIC_SUFFIXES.some((suffix) =>
-      pathname.startsWith(`/${locale}${suffix}`)
-    );
+    return !pathMatchesPublicSuffix(pathname);
   });
 }
 
 function isAdminPublicRoute(pathname: string): boolean {
-  return locales.some((locale) =>
-    ADMIN_PUBLIC_SUFFIXES.some((suffix) =>
-      pathname.startsWith(`/${locale}${suffix}`)
-    )
-  );
+  return pathMatchesPublicSuffix(pathname);
 }
 
 function getLocaleFromPath(pathname: string): string {

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
 import { formatDate } from '@/lib/utils';
+import { toast } from 'sonner';
 import EmptyState from '@/components/admin/shared/EmptyState';
 import SortableHeader, { type SortDirection } from '@/components/admin/shared/SortableHeader';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
@@ -42,7 +43,10 @@ interface BookingRequest {
   assigned_staff: { id: string; full_name: string } | null;
 }
 
-const STATUSES = ['all', 'new', 'in_review', 'pending_payment', 'pending_onboarding', 'completed', 'rejected', 'cancelled'] as const;
+// Tab order follows the booking lifecycle. `contacted` and `confirmed` are
+// legacy values still in the booking_status enum — including them here so
+// rows in those states are filterable; they're rare on the current pipeline.
+const STATUSES = ['all', 'new', 'contacted', 'in_review', 'pending_payment', 'pending_onboarding', 'confirmed', 'completed', 'rejected', 'cancelled'] as const;
 
 const BOOKING_STATUS_OPTIONS = ['new', 'in_review', 'pending_payment', 'pending_onboarding', 'completed', 'rejected', 'cancelled'] as const;
 
@@ -68,7 +72,7 @@ export default function BookingsList() {
   const pathname = usePathname();
   const searchParamsHook = useSearchParams();
 
-  const SORTABLE_FIELDS = ['created_at', 'name', 'status'] as const;
+  const SORTABLE_FIELDS = ['created_at', 'name'] as const;
   const initialSortRaw = searchParamsHook?.get('sort') ?? null;
   const initialSort = (SORTABLE_FIELDS as readonly string[]).includes(initialSortRaw ?? '')
     ? (initialSortRaw as (typeof SORTABLE_FIELDS)[number])
@@ -228,9 +232,12 @@ export default function BookingsList() {
       if (res.ok) {
         setSelectedIds(new Set());
         fetchBookings();
+      } else {
+        toast.error(t('toast.bulkUpdateFailed'));
       }
     } catch (error) {
       console.error('Bulk status change failed:', error);
+      toast.error(t('toast.bulkUpdateFailed'));
     } finally {
       setBulkLoading(false);
       setPendingBulkStatus(null);
@@ -407,13 +414,26 @@ export default function BookingsList() {
           </div>
         </div>
       ) : bookings.length === 0 ? (
-        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
-          <EmptyState
-            icon={MessageSquare}
-            title={t('empty.title')}
-            description={t('empty.description')}
-          />
-        </div>
+        (() => {
+          const filtersActive =
+            statusFilter !== 'all' ||
+            cityFilter !== 'all' ||
+            assignedToFilter !== 'all' ||
+            !!dateFrom ||
+            !!dateTo ||
+            !!searchDebounce;
+          return (
+            <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
+              <EmptyState
+                icon={MessageSquare}
+                title={filtersActive ? t('empty.filteredTitle') : t('empty.title')}
+                description={
+                  filtersActive ? t('empty.filteredDescription') : t('empty.description')
+                }
+              />
+            </div>
+          );
+        })()
       ) : (
         <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
           <div className="overflow-x-auto">
@@ -445,14 +465,9 @@ export default function BookingsList() {
                   <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.city')}
                   </th>
-                  <SortableHeader
-                    field="status"
-                    activeField={sortField}
-                    direction={sortDir}
-                    onSort={handleSort}
-                  >
+                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.status')}
-                  </SortableHeader>
+                  </th>
                   <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden xl:table-cell">
                     {t('table.assignedTo')}
                   </th>

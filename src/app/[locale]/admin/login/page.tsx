@@ -99,12 +99,12 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(t(`errors.${classifyAuthError(error)}`));
+        setError(t(`errors.${classifyAuthError(error, 'otp_send')}`));
       } else {
         setStep('otp');
       }
     } catch (err) {
-      setError(t(`errors.${classifyAuthError(err)}`));
+      setError(t(`errors.${classifyAuthError(err, 'otp_send')}`));
     } finally {
       setLoading(false);
     }
@@ -123,13 +123,13 @@ function LoginForm() {
       });
 
       if (error) {
-        setError(t(`errors.${classifyAuthError(error)}`));
+        setError(t(`errors.${classifyAuthError(error, 'otp_verify')}`));
         setLoading(false);
       } else {
         window.location.href = redirectTo;
       }
     } catch (err) {
-      setError(t(`errors.${classifyAuthError(err)}`));
+      setError(t(`errors.${classifyAuthError(err, 'otp_verify')}`));
       setLoading(false);
     }
   }
@@ -273,16 +273,14 @@ function LoginForm() {
                 {usePassword ? t('switchToOtp') : t('switchToPassword')}
               </button>
 
-              {usePassword && (
-                <p className="text-center">
-                  <a
-                    href={`/${locale}/admin/forgot-password`}
-                    className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-coral transition-colors"
-                  >
-                    {t('forgotPassword')}
-                  </a>
-                </p>
-              )}
+              <p className="text-center">
+                <a
+                  href={`/${locale}/admin/forgot-password`}
+                  className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-coral transition-colors"
+                >
+                  {t('forgotPassword')}
+                </a>
+              </p>
             </form>
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-5">

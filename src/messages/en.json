@@ -505,6 +505,9 @@
         "rateLimited": "Too many attempts. Please wait before trying again.",
         "userNotFound": "No account with this email. Contact admin.",
         "emailInvalid": "That email address looks invalid.",
+        "weakPassword": "Password is too weak. Use at least 12 characters with letters and digits.",
+        "samePassword": "New password must be different from the current one.",
+        "accountDisabled": "This account has been disabled. Contact admin.",
         "network": "Couldn't reach the server. Check your connection and try again.",
         "unknown": "Couldn't sign in. Please try again."
       }
@@ -515,7 +518,10 @@
       "emailLabel": "Email Address",
       "submit": "Send recovery link",
       "successTitle": "Check your email",
-      "successBody": "If an account exists for that email, we've sent a link to reset the password. The link expires in 1 hour."
+      "successBody": "If an account exists for that email, we've sent a link to reset the password. The link expires in 1 hour.",
+      "errors": {
+        "network": "Couldn't reach the server. Check your connection and try again."
+      }
     },
     "resetPassword": {
       "title": "Set a new password",
@@ -531,6 +537,10 @@
         "needsLetterAndDigit": "Password must contain a letter and a number.",
         "mismatch": "Passwords don't match.",
         "noSession": "Recovery link expired or invalid. Request a new one.",
+        "weakPassword": "Password is too weak. Use at least 12 characters with letters and digits.",
+        "samePassword": "New password must be different from your current one.",
+        "rateLimited": "Too many attempts. Please wait before trying again.",
+        "network": "Couldn't reach the server. Check your connection and try again.",
         "unknown": "Couldn't update password. Please try again."
       }
     },
@@ -586,8 +596,8 @@
       "welcome": "Welcome, {name}",
       "subtitle": "Here's an overview of your operations",
       "stats": {
-        "newBookings": "New Bookings",
-        "openMaintenance": "Open Maintenance",
+        "newBookings": "Bookings received",
+        "openMaintenance": "Maintenance opened",
         "totalBuildings": "Total Buildings",
         "activeResidents": "Active Residents",
         "rangeLabel": "Time range",
@@ -605,6 +615,7 @@
         "resident": {
           "created": "added a new resident",
           "updated": "updated a resident",
+          "restored": "restored a checked-out resident",
           "moved_in": "moved in a resident",
           "checked_out": "checked out a resident",
           "checked_out_assignment": "ended a room assignment"
@@ -642,9 +653,11 @@
       "filters": {
         "all": "All",
         "new": "New",
+        "contacted": "Contacted",
         "in_review": "In Review",
         "pending_payment": "Payment",
         "pending_onboarding": "Onboarding",
+        "confirmed": "Confirmed",
         "completed": "Completed",
         "rejected": "Rejected",
         "cancelled": "Cancelled",
@@ -759,13 +772,18 @@
       },
       "empty": {
         "title": "No Booking Requests",
-        "description": "Booking requests from the website contact form will appear here"
+        "description": "Booking requests from the website contact form will appear here",
+        "filteredTitle": "No bookings match your filters",
+        "filteredDescription": "Try adjusting the filters or clearing them."
       },
       "deleteConfirm": {
         "title": "Delete Booking Request",
         "description": "Are you sure you want to delete this booking request? This action cannot be undone.",
         "confirm": "Delete",
         "cancel": "Cancel"
+      },
+      "toast": {
+        "bulkUpdateFailed": "Couldn't update the selected requests. Please try again."
       }
     },
     "bulk": {
@@ -791,7 +809,8 @@
       "maintenanceCancelled": "Maintenance request cancelled",
       "residentArchived": "Resident archived",
       "restored": "Restored",
-      "failed": "Couldn't undo"
+      "failed": "Couldn't undo",
+      "residentNeedsAssignment": "Cannot restore: resident has no active room assignment. Move them in again to mark them active."
     },
     "maintenance": {
       "title": "Maintenance Requests",
@@ -926,7 +945,9 @@
       },
       "empty": {
         "title": "No Maintenance Requests",
-        "description": "Maintenance requests submitted by residents will appear here"
+        "description": "Maintenance requests submitted by residents will appear here",
+        "filteredTitle": "No maintenance requests match your filters",
+        "filteredDescription": "Try adjusting the filters or clearing them."
       },
       "rejectConfirm": {
         "description": "Are you sure you want to reject this maintenance request? The request will be marked as rejected."
@@ -936,6 +957,9 @@
         "description": "Are you sure you want to delete this maintenance request? This action cannot be undone.",
         "confirm": "Delete",
         "cancel": "Cancel"
+      },
+      "toast": {
+        "bulkUpdateFailed": "Couldn't update the selected requests. Please try again."
       }
     },
     "buildings": {
@@ -1161,7 +1185,8 @@
           "urlInvalid": "Please enter a valid URL starting with http:// or https://.",
           "numberInvalid": "Please enter a valid number.",
           "landmarkBilingual": "Both English and Arabic names are required for each landmark.",
-          "requiredMissing": "Some required fields are missing."
+          "requiredMissing": "Some required fields are missing.",
+          "operationalSinceInvalid": "Pick a valid date that isn't in the future."
         },
         "toast": {
           "created": "Building created",

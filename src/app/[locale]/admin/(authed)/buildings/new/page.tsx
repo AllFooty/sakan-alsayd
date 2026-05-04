@@ -37,5 +37,11 @@ export default function NewBuildingPage() {
     );
   }
 
-  return <BuildingForm mode="create" canToggleStatus={true} />;
+  return (
+    <BuildingForm
+      mode="create"
+      canToggleStatus={true}
+      canEditOperationalSince={true}
+    />
+  );
 }

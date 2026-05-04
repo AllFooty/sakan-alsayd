@@ -25,7 +25,7 @@
   "about": {
     "sectionTitle": "من نحن ؟",
     "description": "سكن السيد يخدم جميع المغتربات سواء كانوا من داخل المملكة أو من خارجها يقدم لهم خدمة الإسكان المخدومة - شقق مؤثثة بالكامل ومجهزة بكافة الأجهزة , تقدم العديد من الخدمات منها.",
-    "service1": "الإشراف على الساكنات وتلبية احتياجاتهم واستقبالهم",
+    "service1": "الإشراف على الساكنات وتلبية احتياجاتهن واستقبالهن",
     "service2": "نظافة المبنى ومرافقه.",
     "service3": "مرافق متعددة ( غرفة دراسة عامة , غرفة رياضة )",
     "service4": "مواصلات مجانية ( للسوبر ماركت , صيدلية , مكتبة , مجمعات تجارية )",
@@ -505,6 +505,9 @@
         "rateLimited": "تم تجاوز عدد المحاولات. يرجى الانتظار قبل المحاولة مرة أخرى.",
         "userNotFound": "لا يوجد حساب بهذا البريد الإلكتروني. تواصلي مع الإدارة.",
         "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة.",
+        "weakPassword": "كلمة المرور ضعيفة. استخدمي 12 حرفاً على الأقل تتضمن أحرفاً وأرقاماً.",
+        "samePassword": "كلمة المرور الجديدة يجب أن تختلف عن الحالية.",
+        "accountDisabled": "تم تعطيل هذا الحساب. تواصلي مع الإدارة.",
         "network": "تعذّر الاتصال بالخادم. تحققي من الإنترنت ثم جربي مجدداً.",
         "unknown": "تعذّر تسجيل الدخول. يرجى المحاولة مرة أخرى."
       }
@@ -515,7 +518,10 @@
       "emailLabel": "البريد الإلكتروني",
       "submit": "إرسال رابط الاسترداد",
       "successTitle": "تحقّقي من بريدك",
-      "successBody": "إذا كان هناك حساب بهذا البريد، فقد أرسلنا رابطاً لإعادة تعيين كلمة المرور. ينتهي الرابط خلال ساعة."
+      "successBody": "إذا كان هناك حساب بهذا البريد، فقد أرسلنا رابطاً لإعادة تعيين كلمة المرور. ينتهي الرابط خلال ساعة.",
+      "errors": {
+        "network": "تعذّر الاتصال بالخادم. تحققي من الإنترنت ثم جربي مجدداً."
+      }
     },
     "resetPassword": {
       "title": "اختاري كلمة مرور جديدة",
@@ -531,6 +537,10 @@
         "needsLetterAndDigit": "كلمة المرور يجب أن تحوي حرفاً ورقماً.",
         "mismatch": "كلمتا المرور غير متطابقتين.",
         "noSession": "انتهت صلاحية الرابط أو هو غير صحيح. اطلبي رابطاً جديداً.",
+        "weakPassword": "كلمة المرور ضعيفة. استخدمي 12 حرفاً على الأقل تتضمن أحرفاً وأرقاماً.",
+        "samePassword": "كلمة المرور الجديدة يجب أن تختلف عن الحالية.",
+        "rateLimited": "تم تجاوز عدد المحاولات. يرجى الانتظار قبل المحاولة مرة أخرى.",
+        "network": "تعذّر الاتصال بالخادم. تحققي من الإنترنت ثم جربي مجدداً.",
         "unknown": "تعذّر تحديث كلمة المرور. يرجى المحاولة مرة أخرى."
       }
     },
@@ -586,8 +596,8 @@
       "welcome": "مرحباً، {name}",
       "subtitle": "نظرة عامة على العمليات",
       "stats": {
-        "newBookings": "حجوزات جديدة",
-        "openMaintenance": "صيانة مفتوحة",
+        "newBookings": "طلبات حجز واردة",
+        "openMaintenance": "طلبات صيانة جديدة",
         "totalBuildings": "إجمالي المباني",
         "activeResidents": "ساكنات نشطات",
         "rangeLabel": "الفترة الزمنية",
@@ -603,14 +613,15 @@
       "activityActorUnknown": "النظام",
       "activityActions": {
         "resident": {
-          "created": "أضافت مقيمة جديدة",
-          "updated": "حدّثت بيانات مقيمة",
-          "moved_in": "سجّلت دخول مقيمة",
-          "checked_out": "سجّلت خروج مقيمة",
+          "created": "أضافت ساكنة جديدة",
+          "updated": "حدّثت بيانات ساكنة",
+          "restored": "أعادت تنشيط ساكنة مؤرشفة",
+          "moved_in": "سجّلت دخول ساكنة",
+          "checked_out": "سجّلت خروج ساكنة",
           "checked_out_assignment": "أنهت إسناد غرفة"
         },
         "booking": {
-          "converted_to_resident": "حوّلت طلب حجز إلى مقيمة",
+          "converted_to_resident": "حوّلت طلب حجز إلى ساكنة",
           "status_changed": "نقلت طلب حجز من «{from}» إلى «{to}»"
         },
         "maintenance": {
@@ -642,9 +653,11 @@
       "filters": {
         "all": "الكل",
         "new": "جديد",
+        "contacted": "تم التواصل",
         "in_review": "قيد المراجعة",
         "pending_payment": "الدفع",
         "pending_onboarding": "التسكين",
+        "confirmed": "مؤكد",
         "completed": "مكتمل",
         "rejected": "مرفوض",
         "cancelled": "ملغي",
@@ -683,8 +696,8 @@
           "reject": "رفض",
           "cancel": "إلغاء",
           "reopen": "إعادة فتح",
-          "convertToResident": "تحويل إلى مقيم",
-          "viewResident": "عرض المقيم"
+          "convertToResident": "تحويل إلى ساكنة",
+          "viewResident": "عرض الساكنة"
         },
         "assignAndProceed": "إسناد ومتابعة",
         "selectStaffForDept": "اختر موظف {department}"
@@ -759,13 +772,18 @@
       },
       "empty": {
         "title": "لا توجد طلبات حجز",
-        "description": "ستظهر طلبات الحجز من نموذج التواصل في الموقع هنا"
+        "description": "ستظهر طلبات الحجز من نموذج التواصل في الموقع هنا",
+        "filteredTitle": "لا توجد طلبات حجز تطابق التصفية",
+        "filteredDescription": "حاولي تعديل التصفية أو مسحها."
       },
       "deleteConfirm": {
         "title": "حذف طلب الحجز",
         "description": "هل أنت متأكد من حذف طلب الحجز هذا؟ لا يمكن التراجع عن هذا الإجراء.",
         "confirm": "حذف",
         "cancel": "إلغاء"
+      },
+      "toast": {
+        "bulkUpdateFailed": "تعذّر تحديث الطلبات المحددة. حاولي مرة أخرى."
       }
     },
     "bulk": {
@@ -789,9 +807,10 @@
       "label": "تراجع",
       "bookingCancelled": "تم إلغاء طلب الحجز",
       "maintenanceCancelled": "تم إلغاء طلب الصيانة",
-      "residentArchived": "تمت أرشفة المقيم",
+      "residentArchived": "تمت أرشفة الساكنة",
       "restored": "تم التراجع",
-      "failed": "تعذّر التراجع"
+      "failed": "تعذّر التراجع",
+      "residentNeedsAssignment": "تعذّر استعادة الساكنة: لا يوجد إسناد غرفة نشط. سجّليها في غرفة من جديد لإعادتها إلى الحالة النشطة."
     },
     "maintenance": {
       "title": "طلبات الصيانة",
@@ -926,7 +945,9 @@
       },
       "empty": {
         "title": "لا توجد طلبات صيانة",
-        "description": "ستظهر طلبات الصيانة المقدمة من الساكنات هنا"
+        "description": "ستظهر طلبات الصيانة المقدمة من الساكنات هنا",
+        "filteredTitle": "لا توجد طلبات صيانة تطابق التصفية",
+        "filteredDescription": "حاولي تعديل التصفية أو مسحها."
       },
       "rejectConfirm": {
         "description": "هل أنت متأكد من رفض طلب الصيانة هذا؟ سيتم تحديد الطلب كمرفوض."
@@ -936,6 +957,9 @@
         "description": "هل أنت متأكد من حذف طلب الصيانة هذا؟ لا يمكن التراجع عن هذا الإجراء.",
         "confirm": "حذف",
         "cancel": "إلغاء"
+      },
+      "toast": {
+        "bulkUpdateFailed": "تعذّر تحديث الطلبات المحددة. حاولي مرة أخرى."
       }
     },
     "buildings": {
@@ -996,7 +1020,7 @@
         "reactivate": "إعادة تفعيل",
         "deactivateConfirm": {
           "title": "إيقاف المبنى؟",
-          "description": "سيتم إخفاء {name} من الموقع العام ولن يقبل حجوزات جديدة. تبقى الغرف والمقيمون الحاليون كما هم، ويمكنك إعادة تفعيله في أي وقت.",
+          "description": "سيتم إخفاء {name} من الموقع العام ولن يقبل حجوزات جديدة. تبقى الغرف والساكنات الحاليات كما هن، ويمكنك إعادة تفعيله في أي وقت.",
           "cancel": "إلغاء"
         },
         "toast": {
@@ -1013,9 +1037,9 @@
         "location": "الموقع",
         "openInMaps": "فتح في خرائط جوجل",
         "noMap": "لا يوجد رابط للخريطة.",
-        "residents": "المقيمون الحاليون",
-        "activeAssignmentsHint": "المسجّلون في غرف حالياً",
-        "activeAssignmentsHidden": "صلاحيتك لا تتيح عرض بيانات الساكنين",
+        "residents": "الساكنات الحاليات",
+        "activeAssignmentsHint": "المسجّلات في غرف حالياً",
+        "activeAssignmentsHidden": "صلاحيتك لا تتيح عرض بيانات الساكنات",
         "metadata": "التفاصيل",
         "bilingualNames": "التسميات بالعربية والإنجليزية",
         "bilingual": {
@@ -1062,14 +1086,14 @@
         "summaryPercent": "نسبة الشواغر",
         "summaryPercentTooltip": "تُحتسب الغرف الخاصة كمشغولة بالكامل في نسبة الشواغر، حتى لو لم تُملأ كل الأسرّة.",
         "noOccupantAccessTitle": "تفاصيل الإشغال غير ظاهرة",
-        "noOccupantAccessDescription": "صلاحيتك تتيح عرض حالة الغرف فقط دون معرفة الساكنين فيها. لذلك تظهر حالة الغرفة فقط، وتُخفى الإجماليات وأسماء الساكنات.",
+        "noOccupantAccessDescription": "صلاحيتك تتيح عرض حالة الغرف فقط دون معرفة الساكنات فيها. لذلك تظهر حالة الغرفة فقط، وتُخفى الإجماليات وأسماء الساكنات.",
         "floorLabel": "الطابق {floor}",
         "floorUnassigned": "بدون طابق محدد",
         "floorSummary": "{vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}",
         "floorSummaryRoomsOnly": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
         "apartmentSummary": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}} · {vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}}",
         "apartmentSummaryRoomsOnly": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
-        "apartmentSummaryWithResidents": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}} · {vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}} · {residents, plural, zero {لا يوجد سكان} one {ساكن واحد} two {ساكنان} few {# سكان} many {# ساكناً} other {# ساكن}}",
+        "apartmentSummaryWithResidents": "{rooms, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}} · {vacant} شواغر / {total, plural, zero {لا توجد أسرّة} one {سرير واحد} two {سريران} few {# أسرّة} many {# سريراً} other {# سرير}} · {residents, plural, zero {لا توجد ساكنات} one {ساكنة واحدة} two {ساكنتان} few {# ساكنات} many {# ساكنة} other {# ساكنة}}",
         "apartmentUnknown": "بدون شقة محددة",
         "apartmentInactive": "غير نشطة",
         "apartmentDefaultShort": "تلقائي",
@@ -1086,7 +1110,7 @@
         "partiallyOccupied": "مشغولة جزئياً",
         "bedVacantLabel": "سرير شاغر",
         "bedOccupiedLabel": "مشغول بواسطة {name}",
-        "clickHint": "اضغط على أي غرفة لعرض ساكنيها الحاليين وسجلها.",
+        "clickHint": "اضغط على أي غرفة لعرض ساكناتها الحاليات وسجلها.",
         "emptyTitle": "لا توجد شقق بعد",
         "emptyDescription": "أضف الشقة الأولى في هذا المبنى لتبدأ بتنظيم غرفه.",
         "emptyDescriptionStaff": "لم تُضَف بعد أي شقق إلى هذا المبنى. اطلب من المسؤول الأعلى أو نائب المدير العام إعدادها.",
@@ -1161,7 +1185,8 @@
           "urlInvalid": "يرجى إدخال رابط صالح يبدأ بـ http:// أو https://.",
           "numberInvalid": "يرجى إدخال رقم صالح.",
           "landmarkBilingual": "الاسم بالعربية والإنجليزية مطلوب لكل معلم.",
-          "requiredMissing": "بعض الحقول المطلوبة مفقودة."
+          "requiredMissing": "بعض الحقول المطلوبة مفقودة.",
+          "operationalSinceInvalid": "اختاري تاريخاً صحيحاً وغير مستقبلي."
         },
         "toast": {
           "created": "تم إنشاء المبنى",
@@ -1242,7 +1267,7 @@
         "summary": "{count, plural, zero {لا توجد غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
         "clickHint": "اضغط على أي غرفة لرؤية الساكنة الحالية وسجلها.",
         "emptyTitle": "لم تُضَف غرف لهذا المبنى بعد",
-        "emptyDescription": "أضيفي أول غرفة لتبدئي بإسكان المقيمات.",
+        "emptyDescription": "أضيفي أول غرفة لتبدئي بإسكان الساكنات.",
         "emptyCta": "إضافة أول غرفة",
         "emptyFilteredTitle": "لا توجد غرف مطابقة لعوامل التصفية",
         "emptyFilteredDescription": "جرّبي مسح عوامل التصفية أو تعديل البحث.",
@@ -1286,7 +1311,7 @@
           "floor": "يُضبط تلقائياً من الشقة المختارة.",
           "capacity": "عدد الأسرّة في هذه الغرفة. القيمة الافتراضية مأخوذة من نوع الغرفة، ويمكن تعديلها للحالات غير القياسية.",
           "occupancyMode": "خاص: يتم تأجير الغرفة كاملة لعقد واحد. مشترك: يُؤجَّر كل سرير بشكل مستقل.",
-          "occupancyModeSingle": "الغرفة المفردة دائماً خاصة — لا يوجد ساكن آخر للمشاركة.",
+          "occupancyModeSingle": "الغرفة المفردة دائماً خاصة — لا توجد ساكنة أخرى للمشاركة.",
           "discountedPrice": "اختياري. يجب أن يكون أقل من السعر الشهري.",
           "statusOccupied": "استخدم خطوة إدخال الساكنة لتخصيص الغرفة. هذا الحقل يحدّث حالة العرض فقط.",
           "notes": "تظهر للموظفين فقط. حتى ٥٠٠٠ حرف."
@@ -1359,7 +1384,7 @@
         "livingRoomNo": "—",
         "bathroomsLabel": "{shared} مشتركة، {priv} خاصة",
         "roomsLabel": "{count, plural, zero {لا غرف} one {غرفة واحدة} two {غرفتان} few {# غرف} many {# غرفة} other {# غرفة}}",
-        "residentsLabel": "{count, plural, zero {لا سكان} one {ساكن واحد} two {ساكنان} few {# سكان} many {# ساكناً} other {# ساكن}}",
+        "residentsLabel": "{count, plural, zero {لا ساكنات} one {ساكنة واحدة} two {ساكنتان} few {# ساكنات} many {# ساكنة} other {# ساكنة}}",
         "rowEdit": "تعديل الشقة",
         "rowDelete": "حذف الشقة",
         "rowActions": "إجراءات",
@@ -1464,7 +1489,7 @@
         "addRoom": "إضافة غرفة",
         "roomLabel": "غرفة {number}",
         "roomUnnumbered": "غرفة بدون رقم",
-        "occupiedBy": "ساكن",
+        "occupiedBy": "ساكنة",
         "vacantShort": "متاحة",
         "unknownResident": "ساكنة غير معروفة",
         "kitchenYes": "مطبخ",
@@ -1533,9 +1558,9 @@
       }
     },
     "residents": {
-      "title": "المقيمون",
-      "subtitle": "إدارة جميع المقيمين وتعيينات غرفهم",
-      "addButton": "إضافة مقيم",
+      "title": "الساكنات",
+      "subtitle": "إدارة جميع الساكنات وتعيينات غرفهن",
+      "addButton": "إضافة ساكنة",
       "filters": {
         "search": "البحث بالاسم أو الهاتف أو البريد أو الهوية...",
         "status": "الحالة",
@@ -1574,7 +1599,7 @@
         "floorLabel": "الدور {floor}"
       },
       "detail": {
-        "backToList": "العودة إلى المقيمين",
+        "backToList": "العودة إلى الساكنات",
         "profile": "الملف الشخصي",
         "contactInfo": "معلومات التواصل",
         "emergencyContact": "جهة اتصال الطوارئ",
@@ -1612,8 +1637,8 @@
         "editButton": "تعديل",
         "archiveButton": "أرشفة",
         "archiveConfirm": {
-          "title": "أرشفة هذا المقيم؟",
-          "description": "سيتم تعليم {name} كخارج وإخفاؤه من قائمة المقيمين النشطين. يمكنك استعادته لاحقاً بتعديل حالته.",
+          "title": "أرشفة هذه الساكنة؟",
+          "description": "سيتم تعليم {name} كخارجة وإخفاؤها من قائمة الساكنات النشطات. يمكنك استعادتها لاحقاً بتعديل حالتها.",
           "confirm": "أرشفة",
           "cancel": "إلغاء"
         },
@@ -1622,23 +1647,23 @@
         "checkOutCurrentLabel": "إنهاء هذا التعيين"
       },
       "empty": {
-        "title": "لم تُسجَّل مقيمات بعد",
-        "description": "أضيفي أول مقيمة، أو ستظهر هنا تلقائياً عند تحويل حجز مكتمل.",
-        "cta": "إضافة أول مقيمة",
-        "filteredTitle": "لا توجد مقيمات تطابق الفلاتر",
+        "title": "لم تُسجَّل ساكنات بعد",
+        "description": "أضيفي أول ساكنة، أو ستظهر هنا تلقائياً عند تحويل حجز مكتمل.",
+        "cta": "إضافة أول ساكنة",
+        "filteredTitle": "لا توجد ساكنات تطابقن الفلاتر",
         "filteredDescription": "حاولي تعديل الفلاتر أو مسحها."
       },
       "toast": {
         "genericError": "حدث خطأ. الرجاء المحاولة مرة أخرى.",
-        "notFound": "المقيم غير موجود"
+        "notFound": "الساكنة غير موجودة"
       },
       "pagination": {
-        "summary": "{count, plural, zero {# مقيم} one {# مقيم} two {# مقيمَين} few {# مقيمين} many {# مقيمًا} other {# مقيم}}"
+        "summary": "{count, plural, zero {# ساكنة} one {# ساكنة} two {# ساكنتان} few {# ساكنات} many {# ساكنة} other {# ساكنة}}"
       },
       "form": {
         "title": {
-          "create": "إضافة مقيم",
-          "edit": "تعديل المقيم"
+          "create": "إضافة ساكنة",
+          "edit": "تعديل الساكنة"
         },
         "sections": {
           "personal": "المعلومات الشخصية",
@@ -1664,7 +1689,7 @@
           "email": "name@example.com",
           "national_id_or_iqama": "1XXXXXXXXX",
           "profile_image": "https://...",
-          "notes": "ملاحظات داخلية عن هذا المقيم...",
+          "notes": "ملاحظات داخلية عن هذه الساكنة...",
           "datePlaceholder": "يوم/شهر/سنة"
         },
         "validation": {
@@ -1681,16 +1706,16 @@
           "cancel": "إلغاء"
         },
         "toast": {
-          "createSuccess": "تم إضافة المقيم",
+          "createSuccess": "تم إضافة الساكنة",
           "updateSuccess": "تم حفظ التغييرات",
-          "deleteSuccess": "تم أرشفة المقيم",
+          "deleteSuccess": "تم أرشفة الساكنة",
           "requiredFields": "الرجاء تعبئة الحقول المطلوبة",
           "noChanges": "لا توجد تغييرات للحفظ",
-          "deleteConflict": "هذا المقيم لديه تعيين نشط. الرجاء تسجيل خروجه أولاً."
+          "deleteConflict": "هذه الساكنة لديها تعيين نشط. الرجاء تسجيل خروجها أولاً."
         }
       },
       "moveIn": {
-        "title": "تسكين مقيم",
+        "title": "تسكين ساكنة",
         "subtitle": "تعيين {name} إلى غرفة",
         "steps": {
           "building": "المبنى",
@@ -1723,12 +1748,12 @@
           "cancel": "إلغاء"
         },
         "toast": {
-          "success": "تم تسكين المقيم",
+          "success": "تم تسكين الساكنة",
           "error": "تعذر إكمال التسكين. الرجاء المحاولة مرة أخرى.",
           "roomFull": "هذه الغرفة ممتلئة",
-          "residentAlreadyAssigned": "هذا المقيم لديه تعيين نشط بالفعل",
-          "roomUnavailable": "هذه الغرفة تحت الصيانة أو محجوزة ولا يمكن تسكين مقيمين فيها",
-          "residentNotActive": "هذا المقيم غير نشط ولا يمكن تسكينه"
+          "residentAlreadyAssigned": "هذه الساكنة لديها تعيين نشط بالفعل",
+          "roomUnavailable": "هذه الغرفة تحت الصيانة أو محجوزة ولا يمكن تسكين ساكنات فيها",
+          "residentNotActive": "هذه الساكنة غير نشطة ولا يمكن تسكينها"
         },
         "empty": {
           "noBuildings": "لا توجد مبانٍ متاحة",
@@ -1767,21 +1792,21 @@
           "uploadError": "تعذر رفع المستند",
           "invalidFileType": "يُسمح فقط بملفات PDF أو JPG أو PNG",
           "fileTooLarge": "الملف كبير جداً (الحد الأقصى 10 ميجابايت)",
-          "tooManyDocuments": "بلغ هذا المقيم الحد الأقصى لعدد المستندات",
+          "tooManyDocuments": "بلغت هذه الساكنة الحد الأقصى لعدد المستندات",
           "openError": "تعذر فتح المستند",
           "deleteSuccess": "تم حذف المستند",
           "deleteError": "تعذر حذف المستند"
         }
       },
       "checkOut": {
-        "title": "تسجيل خروج المقيم",
+        "title": "تسجيل خروج الساكنة",
         "subtitleWithRoom": "إنهاء تعيين {name}",
         "fields": {
           "checkOutDate": "تاريخ الخروج",
           "reason": "السبب (اختياري)"
         },
         "placeholders": {
-          "reason": "لماذا يقوم هذا المقيم بتسجيل الخروج؟ ملاحظة داخلية اختيارية.",
+          "reason": "لماذا تقوم هذه الساكنة بتسجيل الخروج؟ ملاحظة داخلية اختيارية.",
           "datePlaceholder": "يوم/شهر/سنة"
         },
         "info": {
@@ -1798,7 +1823,7 @@
           "cancel": "إلغاء"
         },
         "toast": {
-          "success": "تم تسجيل خروج المقيم",
+          "success": "تم تسجيل خروج الساكنة",
           "error": "تعذر إكمال تسجيل الخروج. الرجاء المحاولة مرة أخرى."
         },
         "charCounter": "{count, number} / 1000 حرف"
@@ -1820,7 +1845,7 @@
         "vacancyPct": "نسبة الشواغر الإجمالية"
       },
       "card": {
-        "residents": "{count, plural, zero {بدون مقيمين} one {مقيم} two {مقيمان} few {مقيمين} many {مقيماً} other {مقيم}}",
+        "residents": "{count, plural, zero {بدون ساكنات} one {ساكنة} two {ساكنتان} few {ساكنات} many {ساكنة} other {ساكنة}}",
         "vacantBeds": "{count, plural, zero {بدون أسرّة شاغرة} one {سرير شاغر} two {سريران شاغران} few {أسرّة شاغرة} many {سريراً شاغراً} other {سرير شاغر}}",
         "percentEmpty": "{pct}% شاغرة",
         "heatmapAria": "{name}: {vacant} من أصل {total} سرير شاغرة"
@@ -2049,12 +2074,12 @@
           "delete": "حذف الشقق"
         },
         "residents": {
-          "list": "عرض المقيمين",
-          "create": "إنشاء سجلات مقيمين",
-          "update": "تعديل بيانات المقيمين",
-          "archive": "أرشفة مقيم (حذف ناعم عبر الحالة checked_out)",
-          "moveIn": "تسكين مقيم في غرفة",
-          "checkOut": "تسجيل خروج المقيم من غرفته",
+          "list": "عرض الساكنات",
+          "create": "إنشاء سجلات ساكنات",
+          "update": "تعديل بيانات الساكنات",
+          "archive": "أرشفة ساكنة (حذف ناعم عبر الحالة checked_out)",
+          "moveIn": "تسكين ساكنة في غرفة",
+          "checkOut": "تسجيل خروج الساكنة من غرفتها",
           "documentsUpload": "رفع عقود / مستندات",
           "documentsDownload": "تحميل العقود عبر روابط موقّعة",
           "documentsDelete": "حذف المستندات المرفوعة"

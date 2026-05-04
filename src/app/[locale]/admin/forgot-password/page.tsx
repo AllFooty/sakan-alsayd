@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Mail, Loader2, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { classifyAuthError } from '@/lib/errors/auth';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 export default function ForgotPasswordPage() {
@@ -24,21 +25,31 @@ function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // Always show the same success state regardless of API result so we
-    // don't leak whether the email exists. Errors here are intentionally
-    // swallowed; Supabase rate-limits enumeration attempts on its side.
+    setNetworkError(false);
+    // Anti-enumeration: always show the same success state when the
+    // request reached Supabase, regardless of whether the account exists.
+    // Network failures (offline, DNS, CORS) are surfaced separately —
+    // those don't leak account existence and "we sent a link" would be a
+    // lie. Supabase rate-limits enumeration attempts on its side.
     try {
       const redirectTo = `${window.location.origin}/${locale}/admin/reset-password`;
       await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
-    } catch {
-      // ignore
+      setSubmitted(true);
+    } catch (err) {
+      if (classifyAuthError(err) === 'network') {
+        setNetworkError(true);
+      } else {
+        // Reached Supabase, got a non-network error — keep the
+        // anti-enumeration property by showing success.
+        setSubmitted(true);
+      }
     } finally {
       setLoading(false);
-      setSubmitted(true);
     }
   }
 
@@ -113,6 +124,16 @@ function ForgotPasswordForm() {
                   />
                 </div>
               </div>
+
+              {networkError && (
+                <p
+                  className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-lg p-3"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  {t('errors.network')}
+                </p>
+              )}
 
               <button
                 type="submit"

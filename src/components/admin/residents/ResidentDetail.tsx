@@ -136,6 +136,15 @@ export default function ResidentDetail({ id }: Props) {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ status: priorStatus }),
             });
+            if (r.status === 409) {
+              const body = (await r.json().catch(() => null)) as
+                | { error?: string }
+                | null;
+              if (body?.error === 'residentMustHaveAssignment') {
+                toast.error(tUndo('residentNeedsAssignment'));
+                return 'handled';
+              }
+            }
             if (!r.ok) return false;
             router.push(`/${locale}/admin/residents/${id}`);
             return true;

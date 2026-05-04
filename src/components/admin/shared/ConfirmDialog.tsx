@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import FocusLock from 'react-focus-lock';
+import { useTranslations } from 'next-intl';
 import { AlertTriangle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,14 +29,32 @@ export default function ConfirmDialog({
   variant = 'danger',
   loading = false,
 }: ConfirmDialogProps) {
+  const tCommon = useTranslations('common');
+  // iOS-safe scroll lock matching BookingModal/MaintenanceModal so a stack
+  // (e.g. ConfirmDialog over an open modal) doesn't leave body pinned when
+  // the dialogs unwind. Snapshot prior styles and restore on cleanup.
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isOpen) return;
+    const scrollY = window.scrollY;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyWidth = document.body.style.width;
+    const prevBodyOverflow = document.body.style.overflow;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.width = prevBodyWidth;
+      document.body.style.overflow = prevBodyOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
 
@@ -50,7 +69,7 @@ export default function ConfirmDialog({
   if (!isOpen) return null;
 
   return (
-    <FocusLock returnFocus>
+    <FocusLock returnFocus={{ preventScroll: true }}>
     <div
       role="dialog"
       aria-modal="true"
@@ -63,7 +82,7 @@ export default function ConfirmDialog({
         <button
           onClick={onClose}
           className="absolute top-4 end-4 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--admin-surface-2)]"
-          aria-label="Close"
+          aria-label={tCommon('close')}
         >
           <X size={18} className="text-gray-500 dark:text-[var(--admin-text-muted)]" />
         </button>

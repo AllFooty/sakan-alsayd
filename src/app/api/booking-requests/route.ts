@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
+// All current values of the booking_status enum. Mirrors the union from
+// 001_schema.sql + 004_booking_pipeline.sql. Used to validate `?status=`
+// before forwarding to PostgREST, so an unknown value returns a clean 400
+// instead of a 500 + leaked enum constraint message.
+const BOOKING_STATUSES = new Set([
+  'new',
+  'contacted',
+  'confirmed',
+  'rejected',
+  'in_review',
+  'pending_payment',
+  'pending_onboarding',
+  'completed',
+  'cancelled',
+]);
+
 const MAX_SEARCH_LEN = 100;
 // Strip characters that have special meaning in PostgREST .or() / ilike filters.
 const SEARCH_STRIP_RE = /[,()*"\\]/g;
@@ -46,8 +62,14 @@ export async function GET(request: NextRequest) {
 
     // Sort: allowlist guards against arbitrary column injection. Default
     // matches the historical fixed order so callers without ?sort= are
-    // unaffected.
-    const SORTABLE = new Set(['created_at', 'name', 'status']);
+    // unaffected. `status` is intentionally NOT sortable: booking_status
+    // was extended via ALTER TYPE ADD VALUE in 004 so its declaration
+    // order is `new, contacted, confirmed, rejected, in_review,
+    // pending_payment, pending_onboarding, completed, cancelled`. Postgres
+    // sorts enums by declaration order, which interleaves rejected before
+    // in_review/completed and produces a meaningless lifecycle order.
+    // Filter tabs cover this dimension instead.
+    const SORTABLE = new Set(['created_at', 'name']);
     const rawSort = searchParams.get('sort');
     const sortColumn = rawSort && SORTABLE.has(rawSort) ? rawSort : 'created_at';
     const sortDir = searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
@@ -66,6 +88,9 @@ export async function GET(request: NextRequest) {
       .select('*, assigned_staff:staff_profiles!booking_requests_assigned_to_fkey(id, full_name)', { count: 'exact' });
 
     if (status && status !== 'all') {
+      if (!BOOKING_STATUSES.has(status)) {
+        return NextResponse.json({ error: 'invalidStatus' }, { status: 400 });
+      }
       query = query.eq('status', status);
     }
 

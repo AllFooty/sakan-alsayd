@@ -63,7 +63,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <ChevronDown className="absolute end-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground dark:text-[var(--admin-text-muted)] pointer-events-none" />
         </div>
         {error && (
-          <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-500">
+          <p
+            id={errorId}
+            role="alert"
+            aria-live="assertive"
+            className="mt-1.5 text-sm text-red-500"
+          >
             {error}
           </p>
         )}

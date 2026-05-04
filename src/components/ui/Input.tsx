@@ -44,7 +44,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-500">
+          <p
+            id={errorId}
+            role="alert"
+            aria-live="assertive"
+            className="mt-1.5 text-sm text-red-500"
+          >
             {error}
           </p>
         )}

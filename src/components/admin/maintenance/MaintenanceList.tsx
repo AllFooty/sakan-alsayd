@@ -14,6 +14,7 @@ import {
   Download,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { toast } from 'sonner';
 import StatusBadge, {
   getMaintenanceStatusVariant,
   getMaintenancePriorityVariant,
@@ -253,9 +254,12 @@ export default function MaintenanceList() {
       if (res.ok) {
         setSelectedIds(new Set());
         fetchRequests();
+      } else {
+        toast.error(t('toast.bulkUpdateFailed'));
       }
     } catch (error) {
       console.error('Bulk status change failed:', error);
+      toast.error(t('toast.bulkUpdateFailed'));
     } finally {
       setBulkLoading(false);
       setPendingBulkStatus(null);
@@ -495,13 +499,29 @@ export default function MaintenanceList() {
           </div>
         </div>
       ) : requests.length === 0 ? (
-        <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
-          <EmptyState
-            icon={Wrench}
-            title={t('empty.title')}
-            description={t('empty.description')}
-          />
-        </div>
+        (() => {
+          const filtersActive =
+            statusFilter !== 'all' ||
+            priorityFilter !== 'all' ||
+            categoryFilter !== 'all' ||
+            buildingFilter !== 'all' ||
+            assignedToFilter !== 'all' ||
+            !!dateFrom ||
+            !!dateTo ||
+            apartmentSharedFilter ||
+            !!searchDebounce;
+          return (
+            <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)]">
+              <EmptyState
+                icon={Wrench}
+                title={filtersActive ? t('empty.filteredTitle') : t('empty.title')}
+                description={
+                  filtersActive ? t('empty.filteredDescription') : t('empty.description')
+                }
+              />
+            </div>
+          );
+        })()
       ) : (
         <div className="bg-white dark:bg-[var(--admin-surface)] rounded-xl border border-gray-200 dark:border-[var(--admin-border)] overflow-hidden">
           <div className="overflow-x-auto">

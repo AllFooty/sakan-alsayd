@@ -50,6 +50,10 @@ supabase/.temp/
 CLOUDFLARE_MIGRATION_PLAN.md
 Sakan_Alsayd_Platform_Proposal*.md
 
+# local data dumps — PII (resident lists, etc). Never commit.
+/data/
+/scripts/import-residents/reports/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
