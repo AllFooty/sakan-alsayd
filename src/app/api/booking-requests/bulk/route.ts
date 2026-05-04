@@ -26,22 +26,23 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 });
     }
 
-    // Validate every row can transition to the target status. super_admin / deputy_general_manager can override.
+    // Always pre-fetch current statuses so we can log per-row from→to for
+    // the activity feed (and run the transition allowlist when relevant).
     const canOverride = profile.role === 'super_admin' || profile.role === 'deputy_general_manager';
+    const { data: current, error: fetchError } = await supabase
+      .from('booking_requests')
+      .select('id, status')
+      .in('id', ids);
+
+    if (fetchError) {
+      console.error('Bulk status precheck error:', fetchError);
+      return NextResponse.json({ error: 'Failed to validate transitions' }, { status: 500 });
+    }
+    if (!current || current.length !== ids.length) {
+      return NextResponse.json({ error: 'One or more booking requests not found' }, { status: 404 });
+    }
+
     if (!canOverride) {
-      const { data: current, error: fetchError } = await supabase
-        .from('booking_requests')
-        .select('id, status')
-        .in('id', ids);
-
-      if (fetchError) {
-        console.error('Bulk status precheck error:', fetchError);
-        return NextResponse.json({ error: 'Failed to validate transitions' }, { status: 500 });
-      }
-      if (!current || current.length !== ids.length) {
-        return NextResponse.json({ error: 'One or more booking requests not found' }, { status: 404 });
-      }
-
       const invalid = current.filter((row) => !canTransition(BOOKING_TRANSITIONS, row.status, status));
       if (invalid.length > 0) {
         return NextResponse.json(
@@ -72,6 +73,28 @@ export async function PATCH(request: NextRequest) {
       note: `[system] Bulk status change → ${status}`,
     }));
     await supabase.from('booking_request_notes').insert(notes);
+
+    // Fire-and-forget activity_log batch insert — one row per actually-
+    // changed record so the dashboard feed reflects bulk operations.
+    const activityRows = current
+      .filter((row) => row.status !== status)
+      .map((row) => ({
+        user_id: profile.id,
+        action: 'booking.status_changed',
+        entity_type: 'booking_request',
+        entity_id: row.id,
+        details: { from: row.status, to: status, bulk: true },
+      }));
+    if (activityRows.length > 0) {
+      void supabase
+        .from('activity_log')
+        .insert(activityRows)
+        .then(({ error: logErr }) => {
+          if (logErr) {
+            console.error('activity_log bulk insert failed (booking):', logErr);
+          }
+        });
+    }
 
     return NextResponse.json({ updated: data?.length || 0 });
   } catch (error) {

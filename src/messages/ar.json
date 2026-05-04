@@ -606,7 +606,11 @@
           "checked_out_assignment": "أنهت إسناد غرفة"
         },
         "booking": {
-          "converted_to_resident": "حوّلت طلب حجز إلى مقيمة"
+          "converted_to_resident": "حوّلت طلب حجز إلى مقيمة",
+          "status_changed": "نقلت طلب حجز من «{from}» إلى «{to}»"
+        },
+        "maintenance": {
+          "status_changed": "نقلت طلب صيانة من «{from}» إلى «{to}»"
         }
       }
     },

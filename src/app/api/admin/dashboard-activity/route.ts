@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server';
 import { authenticateApiRequest, isAuthError } from '@/lib/auth/api-guards';
 
 // Returns the latest activity log entries (resident lifecycle, booking
-// conversions). Booking and maintenance status transitions are not yet
-// written to activity_log — when they are, this endpoint will surface them
-// automatically.
+// conversions, booking + maintenance status transitions).
 export interface ActivityItem {
   id: string;
   action: string;
@@ -12,6 +10,7 @@ export interface ActivityItem {
   entity_id: string | null;
   actor_name: string | null;
   created_at: string;
+  details: Record<string, unknown> | null;
 }
 
 const LIMIT = 10;
@@ -26,7 +25,7 @@ export async function GET() {
   // declared in 001_schema.sql (activity_log.user_id → staff_profiles.id).
   const { data, error } = await supabase
     .from('activity_log')
-    .select('id, action, entity_type, entity_id, created_at, staff_profiles(full_name)')
+    .select('id, action, entity_type, entity_id, details, created_at, staff_profiles(full_name)')
     .order('created_at', { ascending: false })
     .limit(LIMIT);
 
@@ -49,6 +48,7 @@ export async function GET() {
       entity_id: row.entity_id,
       actor_name: actorRow?.full_name ?? null,
       created_at: row.created_at,
+      details: (row.details as Record<string, unknown> | null) ?? null,
     };
   });
 

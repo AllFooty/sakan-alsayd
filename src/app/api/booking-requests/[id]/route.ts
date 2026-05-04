@@ -110,6 +110,23 @@ export async function PATCH(
         author_id: user.id,
         note: `[system] Status changed: ${oldStatus} → ${status}`,
       });
+
+      // Fire-and-forget activity_log entry so the dashboard recent-activity
+      // feed surfaces booking transitions. Don't block the response.
+      void supabase
+        .from('activity_log')
+        .insert({
+          user_id: profile.id,
+          action: 'booking.status_changed',
+          entity_type: 'booking_request',
+          entity_id: id,
+          details: { from: oldStatus, to: status },
+        })
+        .then(({ error: logErr }) => {
+          if (logErr) {
+            console.error('activity_log insert failed (booking.status_changed):', logErr);
+          }
+        });
     }
 
     return NextResponse.json(data);

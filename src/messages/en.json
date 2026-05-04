@@ -606,7 +606,11 @@
           "checked_out_assignment": "ended a room assignment"
         },
         "booking": {
-          "converted_to_resident": "converted a booking to a resident"
+          "converted_to_resident": "converted a booking to a resident",
+          "status_changed": "moved a booking from “{from}” to “{to}”"
+        },
+        "maintenance": {
+          "status_changed": "moved a maintenance request from “{from}” to “{to}”"
         }
       }
     },

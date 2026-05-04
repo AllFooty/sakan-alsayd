@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import useSWR from 'swr';
 import { useTranslations, useLocale } from 'next-intl';
-import { UserPlus, UserMinus, UserCheck, ArrowRightCircle, RefreshCcw } from 'lucide-react';
+import { UserPlus, UserMinus, UserCheck, ArrowRightCircle, RefreshCcw, Wrench } from 'lucide-react';
 import type { ActivityItem } from '@/app/api/admin/dashboard-activity/route';
 
 const fetcher = async (url: string): Promise<{ items: ActivityItem[] }> => {
@@ -35,21 +35,26 @@ function formatRelative(iso: string, locale: string): string {
 }
 
 // Pick an icon hint for each known action. Unknown actions get a neutral
-// refresh icon so the row still renders.
-function actionIcon(action: string) {
+// refresh icon so the row still renders. Returns a rendered element rather
+// than a component so the row can stay statically analyzable.
+function actionIconElement(action: string) {
+  const props = { size: 16 };
   switch (action) {
     case 'resident.created':
     case 'resident.moved_in':
-      return UserPlus;
+      return <UserPlus {...props} />;
     case 'resident.checked_out':
     case 'resident.checked_out_assignment':
-      return UserMinus;
+      return <UserMinus {...props} />;
     case 'resident.updated':
-      return UserCheck;
+      return <UserCheck {...props} />;
     case 'booking.converted_to_resident':
-      return ArrowRightCircle;
+    case 'booking.status_changed':
+      return <ArrowRightCircle {...props} />;
+    case 'maintenance.status_changed':
+      return <Wrench {...props} />;
     default:
-      return RefreshCcw;
+      return <RefreshCcw {...props} />;
   }
 }
 
@@ -62,6 +67,8 @@ function entityHref(item: ActivityItem, locale: string): string | null {
       return `/${locale}/admin/residents/${item.entity_id}`;
     case 'booking_request':
       return `/${locale}/admin/bookings/${item.entity_id}`;
+    case 'maintenance_request':
+      return `/${locale}/admin/maintenance/${item.entity_id}`;
     default:
       return null;
   }
@@ -69,8 +76,10 @@ function entityHref(item: ActivityItem, locale: string): string | null {
 
 function ActivityRow({ item }: { item: ActivityItem }) {
   const t = useTranslations('admin.dashboard');
+  const tBookingStatus = useTranslations('admin.bookings.status');
+  const tMaintStatus = useTranslations('admin.maintenance.status');
   const locale = useLocale();
-  const Icon = actionIcon(item.action);
+  const iconEl = actionIconElement(item.action);
   const href = entityHref(item, locale);
 
   // Translation key is the dotted action (resolves through the nested
@@ -78,7 +87,19 @@ function ActivityRow({ item }: { item: ActivityItem }) {
   // un-translated future actions; fall back to the raw action string so
   // it's still visible.
   const actionKey = `activityActions.${item.action}`;
-  const actionLabel = t.has(actionKey) ? t(actionKey) : item.action;
+  let actionLabel: string;
+  if (item.action === 'booking.status_changed' || item.action === 'maintenance.status_changed') {
+    const from = (item.details?.from as string | undefined) ?? '';
+    const to = (item.details?.to as string | undefined) ?? '';
+    const tStatus = item.action === 'booking.status_changed' ? tBookingStatus : tMaintStatus;
+    const fromLabel = from && tStatus.has(from) ? tStatus(from) : from;
+    const toLabel = to && tStatus.has(to) ? tStatus(to) : to;
+    actionLabel = t.has(actionKey)
+      ? t(actionKey, { from: fromLabel, to: toLabel })
+      : `${item.action}: ${fromLabel} → ${toLabel}`;
+  } else {
+    actionLabel = t.has(actionKey) ? t(actionKey) : item.action;
+  }
 
   const actor = item.actor_name ?? t('activityActorUnknown');
   const when = formatRelative(item.created_at, locale);
@@ -86,7 +107,7 @@ function ActivityRow({ item }: { item: ActivityItem }) {
   const body = (
     <div className="flex items-start gap-3 py-3">
       <div className="w-9 h-9 rounded-full bg-coral/10 dark:bg-coral/20 text-coral flex items-center justify-center flex-shrink-0">
-        <Icon size={16} />
+        {iconEl}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-navy dark:text-[var(--admin-text)]">

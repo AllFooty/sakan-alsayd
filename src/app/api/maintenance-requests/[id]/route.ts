@@ -121,6 +121,23 @@ export async function PATCH(
         author_id: user.id,
         note: `[system] Status changed: ${oldStatus} → ${status}`,
       });
+
+      // Fire-and-forget activity_log entry for the dashboard recent-activity
+      // feed. Don't block the response.
+      void supabase
+        .from('activity_log')
+        .insert({
+          user_id: profile.id,
+          action: 'maintenance.status_changed',
+          entity_type: 'maintenance_request',
+          entity_id: id,
+          details: { from: oldStatus, to: status },
+        })
+        .then(({ error: logErr }) => {
+          if (logErr) {
+            console.error('activity_log insert failed (maintenance.status_changed):', logErr);
+          }
+        });
     }
 
     return NextResponse.json(data);
