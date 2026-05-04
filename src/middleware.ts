@@ -10,17 +10,23 @@ const intlMiddleware = createIntlMiddleware({
   localeDetection: false,
 });
 
+// /admin/* routes that don't require an authenticated session.
+const ADMIN_PUBLIC_SUFFIXES = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
+
 function isAdminRoute(pathname: string): boolean {
-  return locales.some(
-    (locale) =>
-      pathname.startsWith(`/${locale}/admin`) &&
-      !pathname.startsWith(`/${locale}/admin/login`)
-  );
+  return locales.some((locale) => {
+    if (!pathname.startsWith(`/${locale}/admin`)) return false;
+    return !ADMIN_PUBLIC_SUFFIXES.some((suffix) =>
+      pathname.startsWith(`/${locale}${suffix}`)
+    );
+  });
 }
 
-function isAdminLoginRoute(pathname: string): boolean {
+function isAdminPublicRoute(pathname: string): boolean {
   return locales.some((locale) =>
-    pathname.startsWith(`/${locale}/admin/login`)
+    ADMIN_PUBLIC_SUFFIXES.some((suffix) =>
+      pathname.startsWith(`/${locale}${suffix}`)
+    )
   );
 }
 
@@ -53,7 +59,7 @@ export default async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
-  if (isAdminLoginRoute(pathname)) {
+  if (isAdminPublicRoute(pathname)) {
     return NextResponse.next();
   }
 

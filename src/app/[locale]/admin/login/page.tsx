@@ -272,6 +272,17 @@ function LoginForm() {
               >
                 {usePassword ? t('switchToOtp') : t('switchToPassword')}
               </button>
+
+              {usePassword && (
+                <p className="text-center">
+                  <a
+                    href={`/${locale}/admin/forgot-password`}
+                    className="text-xs text-gray-500 dark:text-[var(--admin-text-muted)] hover:text-coral transition-colors"
+                  >
+                    {t('forgotPassword')}
+                  </a>
+                </p>
+              )}
             </form>
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-5">

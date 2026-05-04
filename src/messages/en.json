@@ -495,6 +495,8 @@
       "resendOtp": "Resend Code",
       "backToEmail": "Change email",
       "backToWebsite": "Back to Website",
+      "forgotPassword": "Forgot password?",
+      "backToLogin": "Back to sign in",
       "errors": {
         "unexpected": "An unexpected error occurred. Please try again.",
         "invalidCredentials": "Email or password is incorrect.",
@@ -505,6 +507,31 @@
         "emailInvalid": "That email address looks invalid.",
         "network": "Couldn't reach the server. Check your connection and try again.",
         "unknown": "Couldn't sign in. Please try again."
+      }
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send a recovery link.",
+      "emailLabel": "Email Address",
+      "submit": "Send recovery link",
+      "successTitle": "Check your email",
+      "successBody": "If an account exists for that email, we've sent a link to reset the password. The link expires in 1 hour."
+    },
+    "resetPassword": {
+      "title": "Set a new password",
+      "subtitle": "Pick a strong password — at least 12 characters with letters and numbers.",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm new password",
+      "submit": "Save new password",
+      "successTitle": "Password updated",
+      "successBody": "You can now sign in with your new password.",
+      "goToLogin": "Go to sign in",
+      "errors": {
+        "tooShort": "Password must be at least 12 characters.",
+        "needsLetterAndDigit": "Password must contain a letter and a number.",
+        "mismatch": "Passwords don't match.",
+        "noSession": "Recovery link expired or invalid. Request a new one.",
+        "unknown": "Couldn't update password. Please try again."
       }
     },
     "sidebar": {
