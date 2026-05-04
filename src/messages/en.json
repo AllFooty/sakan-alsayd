@@ -328,6 +328,10 @@
     "error": "An error occurred. Please try again.",
     "phoneHint": "Saudi mobile: 05XXXXXXXX",
     "invalidPhone": "Must be 10 digits starting with 05",
+    "errors": {
+      "required": "This field is required",
+      "invalidEmail": "Enter a valid email"
+    },
     "currency": "SAR",
     "placeholders": {
       "fullName": "Full name",
@@ -420,6 +424,10 @@
     "error": "An error occurred. Please try again.",
     "phoneHint": "Saudi mobile: 05XXXXXXXX",
     "invalidPhone": "Must be 10 digits starting with 05",
+    "errors": {
+      "required": "This field is required",
+      "tooLong": "Too long"
+    },
     "next": "Next",
     "placeholders": {
       "building": "Building",

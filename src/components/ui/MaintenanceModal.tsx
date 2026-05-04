@@ -24,6 +24,7 @@ import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvid
 import { cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { classifyError, type SubmitErrorKind } from '@/lib/errors/catalog';
+import FieldError from '@/components/admin/shared/FieldError';
 
 interface MaintenanceModalProps {
   isOpen: boolean;
@@ -86,6 +87,8 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
     reset: resetForm,
     formState: { errors },
     setValue,
+    setFocus,
+    trigger,
     watch,
   } = useForm<MaintenanceFormData>({
     resolver: zodResolver(maintenanceSchema),
@@ -244,9 +247,23 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
     }
   };
 
-  const handleDetailsNext = () => {
-    const summary = watch('description');
-    if (!selectedCategory || !summary || summary.length < 3 || summary.length > SUMMARY_MAX) return;
+  const handleDetailsNext = async () => {
+    // Validate via RHF so errors are populated and the screen reader gets a
+    // chance to announce them through the FieldError live regions.
+    const valid = await trigger(['category', 'description']);
+    if (!valid) {
+      try {
+        if (!selectedCategory) {
+          // Category is a Controller-equivalent (button group) — no input to
+          // focus, but the FieldError + role=alert will announce.
+        } else {
+          setFocus('description');
+        }
+      } catch {
+        // ignore
+      }
+      return;
+    }
     setCurrentStep('info');
   };
 
@@ -497,11 +514,18 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                 <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2 block">
                   {t('steps.details.category')} *
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div
+                  role="radiogroup"
+                  aria-invalid={!!errors.category}
+                  aria-describedby={errors.category ? 'maintenance-category-error' : undefined}
+                  className="grid grid-cols-3 gap-2"
+                >
                   {CATEGORIES.map((cat) => (
                     <button
                       key={cat}
                       type="button"
+                      role="radio"
+                      aria-checked={selectedCategory === cat}
                       onClick={() => setValue('category', cat, { shouldValidate: true })}
                       className={cn(
                         'p-2.5 rounded-xl border-2 text-sm font-medium transition-all',
@@ -514,9 +538,10 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                     </button>
                   ))}
                 </div>
-                {errors.category && (
-                  <p className="text-red-500 dark:text-red-400 text-xs mt-1">{t('steps.details.categoryPlaceholder')}</p>
-                )}
+                <FieldError
+                  id="maintenance-category-error"
+                  message={errors.category ? t('errors.required') : undefined}
+                />
               </div>
 
               {/* Summary */}
@@ -533,14 +558,27 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                   </span>
                 </div>
                 <textarea
+                  id="maintenance-description"
                   {...register('description')}
                   rows={2}
                   maxLength={SUMMARY_MAX}
                   placeholder={t('steps.details.summaryPlaceholder')}
+                  aria-invalid={!!errors.description}
+                  aria-describedby={errors.description ? 'maintenance-description-error' : undefined}
                   className={cn(
                     'w-full px-4 py-2.5 border rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral resize-none transition-colors',
                     errors.description ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                   )}
+                />
+                <FieldError
+                  id="maintenance-description-error"
+                  message={
+                    errors.description
+                      ? errors.description.message === 'tooLong'
+                        ? t('errors.tooLong')
+                        : t('errors.required')
+                      : undefined
+                  }
                 />
               </div>
 
@@ -693,12 +731,21 @@ export default function MaintenanceModal({ isOpen, onClose }: MaintenanceModalPr
                     {t('steps.info.name')} *
                   </label>
                   <input
+                    id="maintenance-requester-name"
                     {...register('requester_name')}
                     placeholder={t('placeholders.fullName')}
+                    aria-invalid={!!errors.requester_name}
+                    aria-describedby={
+                      errors.requester_name ? 'maintenance-requester-name-error' : undefined
+                    }
                     className={cn(
                       'w-full px-4 py-2.5 border rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-coral/50 focus:border-coral transition-colors',
                       errors.requester_name ? 'border-red-400' : 'border-gray-200 dark:border-[var(--admin-border)]'
                     )}
+                  />
+                  <FieldError
+                    id="maintenance-requester-name-error"
+                    message={errors.requester_name ? t('errors.required') : undefined}
                   />
                 </div>
 

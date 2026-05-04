@@ -30,6 +30,7 @@ import { usePublicBuildings } from '@/components/providers/PublicBuildingsProvid
 import { formatPrice, cn, SAUDI_PHONE_REGEX } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { classifyError, type SubmitErrorKind } from '@/lib/errors/catalog';
+import FieldError from '@/components/admin/shared/FieldError';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -127,6 +128,8 @@ export default function BookingModal({
     watch,
     control,
     setValue,
+    setFocus,
+    getFieldState,
     formState: { errors },
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
@@ -331,7 +334,21 @@ export default function BookingModal({
     const fields = FIELDS_PER_STEP[currentStep];
     if (fields) {
       const valid = await trigger(fields);
-      if (!valid) return;
+      if (!valid) {
+        // Move keyboard focus to the first invalid field so screen-reader
+        // users (and anyone tabbing) jump straight to what's wrong.
+        const firstInvalid = fields.find((f) => getFieldState(f).invalid);
+        if (firstInvalid) {
+          try {
+            setFocus(firstInvalid);
+          } catch {
+            // Controller-only fields (occupation, withTransportation) aren't
+            // registered to a DOM input; setFocus throws on those. Ignore —
+            // the inline FieldError + role=alert still announces.
+          }
+        }
+        return;
+      }
     }
     const nextIndex = stepIndex + 1;
     if (nextIndex < STEPS.length) {
@@ -702,21 +719,33 @@ export default function BookingModal({
                     autoComplete="name"
                     {...register('name')}
                     placeholder={t('placeholders.fullName')}
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? 'booking-name-error' : undefined}
                     className={inputClassName(!!errors.name)}
+                  />
+                  <FieldError
+                    id="booking-name-error"
+                    message={errors.name ? t('errors.required') : undefined}
                   />
                 </div>
 
                 {/* Date of birth */}
                 <div>
-                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
+                  <label
+                    htmlFor="booking-dob"
+                    className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block"
+                  >
                     {t('steps.personal.dateOfBirth')} *
                   </label>
                   <div className="relative">
                     <input
+                      id="booking-dob"
                       {...register('dateOfBirth')}
                       type="date"
                       lang="en"
                       max={maxDobStr}
+                      aria-invalid={!!errors.dateOfBirth}
+                      aria-describedby={errors.dateOfBirth ? 'booking-dob-error' : undefined}
                       className={cn(
                         inputClassName(!!errors.dateOfBirth),
                         !watchDateOfBirth && 'text-transparent'
@@ -728,6 +757,10 @@ export default function BookingModal({
                       </span>
                     )}
                   </div>
+                  <FieldError
+                    id="booking-dob-error"
+                    message={errors.dateOfBirth ? t('errors.required') : undefined}
+                  />
                 </div>
 
                 {/* Occupation */}
@@ -739,11 +772,18 @@ export default function BookingModal({
                     name="occupation"
                     control={control}
                     render={({ field }) => (
-                      <div className="grid grid-cols-2 gap-2">
+                      <div
+                        role="radiogroup"
+                        aria-invalid={!!errors.occupation}
+                        aria-describedby={errors.occupation ? 'booking-occupation-error' : undefined}
+                        className="grid grid-cols-2 gap-2"
+                      >
                         {OCCUPATION_OPTIONS.map((option) => (
                           <button
                             key={option}
                             type="button"
+                            role="radio"
+                            aria-checked={watchOccupation === option}
                             onClick={() => field.onChange(option)}
                             className={cn(
                               'px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all',
@@ -758,9 +798,10 @@ export default function BookingModal({
                       </div>
                     )}
                   />
-                  {errors.occupation && (
-                    <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.occupation.message}</p>
-                  )}
+                  <FieldError
+                    id="booking-occupation-error"
+                    message={errors.occupation ? t('errors.required') : undefined}
+                  />
                 </div>
               </div>
             </div>
@@ -779,7 +820,19 @@ export default function BookingModal({
                     {...register('email')}
                     type="email"
                     placeholder={t('placeholders.email')}
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? 'booking-email-error' : undefined}
                     className={inputClassName(!!errors.email)}
+                  />
+                  <FieldError
+                    id="booking-email-error"
+                    message={
+                      errors.email
+                        ? errors.email.message === 'invalid'
+                          ? t('errors.invalidEmail')
+                          : t('errors.required')
+                        : undefined
+                    }
                   />
                 </div>
                 <div>
@@ -795,13 +848,25 @@ export default function BookingModal({
 
                 <div className="pt-2 border-t border-gray-100 dark:border-[var(--admin-border)]">
                   <div>
-                    <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
+                    <label
+                      htmlFor="booking-emergency-name"
+                      className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block"
+                    >
                       {t('steps.contact.emergencyContactName')} *
                     </label>
                     <input
+                      id="booking-emergency-name"
                       {...register('emergencyContactName')}
                       placeholder={t('placeholders.emergencyName')}
+                      aria-invalid={!!errors.emergencyContactName}
+                      aria-describedby={
+                        errors.emergencyContactName ? 'booking-emergency-name-error' : undefined
+                      }
                       className={inputClassName(!!errors.emergencyContactName)}
+                    />
+                    <FieldError
+                      id="booking-emergency-name-error"
+                      message={errors.emergencyContactName ? t('errors.required') : undefined}
                     />
                   </div>
                 </div>
@@ -825,15 +890,23 @@ export default function BookingModal({
               <div className="space-y-4">
                 {/* Contract start date */}
                 <div>
-                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
+                  <label
+                    htmlFor="booking-start-date"
+                    className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block"
+                  >
                     {t('steps.logistics.contractStartDate')} *
                   </label>
                   <div className="relative">
                     <input
+                      id="booking-start-date"
                       {...register('contractStartDate')}
                       type="date"
                       lang="en"
                       min={today}
+                      aria-invalid={!!errors.contractStartDate}
+                      aria-describedby={
+                        errors.contractStartDate ? 'booking-start-date-error' : undefined
+                      }
                       className={cn(
                         inputClassName(!!errors.contractStartDate),
                         !watchContractStartDate && 'text-transparent'
@@ -845,6 +918,10 @@ export default function BookingModal({
                       </span>
                     )}
                   </div>
+                  <FieldError
+                    id="booking-start-date-error"
+                    message={errors.contractStartDate ? t('errors.required') : undefined}
+                  />
                 </div>
 
                 {/* Transportation */}
@@ -957,11 +1034,17 @@ export default function BookingModal({
 
                 {/* How did you hear */}
                 <div>
-                  <label className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block">
+                  <label
+                    htmlFor="booking-referral"
+                    className="text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-1 block"
+                  >
                     {t('steps.additional.referralSource')} *
                   </label>
                   <select
+                    id="booking-referral"
                     {...register('referralSource')}
+                    aria-invalid={!!errors.referralSource}
+                    aria-describedby={errors.referralSource ? 'booking-referral-error' : undefined}
                     className={cn(
                       inputClassName(!!errors.referralSource),
                       'appearance-none bg-white dark:bg-[var(--admin-surface)]'
@@ -977,6 +1060,10 @@ export default function BookingModal({
                       </option>
                     ))}
                   </select>
+                  <FieldError
+                    id="booking-referral-error"
+                    message={errors.referralSource ? t('errors.required') : undefined}
+                  />
                 </div>
 
                 {/* Notes */}

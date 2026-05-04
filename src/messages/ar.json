@@ -328,6 +328,10 @@
     "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
     "phoneHint": "جوال سعودي: 05XXXXXXXX",
     "invalidPhone": "يجب أن يكون 10 أرقام ويبدأ بـ 05",
+    "errors": {
+      "required": "هذا الحقل مطلوب",
+      "invalidEmail": "أدخلِ بريداً إلكترونياً صحيحاً"
+    },
     "currency": "ريال",
     "placeholders": {
       "fullName": "الاسم الكامل",
@@ -420,6 +424,10 @@
     "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
     "phoneHint": "جوال سعودي: 05XXXXXXXX",
     "invalidPhone": "يجب أن يكون 10 أرقام ويبدأ بـ 05",
+    "errors": {
+      "required": "هذا الحقل مطلوب",
+      "tooLong": "النص طويل جداً"
+    },
     "next": "التالي",
     "placeholders": {
       "building": "الفرع",
