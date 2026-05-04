@@ -40,6 +40,10 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('date_from');
     const dateTo = searchParams.get('date_to');
     const isExport = searchParams.get('export') === 'true';
+    const SORTABLE = new Set(['created_at', 'priority', 'status']);
+    const rawSort = searchParams.get('sort');
+    const sortColumn = rawSort && SORTABLE.has(rawSort) ? rawSort : 'created_at';
+    const sortDir = searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
     // `apartment_shared=1` returns only requests with no specific room
     // (shared-area issues — kitchen/hallway/AC). The apartment_id is optional
     // because the public modal lets the requester leave the apartment hint
@@ -102,7 +106,10 @@ export async function GET(request: NextRequest) {
       query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
     }
 
-    query = query.order('created_at', { ascending: false });
+    query = query.order(sortColumn, { ascending: sortDir === 'asc' });
+    if (sortColumn !== 'created_at') {
+      query = query.order('created_at', { ascending: false });
+    }
 
     if (!isExport) {
       query = query.range(offset, offset + limit - 1);

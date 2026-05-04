@@ -44,6 +44,14 @@ export async function GET(request: NextRequest) {
     const page = Math.max(safeInt(searchParams.get('page'), 1), 1);
     const offset = (page - 1) * limit;
 
+    // Sort: allowlist guards against arbitrary column injection. Default
+    // matches the historical fixed order so callers without ?sort= are
+    // unaffected.
+    const SORTABLE = new Set(['created_at', 'name', 'status']);
+    const rawSort = searchParams.get('sort');
+    const sortColumn = rawSort && SORTABLE.has(rawSort) ? rawSort : 'created_at';
+    const sortDir = searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
+
     if (
       isExport &&
       !['super_admin', 'deputy_general_manager', 'branch_manager', 'finance_manager'].includes(
@@ -81,7 +89,11 @@ export async function GET(request: NextRequest) {
       query = query.lte('created_at', `${dateTo}T23:59:59.999Z`);
     }
 
-    query = query.order('created_at', { ascending: false });
+    query = query.order(sortColumn, { ascending: sortDir === 'asc' });
+    // Stable secondary order so equal primary keys don't shuffle between pages.
+    if (sortColumn !== 'created_at') {
+      query = query.order('created_at', { ascending: false });
+    }
 
     if (!isExport) {
       query = query.range(offset, offset + limit - 1);

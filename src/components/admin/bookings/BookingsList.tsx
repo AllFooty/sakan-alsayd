@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import {
   Search,
@@ -16,6 +16,7 @@ import {
 import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/StatusBadge';
 import { formatDate } from '@/lib/utils';
 import EmptyState from '@/components/admin/shared/EmptyState';
+import SortableHeader, { type SortDirection } from '@/components/admin/shared/SortableHeader';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
@@ -64,6 +65,18 @@ export default function BookingsList() {
   const PrevIcon = isArabic ? ChevronRight : ChevronLeft;
   const NextIcon = isArabic ? ChevronLeft : ChevronRight;
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParamsHook = useSearchParams();
+
+  const SORTABLE_FIELDS = ['created_at', 'name', 'status'] as const;
+  const initialSortRaw = searchParamsHook?.get('sort') ?? null;
+  const initialSort = (SORTABLE_FIELDS as readonly string[]).includes(initialSortRaw ?? '')
+    ? (initialSortRaw as (typeof SORTABLE_FIELDS)[number])
+    : 'created_at';
+  const initialDir: SortDirection = searchParamsHook?.get('dir') === 'asc' ? 'asc' : 'desc';
+
+  const [sortField, setSortField] = useState<(typeof SORTABLE_FIELDS)[number]>(initialSort);
+  const [sortDir, setSortDir] = useState<SortDirection>(initialDir);
 
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,6 +130,10 @@ export default function BookingsList() {
       if (assignedToFilter !== 'all') params.set('assigned_to', assignedToFilter);
       if (dateFrom) params.set('date_from', dateFrom);
       if (dateTo) params.set('date_to', dateTo);
+      if (sortField !== 'created_at' || sortDir !== 'desc') {
+        params.set('sort', sortField);
+        params.set('dir', sortDir);
+      }
 
       const res = await fetch(`/api/booking-requests?${params}`);
       if (!res.ok) throw new Error('Failed to fetch');
@@ -128,7 +145,7 @@ export default function BookingsList() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, searchDebounce, cityFilter, assignedToFilter, dateFrom, dateTo]);
+  }, [page, statusFilter, searchDebounce, cityFilter, assignedToFilter, dateFrom, dateTo, sortField, sortDir]);
 
   useEffect(() => {
     fetchBookings();
@@ -138,7 +155,35 @@ export default function BookingsList() {
   useEffect(() => {
     setPage(1);
     setSelectedIds(new Set());
-  }, [statusFilter, searchDebounce, cityFilter, assignedToFilter, dateFrom, dateTo]);
+  }, [statusFilter, searchDebounce, cityFilter, assignedToFilter, dateFrom, dateTo, sortField, sortDir]);
+
+  // Mirror sort state into the URL so refresh + share-link preserve order.
+  // Strip params when at the default (created_at desc) to keep URLs clean.
+  useEffect(() => {
+    if (!pathname) return;
+    const params = new URLSearchParams(searchParamsHook?.toString() || '');
+    if (sortField === 'created_at' && sortDir === 'desc') {
+      params.delete('sort');
+      params.delete('dir');
+    } else {
+      params.set('sort', sortField);
+      params.set('dir', sortDir);
+    }
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortField, sortDir]);
+
+  const handleSort = (field: string) => {
+    if (!(SORTABLE_FIELDS as readonly string[]).includes(field)) return;
+    const f = field as (typeof SORTABLE_FIELDS)[number];
+    if (f === sortField) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(f);
+      setSortDir('desc');
+    }
+  };
 
   // Clear selection when page changes
   useEffect(() => {
@@ -383,9 +428,14 @@ export default function BookingsList() {
                       className="rounded border-gray-300 dark:border-[var(--admin-border)] text-coral focus:ring-coral/50"
                     />
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
+                  <SortableHeader
+                    field="name"
+                    activeField={sortField}
+                    direction={sortDir}
+                    onSort={handleSort}
+                  >
                     {t('table.name')}
-                  </th>
+                  </SortableHeader>
                   <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden md:table-cell">
                     {t('table.email')}
                   </th>
@@ -395,15 +445,26 @@ export default function BookingsList() {
                   <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.city')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
+                  <SortableHeader
+                    field="status"
+                    activeField={sortField}
+                    direction={sortDir}
+                    onSort={handleSort}
+                  >
                     {t('table.status')}
-                  </th>
+                  </SortableHeader>
                   <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden xl:table-cell">
                     {t('table.assignedTo')}
                   </th>
-                  <th className="text-start px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)] hidden sm:table-cell">
+                  <SortableHeader
+                    field="created_at"
+                    activeField={sortField}
+                    direction={sortDir}
+                    onSort={handleSort}
+                    className="hidden sm:table-cell"
+                  >
                     {t('table.date')}
-                  </th>
+                  </SortableHeader>
                   <th className="text-end px-4 py-3 font-medium text-gray-500 dark:text-[var(--admin-text-muted)]">
                     {t('table.actions')}
                   </th>
