@@ -18,6 +18,7 @@ import {
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import FieldError from '@/components/admin/shared/FieldError';
 import { cn } from '@/lib/utils';
 import type { ResidentRow, ResidentStatus } from '@/lib/residents/types';
 
@@ -345,13 +346,16 @@ export default function ResidentForm({
           />
           {/* Date of birth — overlay pattern (see project memory) */}
           <div className="w-full">
-            <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
+            <label htmlFor="resident-date-of-birth" className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
               {t('form.fields.date_of_birth')}
             </label>
             <div className="relative">
               <input
+                id="resident-date-of-birth"
                 type="date"
                 lang="en"
+                aria-invalid={errors.date_of_birth ? true : undefined}
+                aria-describedby={errors.date_of_birth ? 'resident-date-of-birth-error' : undefined}
                 {...register('date_of_birth')}
                 className={cn(
                   'block w-full rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] px-3 py-2 text-sm text-navy dark:text-[var(--admin-text)] shadow-sm transition-colors focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral disabled:cursor-not-allowed disabled:opacity-50',
@@ -365,11 +369,7 @@ export default function ResidentForm({
                 </span>
               )}
             </div>
-            {errors.date_of_birth?.message && (
-              <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">
-                {errors.date_of_birth.message}
-              </p>
-            )}
+            <FieldError id="resident-date-of-birth-error" message={errors.date_of_birth?.message} />
           </div>
           <Input
             label={t('form.fields.university_or_workplace')}
@@ -416,10 +416,13 @@ export default function ResidentForm({
         <div className="space-y-4">
           {mode === 'edit' && (
             <div className="w-full max-w-xs">
-              <label className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
+              <label htmlFor="resident-status" className="block text-sm font-medium text-navy dark:text-[var(--admin-text)] mb-2">
                 {t('form.fields.status')}
               </label>
               <select
+                id="resident-status"
+                aria-invalid={errors.status ? true : undefined}
+                aria-describedby={errors.status ? 'resident-status-error' : undefined}
                 {...register('status')}
                 className={cn(
                   'block w-full rounded-lg border border-gray-200 dark:border-[var(--admin-border)] bg-white dark:bg-[var(--admin-surface)] px-3 py-2 text-sm text-navy dark:text-[var(--admin-text)] shadow-sm transition-colors focus:border-coral focus:outline-none focus:ring-1 focus:ring-coral',
@@ -433,11 +436,7 @@ export default function ResidentForm({
                   </option>
                 ))}
               </select>
-              {errors.status?.message && (
-                <p className="mt-1.5 text-sm text-red-500 dark:text-red-400">
-                  {errors.status.message}
-                </p>
-              )}
+              <FieldError id="resident-status-error" message={errors.status?.message} />
             </div>
           )}
           <Textarea

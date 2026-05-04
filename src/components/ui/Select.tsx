@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, type SelectHTMLAttributes } from 'react';
+import { forwardRef, useId, type SelectHTMLAttributes } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +18,9 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, options, placeholder, id, ...props }, ref) => {
-    const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const reactId = useId();
+    const selectId = id || label?.toLowerCase().replace(/\s+/g, '-') || reactId;
+    const errorId = `${selectId}-error`;
 
     return (
       <div className="w-full">
@@ -34,6 +36,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             id={selectId}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               'w-full px-4 py-3 rounded-xl border bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] appearance-none',
               'focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent',
@@ -59,7 +63,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <ChevronDown className="absolute end-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground dark:text-[var(--admin-text-muted)] pointer-events-none" />
         </div>
         {error && (
-          <p className="mt-1.5 text-sm text-red-500">{error}</p>
+          <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-500">
+            {error}
+          </p>
         )}
       </div>
     );

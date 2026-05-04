@@ -10,13 +10,13 @@ import {
   Loader2,
   Plus,
   Trash2,
-  AlertCircle,
   DoorOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import FieldError from '@/components/admin/shared/FieldError';
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const URL_RE = /^https?:\/\/.+/i;
@@ -514,12 +514,11 @@ export default function BuildingForm({
                     dir="rtl"
                   />
                 </div>
-                {errors[`landmark-${i}`] && (
-                  <p className="flex items-center gap-1 text-sm text-red-500 dark:text-red-400">
-                    <AlertCircle size={12} />
-                    {errors[`landmark-${i}`]}
-                  </p>
-                )}
+                <FieldError
+                  id={`landmark-${i}-error`}
+                  message={errors[`landmark-${i}`]}
+                  withIcon
+                />
               </li>
             ))}
           </ul>

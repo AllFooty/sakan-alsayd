@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, type TextareaHTMLAttributes } from 'react';
+import { forwardRef, useId, type TextareaHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -11,7 +11,11 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, helperText, id, ...props }, ref) => {
-    const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const reactId = useId();
+    const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-') || reactId;
+    const errorId = `${textareaId}-error`;
+    const helperId = `${textareaId}-helper`;
+    const describedBy = error ? errorId : helperText ? helperId : undefined;
 
     return (
       <div className="w-full">
@@ -26,6 +30,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           id={textareaId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           className={cn(
             'w-full px-4 py-3 rounded-xl border bg-white dark:bg-[var(--admin-surface)] text-navy dark:text-[var(--admin-text)] placeholder:text-muted-foreground dark:placeholder:text-[var(--admin-text-subtle)]',
             'focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent',
@@ -38,10 +44,14 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {error && (
-          <p className="mt-1.5 text-sm text-red-500">{error}</p>
+          <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-500">
+            {error}
+          </p>
         )}
         {helperText && !error && (
-          <p className="mt-1.5 text-sm text-muted-foreground">{helperText}</p>
+          <p id={helperId} className="mt-1.5 text-sm text-muted-foreground">
+            {helperText}
+          </p>
         )}
       </div>
     );
