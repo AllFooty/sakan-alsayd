@@ -41,6 +41,7 @@ import ResidentDocumentsManager from '@/components/admin/residents/ResidentDocum
 import { useAuth } from '@/lib/auth/hooks';
 import { cn, formatDate } from '@/lib/utils';
 import { isAutoApartmentNumber } from '@/lib/apartments/auto-name';
+import { showUndoToast } from '@/lib/admin/undoToast';
 import type {
   ResidentDetailPayload,
   ResidentStatus,
@@ -84,6 +85,7 @@ interface Props {
 
 export default function ResidentDetail({ id }: Props) {
   const t = useTranslations('admin.residents');
+  const tUndo = useTranslations('admin.undo');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const router = useRouter();
@@ -108,6 +110,7 @@ export default function ResidentDetail({ id }: Props) {
 
   async function handleArchive() {
     setArchiving(true);
+    const priorStatus = resident?.status;
     try {
       const res = await fetch(`/api/admin/residents/${id}`, {
         method: 'DELETE',
@@ -118,8 +121,29 @@ export default function ResidentDetail({ id }: Props) {
         return;
       }
       if (!res.ok) throw new Error('Failed');
-      toast.success(t('form.toast.deleteSuccess'));
       router.push(`/${locale}/admin/residents`);
+      // Show undo toast after navigation. Sonner is mounted in AdminShell
+      // so the toast persists across the route change.
+      if (priorStatus && priorStatus !== 'checked_out') {
+        showUndoToast({
+          message: tUndo('residentArchived'),
+          undoLabel: tUndo('label'),
+          restoredMessage: tUndo('restored'),
+          failedMessage: tUndo('failed'),
+          onUndo: async () => {
+            const r = await fetch(`/api/admin/residents/${id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: priorStatus }),
+            });
+            if (!r.ok) return false;
+            router.push(`/${locale}/admin/residents/${id}`);
+            return true;
+          },
+        });
+      } else {
+        toast.success(t('form.toast.deleteSuccess'));
+      }
     } catch (err) {
       console.error('Failed to archive resident:', err);
       toast.error(t('toast.genericError'));

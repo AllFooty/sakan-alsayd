@@ -31,6 +31,7 @@ import StatusBadge, { getBookingStatusVariant } from '@/components/admin/shared/
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import BookingPipelineStepper, { getDepartmentForStatus, getRoleForHandoff } from './BookingPipelineStepper';
 import { toWhatsAppUrl, formatDate } from '@/lib/utils';
+import { showUndoToast } from '@/lib/admin/undoToast';
 
 interface StaffMember {
   id: string;
@@ -91,6 +92,7 @@ const ACTION_LABELS: Record<string, string> = {
 
 export default function BookingDetail({ bookingId }: { bookingId: string }) {
   const t = useTranslations('admin.bookings');
+  const tUndo = useTranslations('admin.undo');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const router = useRouter();
@@ -205,9 +207,31 @@ export default function BookingDetail({ bookingId }: { bookingId: string }) {
     setConfirmAction(null);
     updateBooking('rejected');
   };
-  const handleCancel = () => {
+  const handleCancel = async () => {
     setConfirmAction(null);
-    updateBooking('cancelled');
+    const priorStatus = booking?.status;
+    const priorAssignedTo = booking?.assigned_to ?? null;
+    await updateBooking('cancelled');
+    if (!priorStatus || priorStatus === 'cancelled') return;
+    showUndoToast({
+      message: tUndo('bookingCancelled'),
+      undoLabel: tUndo('label'),
+      restoredMessage: tUndo('restored'),
+      failedMessage: tUndo('failed'),
+      onUndo: async () => {
+        const res = await fetch(`/api/booking-requests/${bookingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: priorStatus, assigned_to: priorAssignedTo }),
+        });
+        if (!res.ok) return false;
+        const updated = await res.json();
+        setBooking(updated);
+        const notesRes = await fetch(`/api/booking-requests/${bookingId}/notes`);
+        if (notesRes.ok) setNotes(await notesRes.json());
+        return true;
+      },
+    });
   };
   const handleReopen = () => updateBooking('new', null);
 

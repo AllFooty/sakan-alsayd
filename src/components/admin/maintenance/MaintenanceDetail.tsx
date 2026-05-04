@@ -31,6 +31,7 @@ import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import MaintenancePipelineStepper from './MaintenancePipelineStepper';
 import { toWhatsAppUrl, formatDate } from '@/lib/utils';
 import { isAutoApartmentNumber } from '@/lib/apartments/auto-name';
+import { showUndoToast } from '@/lib/admin/undoToast';
 
 interface StaffMember {
   id: string;
@@ -78,6 +79,7 @@ const MAINTENANCE_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
 export default function MaintenanceDetail({ requestId }: { requestId: string }) {
   const t = useTranslations('admin.maintenance');
+  const tUndo = useTranslations('admin.undo');
   const locale = useLocale();
   const isArabic = locale === 'ar';
   const router = useRouter();
@@ -261,9 +263,31 @@ export default function MaintenanceDetail({ requestId }: { requestId: string }) 
     setShowRejectConfirm(false);
     updateRequest({ status: 'rejected' });
   };
-  const handleCancel = () => {
+  const handleCancel = async () => {
     setShowCancelConfirm(false);
-    updateRequest({ status: 'cancelled' });
+    const priorStatus = request?.status;
+    const priorAssignedTo = request?.assigned_to ?? null;
+    await updateRequest({ status: 'cancelled' });
+    if (!priorStatus || priorStatus === 'cancelled') return;
+    showUndoToast({
+      message: tUndo('maintenanceCancelled'),
+      undoLabel: tUndo('label'),
+      restoredMessage: tUndo('restored'),
+      failedMessage: tUndo('failed'),
+      onUndo: async () => {
+        const res = await fetch(`/api/maintenance-requests/${requestId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: priorStatus, assigned_to: priorAssignedTo }),
+        });
+        if (!res.ok) return false;
+        const updated = await res.json();
+        setRequest(updated);
+        const notesRes = await fetch(`/api/maintenance-requests/${requestId}/notes`);
+        if (notesRes.ok) setNotes(await notesRes.json());
+        return true;
+      },
+    });
   };
   const handleReopen = () => updateRequest({ status: 'submitted', assigned_to: null });
 

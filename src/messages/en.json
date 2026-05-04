@@ -742,6 +742,14 @@
         "cancel": "Cancel"
       }
     },
+    "undo": {
+      "label": "Undo",
+      "bookingCancelled": "Booking cancelled",
+      "maintenanceCancelled": "Maintenance request cancelled",
+      "residentArchived": "Resident archived",
+      "restored": "Restored",
+      "failed": "Couldn't undo"
+    },
     "maintenance": {
       "title": "Maintenance Requests",
       "subtitle": "Manage and track all maintenance requests",

@@ -742,6 +742,14 @@
         "cancel": "إلغاء"
       }
     },
+    "undo": {
+      "label": "تراجع",
+      "bookingCancelled": "تم إلغاء طلب الحجز",
+      "maintenanceCancelled": "تم إلغاء طلب الصيانة",
+      "residentArchived": "تمت أرشفة المقيم",
+      "restored": "تم التراجع",
+      "failed": "تعذّر التراجع"
+    },
     "maintenance": {
       "title": "طلبات الصيانة",
       "subtitle": "إدارة ومتابعة جميع طلبات الصيانة",
