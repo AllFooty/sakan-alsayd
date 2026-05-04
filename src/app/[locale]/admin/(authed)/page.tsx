@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import DashboardStatsClient, {
   type DashboardStats,
 } from '@/components/admin/dashboard/DashboardStatsClient';
+import RecentActivityList from '@/components/admin/dashboard/RecentActivityList';
 
 export default async function AdminDashboard({
   params,
@@ -42,7 +43,7 @@ export default async function AdminDashboard({
         <h2 className="text-lg font-semibold text-navy dark:text-[var(--admin-text)] mb-4">
           {t('recentActivity')}
         </h2>
-        <p className="text-gray-400 dark:text-[var(--admin-text-subtle)] text-sm">{t('noActivity')}</p>
+        <RecentActivityList />
       </div>
     </div>
   );

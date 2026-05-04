@@ -558,7 +558,22 @@
       },
       "recentActivity": "Recent Activity",
       "noActivity": "No recent activity to show",
-      "statsError": "Could not load dashboard stats"
+      "statsError": "Could not load dashboard stats",
+      "activityError": "Couldn't load activity",
+      "activityLoading": "Loading...",
+      "activityActorUnknown": "System",
+      "activityActions": {
+        "resident": {
+          "created": "added a new resident",
+          "updated": "updated a resident",
+          "moved_in": "moved in a resident",
+          "checked_out": "checked out a resident",
+          "checked_out_assignment": "ended a room assignment"
+        },
+        "booking": {
+          "converted_to_resident": "converted a booking to a resident"
+        }
+      }
     },
     "comingSoon": {
       "title": "Coming Soon",

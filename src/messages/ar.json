@@ -558,7 +558,22 @@
       },
       "recentActivity": "آخر النشاطات",
       "noActivity": "لا توجد نشاطات حديثة",
-      "statsError": "تعذر تحميل الإحصائيات"
+      "statsError": "تعذر تحميل الإحصائيات",
+      "activityError": "تعذر تحميل النشاطات",
+      "activityLoading": "جاري التحميل...",
+      "activityActorUnknown": "النظام",
+      "activityActions": {
+        "resident": {
+          "created": "أضافت مقيمة جديدة",
+          "updated": "حدّثت بيانات مقيمة",
+          "moved_in": "سجّلت دخول مقيمة",
+          "checked_out": "سجّلت خروج مقيمة",
+          "checked_out_assignment": "أنهت إسناد غرفة"
+        },
+        "booking": {
+          "converted_to_resident": "حوّلت طلب حجز إلى مقيمة"
+        }
+      }
     },
     "comingSoon": {
       "title": "قريباً",
