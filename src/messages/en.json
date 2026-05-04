@@ -701,7 +701,14 @@
       "clear": "Clear",
       "confirmDelete": "Are you sure you want to delete {count} items?",
       "bulkUpdateSuccess": "Updated {count} items",
-      "bulkDeleteSuccess": "Deleted {count} items"
+      "bulkDeleteSuccess": "Deleted {count} items",
+      "confirmStatusChange": {
+        "title": "Confirm status change",
+        "bookingsDescription": "Change status of {count, plural, one {# booking} other {# bookings}} to “{status}”?",
+        "maintenanceDescription": "Change status of {count, plural, one {# maintenance request} other {# maintenance requests}} to “{status}”?",
+        "confirm": "Change status",
+        "cancel": "Cancel"
+      }
     },
     "maintenance": {
       "title": "Maintenance Requests",

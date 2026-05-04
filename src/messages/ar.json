@@ -701,7 +701,14 @@
       "clear": "مسح",
       "confirmDelete": "هل أنت متأكد من حذف {count} عنصر؟",
       "bulkUpdateSuccess": "تم تحديث {count} عنصر",
-      "bulkDeleteSuccess": "تم حذف {count} عنصر"
+      "bulkDeleteSuccess": "تم حذف {count} عنصر",
+      "confirmStatusChange": {
+        "title": "تأكيد تغيير الحالة",
+        "bookingsDescription": "تغيير حالة {count, plural, one {طلب حجز واحد} two {طلبَي حجز} few {# طلبات حجز} many {# طلب حجز} other {# طلب حجز}} إلى «{status}»؟",
+        "maintenanceDescription": "تغيير حالة {count, plural, one {طلب صيانة واحد} two {طلبَي صيانة} few {# طلبات صيانة} many {# طلب صيانة} other {# طلب صيانة}} إلى «{status}»؟",
+        "confirm": "تأكيد التغيير",
+        "cancel": "إلغاء"
+      }
     },
     "maintenance": {
       "title": "طلبات الصيانة",

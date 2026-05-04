@@ -20,6 +20,7 @@ import StatusBadge, {
 } from '@/components/admin/shared/StatusBadge';
 import EmptyState from '@/components/admin/shared/EmptyState';
 import BulkActionBar from '@/components/admin/shared/BulkActionBar';
+import ConfirmDialog from '@/components/admin/shared/ConfirmDialog';
 import AdvancedFilters from '@/components/admin/shared/AdvancedFilters';
 import { generateCsv, downloadCsv } from '@/lib/export';
 
@@ -84,6 +85,7 @@ export default function MaintenanceList() {
   const [showNewMaintenance, setShowNewMaintenance] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [pendingBulkStatus, setPendingBulkStatus] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [buildingFilter, setBuildingFilter] = useState<string>('all');
   const [assignedToFilter, setAssignedToFilter] = useState<string>('all');
@@ -189,8 +191,14 @@ export default function MaintenanceList() {
     });
   };
 
-  const handleBulkStatusChange = async (status: string) => {
+  const handleBulkStatusChange = (status: string) => {
     if (selectedIds.size === 0) return;
+    setPendingBulkStatus(status);
+  };
+
+  const confirmBulkStatusChange = async () => {
+    const status = pendingBulkStatus;
+    if (!status || selectedIds.size === 0) return;
     setBulkLoading(true);
     try {
       const res = await fetch('/api/maintenance-requests/bulk', {
@@ -206,6 +214,7 @@ export default function MaintenanceList() {
       console.error('Bulk status change failed:', error);
     } finally {
       setBulkLoading(false);
+      setPendingBulkStatus(null);
     }
   };
 
@@ -602,6 +611,21 @@ export default function MaintenanceList() {
           value: s,
           label: t(`status.${s}`),
         }))}
+        loading={bulkLoading}
+      />
+
+      <ConfirmDialog
+        isOpen={pendingBulkStatus !== null}
+        onClose={() => setPendingBulkStatus(null)}
+        onConfirm={confirmBulkStatusChange}
+        title={tb('confirmStatusChange.title')}
+        description={tb('confirmStatusChange.maintenanceDescription', {
+          count: selectedIds.size,
+          status: pendingBulkStatus ? t(`status.${pendingBulkStatus}`) : '',
+        })}
+        confirmLabel={tb('confirmStatusChange.confirm')}
+        cancelLabel={tb('confirmStatusChange.cancel')}
+        variant="warning"
         loading={bulkLoading}
       />
 
